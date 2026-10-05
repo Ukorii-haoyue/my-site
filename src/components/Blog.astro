@@ -53,7 +53,7 @@ import "../styles/blog.css";
         const num = String(index + 1).padStart(2, "0");
         const base = import.meta.env.BASE_URL;
         return `
-          <a class="blog-row" href="${base}blog/${post.id}/">
+          <a class="blog-row" href="${base}/blog/${post.id}/">
             <span class="blog-number">${num}</span>
             <div class="blog-row-info">
               <h3>${post.title}</h3>

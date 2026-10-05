@@ -51,7 +51,7 @@ import "../styles/films-carousel.css";
 
       track.innerHTML = films.map((film, index) => `
         <div class="carousel-item" data-index="${index}" data-title="${film.title}" data-id="${film.id}">
-          <a class="card-frame" href="${base}film-records/${film.id}/">
+          <a class="card-frame" href="${base}/film-records/${film.id}/">
             ${film.image_url
               ? `<img src="${film.image_url}" alt="${film.title}" class="card-img" />`
               : `<div class="card-empty"><span>${film.title}</span></div>`}
@@ -65,7 +65,7 @@ import "../styles/films-carousel.css";
 
       pagination.innerHTML = films.map((_, index) =>
         `<button class="page-nav-btn" data-index="${index}">${String(index + 1).padStart(2, "0")}</button>`
-      ).join("") + `<a href="${base}film-records/" class="film-all-link">all →</a>`;
+      ).join("") + `<a href="${base}/film-records/" class="film-all-link">all →</a>`;
 
       initCarousel(track, container);
     } catch (e) {
