@@ -12,6 +12,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+preview.log
 
 # environment variables
 .env
@@ -22,3 +23,16 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# preview cache
+.preview/
+
+# backup copies (副本)
+*- 副本/
+*- 副本
+
+# vscode
+.vscode/
+
+# desktop.ini
+desktop.ini
