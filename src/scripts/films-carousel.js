@@ -1,43 +1,33 @@
 // src/scripts/films-carousel.js
 
+let _wheelBound = false;
+
 function initFilmsCarousel() {
     const track = document.getElementById("carouselTrack");
-    const carouselContainer = document.querySelector(".carousel-container");
-
-    if (!track || !carouselContainer) return;
+    const container = document.querySelector(".carousel-container");
+    if (!track || !container) return;
 
     const items = Array.from(track.getElementsByClassName("carousel-item"));
     if (!items.length) return;
 
-    const buttons = Array.from(
-        document.querySelectorAll(".page-nav-btn:not(.film-all-link)")
-    );
-
+    const buttons = Array.from(document.querySelectorAll(".page-nav-btn"));
     const titleDisplay = document.getElementById("carouselActiveTitle");
 
     let currentIndex = Math.floor(items.length / 2);
     let isMouseInside = false;
     let isThrottled = false;
 
-    function updateCarousel() {
+    function render() {
         items.forEach((item, index) => {
             const offset = index - currentIndex;
-
             if (offset === 0) {
-                item.style.transform = "translate3d(0, 0, 0) rotate(0deg) scale(1.2)";
-                item.style.zIndex = "10";
-                item.style.opacity = "1";
-                item.style.pointerEvents = "auto";
+                item.style.cssText = "transform:translate3d(0,0,0) rotate(0) scale(1.2); z-index:10; opacity:1; pointer-events:auto;";
                 item.classList.add("active");
                 if (titleDisplay) titleDisplay.textContent = item.getAttribute("data-title");
             } else {
                 item.classList.remove("active");
-                const translateX = offset * 75;
-                const translateY = 35;
-                const rotateDeg = -12;
-                const scale = 0.85;
-                item.style.transform = `translate3d(${translateX}%, ${translateY}px, 0) rotate(${rotateDeg}deg) scale(${scale})`;
-                item.style.zIndex = String(10 - Math.abs(offset));
+                const tx = offset * 75;
+                item.style.cssText = `transform:translate3d(${tx}%,35px,0) rotate(-12deg) scale(0.85); z-index:${10 - Math.abs(offset)};`;
                 if (Math.abs(offset) <= 2) {
                     item.style.opacity = Math.abs(offset) === 1 ? "0.75" : "0.25";
                     item.style.pointerEvents = "auto";
@@ -47,75 +37,61 @@ function initFilmsCarousel() {
                 }
             }
         });
-
-        buttons.forEach((btn, index) => {
-            if (index === currentIndex) btn.classList.add("active");
-            else btn.classList.remove("active");
+        buttons.forEach((btn, i) => {
+            btn.classList.toggle("active", i === currentIndex);
         });
     }
 
-    // 移除旧的事件监听，避免重复绑定
-    const newTrack = track.cloneNode(true);
-    track.parentNode.replaceChild(newTrack, track);
-    // 重新绑定 track 引用
-    const freshItems = Array.from(newTrack.getElementsByClassName("carousel-item"));
-    freshItems.forEach((item, index) => {
-        item.addEventListener("click", (event) => {
+    function goTo(index) {
+        currentIndex = Math.max(0, Math.min(items.length - 1, index));
+        render();
+    }
+
+    // 点击卡片
+    items.forEach((item, index) => {
+        item.onclick = (e) => {
             if (index === currentIndex) {
                 const link = item.querySelector(".card-frame");
-                if (link && link.href) window.location.href = link.href;
-                return;
+                if (link) window.location.href = link.href;
+            } else {
+                e.preventDefault();
+                goTo(index);
             }
-            event.preventDefault();
-            currentIndex = index;
-            updateCarousel();
-        });
+        };
     });
 
+    // 点击页码
     buttons.forEach((btn, index) => {
-        btn.addEventListener("click", () => {
-            currentIndex = index;
-            updateCarousel();
-        });
+        btn.onclick = () => goTo(index);
     });
 
-    carouselContainer.onmouseenter = () => { isMouseInside = true; };
-    carouselContainer.onmouseleave = () => { isMouseInside = false; };
+    // 鼠标进入/离开
+    container.onmouseenter = () => { isMouseInside = true; };
+    container.onmouseleave = () => { isMouseInside = false; };
 
-    window.onwheel = null;
-    window.addEventListener("wheel", (e) => {
-        if (!isMouseInside) return;
-        if (e.deltaY > 0) {
-            if (currentIndex < items.length - 1) {
-                e.preventDefault();
-                if (isThrottled) return;
-                isThrottled = true;
-                currentIndex++;
-                updateCarousel();
-                setTimeout(() => { isThrottled = false; }, 400);
-                return;
-            }
-            isMouseInside = false;
-            return;
-        }
-        if (e.deltaY < 0) {
-            if (currentIndex > 0) {
-                e.preventDefault();
-                if (isThrottled) return;
-                isThrottled = true;
-                currentIndex--;
-                updateCarousel();
-                setTimeout(() => { isThrottled = false; }, 400);
-                return;
-            }
-            isMouseInside = false;
-            return;
-        }
-    }, { passive: false });
+    // 滚轮（只绑定一次，通过闭包变量控制）
+    if (!_wheelBound) {
+        _wheelBound = true;
+        window.addEventListener("wheel", (e) => {
+            if (!isMouseInside) return;
+            if (isThrottled) return;
 
-    updateCarousel();
+            if (e.deltaY > 0 && currentIndex < items.length - 1) {
+                e.preventDefault();
+                isThrottled = true;
+                goTo(currentIndex + 1);
+                setTimeout(() => { isThrottled = false; }, 400);
+            } else if (e.deltaY < 0 && currentIndex > 0) {
+                e.preventDefault();
+                isThrottled = true;
+                goTo(currentIndex - 1);
+                setTimeout(() => { isThrottled = false; }, 400);
+            }
+        }, { passive: false });
+    }
+
+    render();
 }
 
 window.initFilmsCarousel = initFilmsCarousel;
-
 document.addEventListener("DOMContentLoaded", initFilmsCarousel);
