@@ -1,0 +1,602 @@
+/* =========================================================
+   UKO'S DIARY — NAVBAR
+   ========================================================= */
+@font-face {
+  font-family: "GochiHand";
+
+  src: url("/fonts/GochiHand-Regular.ttf")
+       format("truetype");
+
+  font-weight: normal;
+  font-style: normal;
+
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "MaokenAssortedSans";
+
+  src: url("/fonts/猫啃什锦黑1.70/MaokenAssortedSans.ttf")
+       format("truetype");
+
+  font-weight: normal;
+  font-style: normal;
+
+  font-display: swap;
+}
+
+
+.uko-navbar {
+  position: fixed;
+
+  /*
+   * 不再使用 top + 外部 padding
+   * 让导航直接贴在浏览器顶部
+   */
+  top: 0;
+  left: 0;
+
+  width: 100%;
+
+  z-index: 1000;
+
+  /*
+   * 不给 Hero 留顶部空间
+   */
+  padding: 0;
+
+  pointer-events: none;
+
+  transition:
+    padding 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+/* =========================================================
+   NAVBAR INNER
+   ========================================================= */
+
+.navbar-inner {
+  position: relative;
+
+  width: 100%;
+
+  min-height: 70px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 10px 32px;
+
+  /*
+   * 顶部没有圆角
+   * 让它和 Hero 无缝连接
+   */
+  border-radius: 0;
+
+  background: transparent;
+
+  border: 0;
+
+  box-shadow: none;
+
+  pointer-events: auto;
+
+  transition:
+    min-height 1.2s cubic-bezier(0.22, 1, 0.36, 1),
+    background 1.2s ease,
+    box-shadow 1.2s ease;
+}
+
+
+/* =========================================================
+   LOGO
+   ========================================================= */
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  color: #9d294d;
+
+  text-decoration: none;
+
+  font-family:
+    GochiHand,
+    "Times New Roman",
+    serif;
+
+  font-size: 30px;
+
+  font-style: italic;
+
+  white-space: nowrap;
+
+  transition:
+    transform 0.35s ease,
+    font-size 1.2s cubic-bezier(0.22, 1, 0.36, 1),
+    color 1.2s ease;
+}
+
+.navbar-logo:hover {
+  color: #c5285c;
+
+  transform:
+    translateY(-2px)
+    rotate(-1deg);
+}
+
+.logo-star {
+  font-size: 20px;
+
+  display: inline-block;
+
+  transition:
+    transform 0.5s ease;
+}
+
+.navbar-logo:hover .logo-star {
+  transform:
+    rotate(25deg)
+    scale(1.2);
+}
+
+
+/* =========================================================
+   CENTER DECORATION
+   ========================================================= */
+
+.tiny-star {
+  font-family: GochiHand, "Times New Roman", serif;
+
+  font-size: 15px;
+
+  animation:
+    tinyFloat 3s ease-in-out infinite;
+}
+
+.tiny-star:last-child {
+  animation-delay: 1s;
+}
+
+.pearl {
+  display: block;
+
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: white;
+
+  box-shadow:
+    0 0 5px rgba(255, 255, 255, 0.9);
+}
+
+@keyframes tinyFloat {
+
+  0%,
+  100% {
+    transform:
+      translateY(0)
+      rotate(0);
+  }
+
+  50% {
+    transform:
+      translateY(-3px)
+      rotate(8deg);
+  }
+
+}
+
+
+/* =========================================================
+   NAV LINKS
+   ========================================================= */
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+}
+
+.nav-link {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+
+  padding: 9px 13px;
+
+  color: #7f3049;
+
+  text-decoration: none;
+
+  border-radius: 50px;
+
+  font-family:
+    GochiHand,
+    "Times New Roman",
+    serif;
+
+  transition:
+    color 1.2s ease,
+    background 1.2s ease,
+    transform 1.2s ease,
+    padding 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+/* text */
+
+.nav-text {
+  display: inline-grid;
+
+  font-size: 18px;
+
+  letter-spacing: 0.01em;
+
+  font-family:
+    GochiHand,
+    "Times New Roman",
+    serif;
+}
+
+/* 中英文两层文字叠放在同一格子内，悬停时交叉淡入淡出 */
+
+.nav-text .text-en,
+.nav-text .text-cn {
+  grid-area: 1 / 1;
+
+  justify-self: center;
+
+  white-space: nowrap;
+
+  transition:
+    opacity 0.3s ease;
+}
+
+.nav-text .text-cn {
+  opacity: 0;
+
+  font-family:
+    "MaokenAssortedSans",
+    "猫啃什锦黑",
+    sans-serif;
+
+  font-weight: normal;
+}
+
+.nav-link:hover .text-en {
+  opacity: 0;
+}
+
+.nav-link:hover .text-cn {
+  opacity: 1;
+}
+
+
+/* =========================================================
+   HEART ABOVE NAV
+   ========================================================= */
+
+.nav-link::before {
+  content: "♡";
+
+  position: absolute;
+
+  left: 50%;
+  top: -7px;
+
+  transform:
+    translateX(-50%)
+    scale(0);
+
+  color:#9d294d;
+
+  font-size: 10px;
+
+  transition:
+    transform 0.3s
+    cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nav-link:hover {
+  color: #c5285c;
+
+  background:
+    rgba(255, 255, 255, 0.5);
+
+  transform:
+    translateY(-2px);
+}
+
+.nav-link:hover::before {
+  transform:
+    translateX(-50%)
+    scale(1);
+}
+
+
+/* =========================================================
+   ACTIVE
+   ========================================================= */
+
+/*
+ * 注意：
+ * 这里故意没有 ::after
+ * 所以不会出现下面的小圆点
+ */
+
+.nav-link.active {
+  color: #c5285c;
+
+  background:
+    rgba(255, 255, 255, 0.45);
+}
+
+
+/* =========================================================
+   SCROLLED
+   ========================================================= */
+
+.uko-navbar.scrolled .navbar-inner {
+  min-height: 54px;
+
+  background:
+    rgba(255, 238, 245, 0.88);
+
+  box-shadow:
+    0 8px 28px rgba(183, 61, 103, 0.08);
+}
+
+.uko-navbar.scrolled .navbar-logo {
+  font-size: 16px;
+}
+
+.uko-navbar.scrolled .nav-link {
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+
+
+/* =========================================================
+   MOBILE BUTTON
+   ========================================================= */
+
+.menu-toggle {
+  display: none;
+
+  position: relative;
+
+  width: 42px;
+  height: 42px;
+
+  padding: 0;
+
+  border:
+    1px solid rgba(184, 38, 82, 0.2);
+
+  border-radius: 50%;
+
+  background:
+    rgba(255, 255, 255, 0.5);
+
+  cursor: pointer;
+}
+
+.menu-toggle span {
+  position: absolute;
+
+  left: 50%;
+
+  width: 16px;
+  height: 1px;
+
+  background: #9d294d;
+
+  transition:
+    transform 0.35s ease;
+}
+
+.menu-toggle span:first-child {
+  top: 16px;
+
+  transform:
+    translateX(-50%);
+}
+
+.menu-toggle span:last-child {
+  top: 23px;
+
+  transform:
+    translateX(-50%);
+}
+
+.menu-toggle.open span:first-child {
+  transform:
+    translateX(-50%)
+    translateY(3.5px)
+    rotate(45deg);
+}
+
+.menu-toggle.open span:last-child {
+  transform:
+    translateX(-50%)
+    translateY(-3.5px)
+    rotate(-45deg);
+}
+
+
+/* =========================================================
+   MOBILE MENU
+   ========================================================= */
+
+.mobile-menu {
+  display: none;
+
+  margin: 10px 15px 0;
+
+  padding: 25px 22px;
+
+  border-radius: 25px;
+
+  background:
+    rgba(255, 238, 245, 0.96);
+
+  border:
+    1px solid rgba(184, 38, 82, 0.15);
+
+  box-shadow:
+    0 15px 40px rgba(183, 61, 103, 0.12);
+
+  pointer-events: auto;
+}
+
+.mobile-menu a {
+  display: flex;
+  align-items: baseline;
+
+  gap: 10px;
+
+  padding: 12px 0;
+
+  color: #8c2d4b;
+
+  text-decoration: none;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 25px;
+
+  font-style: italic;
+
+  border-bottom:
+    1px dashed rgba(184, 38, 82, 0.15);
+}
+
+.mobile-menu a span {
+  font-family: Arial, sans-serif;
+
+  font-size: 9px;
+
+  opacity: 0.45;
+}
+
+.mobile-menu a:hover {
+  color: #c5285c;
+
+  padding-left: 8px;
+}
+
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+  .uko-navbar {
+    padding: 0;
+  }
+
+  .navbar-inner {
+    min-height: 58px;
+
+    padding:
+      7px
+      15px
+      7px
+      18px;
+
+    border-radius: 0;
+  }
+
+  .navbar-links {
+    display: none;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .uko-navbar.menu-open .mobile-menu {
+    display: block;
+
+    animation:
+      menuAppear
+      0.4s
+      cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .uko-navbar.scrolled .navbar-inner {
+    min-height: 52px;
+  }
+
+}
+
+@keyframes menuAppear {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-8px)
+      scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+
+}
+
+
+.uko-navbar a {
+  position: relative;
+  text-decoration: none;
+}
+
+.uko-navbar a::before {
+  content: "♡";
+
+  position: absolute;
+
+  left: 50%;
+
+  top: -14px;
+
+  transform:
+    translateX(-50%)
+    scale(0);
+
+  color: #ff8fa3;
+
+  font-size: 12px;
+
+  transition:
+    transform 0.2s ease;
+}
+
+.uko-navbar a:hover::before {
+  transform:
+    translateX(-50%)
+    scale(1);
+}

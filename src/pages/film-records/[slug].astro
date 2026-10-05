@@ -1,0 +1,229 @@
+---
+// src/pages/film-records/[slug].astro
+// 单部电影详情页：参数 [slug] 实际放的是 films.id
+// 构建时从 Supabase 查询这部电影，description 即 film note 正文
+import "../../styles/film-records.css";
+import "../../styles/film-detail.css";
+import { supabase } from "../../lib/supabase.js";
+
+// =========================
+// 静态生成：为每部电影产出一个 /film-records/{id}/ 页面
+// =========================
+
+export async function getStaticPaths() {
+  const { data } = await supabase
+    .from("films")
+    .select("id")
+    .order("id", { ascending: true });
+
+  return (data ?? []).map((film) => ({
+    params: { slug: String(film.id) },
+  }));
+}
+
+// =========================
+// 获取当前电影 ID
+// =========================
+
+const { slug } = Astro.params;
+const filmId = Number(slug);
+
+// =========================
+// 从 Supabase 获取这部电影
+// =========================
+
+const {
+  data: film,
+  error,
+} = await supabase
+  .from("films")
+  .select("id, title, year, director, image_url, description, created_at")
+  .eq("id", filmId)
+  .single();
+
+// 找不到电影（理论上静态路径不会出现，兜底回到列表）
+if (error || !film) {
+  return Astro.redirect("/film-records/");
+}
+
+// =========================
+// 获取电影列表，用来实现 prev / next
+// =========================
+
+const { data: allFilms } = await supabase
+  .from("films")
+  .select("id, title")
+  .order("id", { ascending: true });
+
+const filmList = allFilms ?? [];
+
+const currentIndex = filmList.findIndex(
+  (item) => item.id === film.id
+);
+
+const prevFilm =
+  currentIndex > 0
+    ? filmList[currentIndex - 1]
+    : null;
+
+const nextFilm =
+  currentIndex < filmList.length - 1
+    ? filmList[currentIndex + 1]
+    : null;
+
+// 当前电影编号
+const filmNumber = String(
+  currentIndex + 1
+).padStart(2, "0");
+
+// description 按空行 / 换行拆成自然段
+const noteParagraphs = film.description
+  ? film.description
+      .split(/\n+/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+  : [];
+
+// 写作时间（created_at）按北京时间格式化为 YYYY.MM.DD HH:mm
+const formatNoteDate = (value) => {
+  if (!value) return "";
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(new Date(value));
+  const get = (type) =>
+    parts.find((part) => part.type === type)?.value ?? "";
+  return `${get("year")}.${get("month")}.${get("day")} ${get("hour")}:${get("minute")}`;
+};
+
+const noteDate = formatNoteDate(film.created_at);
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{film.title} · My Film Diary</title>
+</head>
+
+<body>
+
+  <main class="film-records film-detail-page">
+
+    <!-- 顶部：返回 + 上下篇 -->
+    <nav class="detail-topbar">
+
+      <a href="/film-records/" class="back-link">
+        <span class="link-text">
+          <span class="text-en">← back to films</span>
+          <span class="text-cn">← 返回电影</span>
+        </span>
+      </a>
+
+      <div class="topbar-nav">
+
+        {prevFilm ? (
+          <a
+            href={`/film-records/${prevFilm.id}/`}
+            class="topbar-nav-link"
+          >
+            <span class="link-text">
+              <span class="text-en">← prev</span>
+              <span class="text-cn">← 上一篇</span>
+            </span>
+          </a>
+        ) : (
+          <span class="topbar-nav-link is-empty"></span>
+        )}
+
+        <span class="topbar-no">NO.{filmNumber}</span>
+
+        {nextFilm ? (
+          <a
+            href={`/film-records/${nextFilm.id}/`}
+            class="topbar-nav-link"
+          >
+            <span class="link-text">
+              <span class="text-en">next →</span>
+              <span class="text-cn">下一篇 →</span>
+            </span>
+          </a>
+        ) : (
+          <span class="topbar-nav-link is-empty"></span>
+        )}
+
+      </div>
+
+    </nav>
+
+
+    <section class="detail-grid">
+
+      <!-- 左上角：海报 + 影片信息 -->
+      <aside class="film-side">
+
+        <figure class="poster-frame">
+          {film.image_url ? (
+            <img
+              src={film.image_url}
+              alt={`${film.title} 海报`}
+            />
+          ) : (
+            <div class="poster-empty">
+              No poster ♡
+            </div>
+          )}
+        </figure>
+
+        <div class="film-side-info">
+
+          <h1 class="detail-title">{film.title}</h1>
+
+          <p class="detail-meta">
+            <span>{film.year}</span>
+            <span class="dot">·</span>
+            <span>{film.director}</span>
+          </p>
+
+        </div>
+
+      </aside>
+
+
+      <!-- 主体：film note（后台 description 即随笔正文） -->
+      <article class="note-card">
+
+        <h2 class="note-heading">film note</h2>
+
+        <div class="note-body">
+          {noteParagraphs.length > 0 ? (
+            noteParagraphs.map((paragraph) => (
+              <p class="note-paragraph">{paragraph}</p>
+            ))
+          ) : (
+            <p class="note-paragraph empty-note">
+              A little note is waiting to be written...
+            </p>
+          )}
+        </div>
+
+        <p class="note-date">
+          {noteDate ? `${noteDate} ♡` : "Uko's little film note ♡"}
+        </p>
+
+      </article>
+
+    </section>
+
+  </main>
+
+</body>
+
+</html>

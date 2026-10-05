@@ -1,0 +1,16 @@
+@import "films-carousel.css";
+@import "./hero.css";
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+
+:root{
+    --cream:#ffeef5;
+    --red:#E33529;
+    --ink:#2B2926;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+    font-family:'Helvetica Neue',Arial,'PingFang SC','Microsoft Yahei',sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+    overflow-x:hidden;
+}

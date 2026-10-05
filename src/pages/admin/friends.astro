@@ -1,0 +1,1029 @@
+---
+import "../../styles/admin.css";
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Friends · Admin · Uko's Diary</title>
+</head>
+
+<body>
+
+  <main class="admin-page">
+
+    <header class="admin-header">
+      <div>
+        <p class="admin-eyebrow">Uko's Diary</p>
+        <h1>Friends</h1>
+      </div>
+
+      <div class="admin-header-actions">
+        <a href="/admin" class="admin-button secondary">
+          Dashboard
+        </a>
+
+        <button id="logout-btn" class="admin-button">
+          Logout
+        </button>
+      </div>
+    </header>
+
+
+    <!-- Loading -->
+    <div id="loading" class="admin-loading">
+      Loading friends...
+    </div>
+
+
+    <!-- Content -->
+    <section id="friends-section" style="display:none;">
+
+      <div class="admin-section-heading">
+        <div>
+          <p class="admin-eyebrow">Friend Links</p>
+          <h2>Friend Links</h2>
+        </div>
+
+        <button id="add-friend-btn" class="admin-button">
+          + Add Friend
+        </button>
+      </div>
+
+
+      <!-- Add / Edit Friend Form -->
+      <div id="friend-form" class="admin-form-card" style="display:none;">
+
+        <h3 id="friend-form-title">Add a new friend</h3>
+
+        <div class="admin-form-grid">
+
+          <label>
+            Name
+            <input
+              type="text"
+              id="friend-name"
+              placeholder="A little friend's name"
+            />
+          </label>
+
+
+          <label>
+            URL
+            <input
+              type="url"
+              id="friend-url"
+              placeholder="https://example.com"
+            />
+          </label>
+
+
+          <label class="full-width">
+            Description
+            <textarea
+              id="friend-description"
+              rows="4"
+              placeholder="Who is this friend? Write something..."
+            ></textarea>
+          </label>
+
+
+          <label class="full-width">
+            Avatar
+            <input
+              type="file"
+              id="friend-avatar"
+              accept="image/*"
+            />
+            <small id="friend-avatar-hint" class="upload-hint"></small>
+          </label>
+
+        </div>
+
+
+        <div class="admin-form-actions">
+
+          <button
+            id="cancel-friend-btn"
+            class="admin-button secondary"
+          >
+            Cancel
+          </button>
+
+          <button
+            id="save-friend-btn"
+            class="admin-button"
+          >
+            Save Friend
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- Applications -->
+      <div class="admin-section-heading">
+        <div>
+          <p class="admin-eyebrow">Applications</p>
+          <h2>Friend Applications</h2>
+        </div>
+      </div>
+
+      <div id="applications-list" class="admin-content-list"></div>
+
+
+      <!-- Friend List -->
+      <div id="friends-list" class="admin-content-list"></div>
+
+    </section>
+
+  </main>
+
+
+  <script>
+    import { supabase } from "../../lib/supabase.js";
+
+
+    const loading = document.getElementById("loading");
+    const friendsSection = document.getElementById("friends-section");
+    const friendsList = document.getElementById("friends-list");
+    const applicationsList = document.getElementById("applications-list");
+
+    const addFriendBtn = document.getElementById("add-friend-btn");
+    const friendForm = document.getElementById("friend-form");
+
+    const cancelFriendBtn = document.getElementById("cancel-friend-btn");
+    const saveFriendBtn = document.getElementById("save-friend-btn");
+
+    const logoutBtn = document.getElementById("logout-btn");
+
+    let editingFriendId = null;
+    let editingFriendAvatarUrl = "";
+    let applicationsCache = [];
+
+
+    // --------------------------------
+    // Check administrator
+    // --------------------------------
+
+    async function checkAdmin() {
+
+      const {
+        data: { user }
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        window.location.href = "/admin";
+        return false;
+      }
+
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("is_admin")
+        .eq("id", user.id)
+        .single();
+
+
+      if (error || !data?.is_admin) {
+        alert("You do not have administrator permission.");
+        window.location.href = "/admin";
+        return false;
+      }
+
+      return true;
+    }
+
+
+    // --------------------------------
+    // Load friends
+    // --------------------------------
+
+    async function loadFriends() {
+
+      const {
+        data,
+        error
+      } = await supabase
+        .from("friends")
+        .select("id, name, url, description, avatar_url, created_at")
+        .order("created_at", {
+          ascending: false
+        });
+
+
+      if (error) {
+        console.error(error);
+        friendsList.innerHTML = `
+          <p class="admin-error">
+            Failed to load friends: ${error.message}
+          </p>
+        `;
+        return;
+      }
+
+
+      if (!data || data.length === 0) {
+
+        friendsList.innerHTML = `
+          <div class="admin-empty">
+            <p>No friends yet.</p>
+            <span>Add your first friend link ♡</span>
+          </div>
+        `;
+
+        return;
+      }
+
+
+      friendsList.innerHTML = data.map(friend => `
+
+        <article class="admin-content-card">
+
+          ${
+            friend.avatar_url
+              ? `
+                <div class="admin-content-image friend-avatar">
+                  <img
+                    src="${friend.avatar_url}"
+                    alt="${friend.name}"
+                  />
+                </div>
+              `
+              : `
+                <div class="admin-content-image friend-avatar placeholder">
+                  ♡
+                </div>
+              `
+          }
+
+
+          <div class="admin-content-info">
+
+            <h3>${friend.name}</h3>
+
+            <p class="admin-content-meta">
+              ${friend.url || ""}
+            </p>
+
+            <p class="admin-content-description">
+              ${friend.description || ""}
+            </p>
+
+          </div>
+
+
+          <div class="admin-content-actions">
+
+            <button
+              class="admin-edit-btn"
+              data-id="${friend.id}"
+            >
+              Edit
+            </button>
+
+            <button
+              class="admin-delete-btn"
+              data-id="${friend.id}"
+              data-avatar="${friend.avatar_url || ""}"
+            >
+              Delete
+            </button>
+
+          </div>
+
+        </article>
+
+      `).join("");
+
+
+      // Delete buttons
+
+      document
+        .querySelectorAll(".admin-delete-btn")
+        .forEach(button => {
+
+          button.addEventListener("click", async () => {
+
+            const id = button.dataset.id;
+            const avatarUrl = button.dataset.avatar;
+
+
+            const confirmed = confirm(
+              "Delete this friend?"
+            );
+
+            if (!confirmed) return;
+
+
+            // Delete database record
+
+            const {
+              error: deleteError
+            } = await supabase
+              .from("friends")
+              .delete()
+              .eq("id", id);
+
+
+            if (deleteError) {
+
+              alert(
+                "Delete failed: " +
+                deleteError.message
+              );
+
+              return;
+            }
+
+
+            // Delete avatar from Storage if it exists
+
+            if (avatarUrl) {
+
+              const fileName =
+                avatarUrl.split("/").pop();
+
+              if (fileName) {
+
+                await supabase.storage
+                  .from("friends")
+                  .remove([fileName]);
+
+              }
+
+            }
+
+
+            await loadFriends();
+
+          });
+
+        });
+
+
+      // Edit buttons
+
+      document
+        .querySelectorAll(".admin-edit-btn")
+        .forEach(button => {
+
+          button.addEventListener("click", () => {
+
+            const friend =
+              data.find(
+                item => item.id === Number(button.dataset.id)
+              );
+
+            if (friend) {
+              startEditFriend(friend);
+            }
+
+          });
+
+        });
+
+    }
+
+
+    // --------------------------------
+    // Load friend applications
+    // --------------------------------
+
+    async function loadApplications() {
+
+      applicationsList.innerHTML = `
+        <div class="admin-loading">
+          Loading applications...
+        </div>
+      `;
+
+
+      const {
+        data,
+        error
+      } = await supabase
+        .from("friend_applications")
+        .select("id, name, url, description, avatar_url, created_at")
+        .order("created_at", {
+          ascending: false
+        });
+
+
+      if (error) {
+
+        console.error(error);
+
+        applicationsList.innerHTML = `
+          <p class="admin-error">
+            Failed to load applications: ${error.message}
+          </p>
+        `;
+
+        return;
+
+      }
+
+
+      applicationsCache = data || [];
+
+
+      if (!applicationsCache.length) {
+
+        applicationsList.innerHTML = `
+          <div class="admin-empty">
+            <p>No pending applications.</p>
+            <span>New applications will show up here ♡</span>
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      applicationsList.innerHTML = applicationsCache.map(app => `
+
+        <article class="admin-content-card">
+
+          ${
+            app.avatar_url
+              ? `
+                <div class="admin-content-image friend-avatar">
+                  <img
+                    src="${app.avatar_url}"
+                    alt="${app.name}"
+                  />
+                </div>
+              `
+              : `
+                <div class="admin-content-image friend-avatar placeholder">
+                  ♡
+                </div>
+              `
+          }
+
+
+          <div class="admin-content-info">
+
+            <h3>${app.name}</h3>
+
+            <p class="admin-content-meta">
+              ${app.url || ""}
+            </p>
+
+            <p class="admin-content-description">
+              ${app.description || ""}
+            </p>
+
+          </div>
+
+
+          <div class="admin-content-actions">
+
+            <button
+              class="approve-btn"
+              data-id="${app.id}"
+            >
+              Approve
+            </button>
+
+            <button
+              class="admin-delete-btn reject-btn"
+              data-id="${app.id}"
+            >
+              Reject
+            </button>
+
+          </div>
+
+        </article>
+
+      `).join("");
+
+
+      // Approve buttons
+
+      document
+        .querySelectorAll(".approve-btn")
+        .forEach(button => {
+
+          button.addEventListener("click", () => {
+
+            const app =
+              applicationsCache.find(
+                item => item.id === Number(button.dataset.id)
+              );
+
+            if (app) {
+              approveApplication(app);
+            }
+
+          });
+
+        });
+
+
+      // Reject buttons
+
+      document
+        .querySelectorAll(".reject-btn")
+        .forEach(button => {
+
+          button.addEventListener("click", () => {
+
+            rejectApplication(
+              Number(button.dataset.id)
+            );
+
+          });
+
+        });
+
+    }
+
+
+    // --------------------------------
+    // Approve application
+    // --------------------------------
+
+    async function approveApplication(app) {
+
+      const confirmed =
+        confirm(
+          `Approve "${app.name}" and add to friends?`
+        );
+
+      if (!confirmed) return;
+
+
+      // 写入正式 friends 表
+
+      const {
+        error: insertError
+      } = await supabase
+        .from("friends")
+        .insert({
+          name: app.name,
+          url: app.url,
+          description: app.description || null,
+          avatar_url: app.avatar_url || null
+        });
+
+
+      if (insertError) {
+
+        alert(
+          "Approve failed: " +
+          insertError.message
+        );
+
+        return;
+
+      }
+
+
+      // 删除对应申请
+
+      const {
+        error: deleteError
+      } = await supabase
+        .from("friend_applications")
+        .delete()
+        .eq("id", app.id);
+
+
+      if (deleteError) {
+
+        alert(
+          "Application record delete failed: " +
+          deleteError.message
+        );
+
+      }
+
+
+      await loadApplications();
+
+      await loadFriends();
+
+    }
+
+
+    // --------------------------------
+    // Reject application
+    // --------------------------------
+
+    async function rejectApplication(id) {
+
+      const confirmed =
+        confirm(
+          "Reject this application?"
+        );
+
+      if (!confirmed) return;
+
+
+      const {
+        error
+      } = await supabase
+        .from("friend_applications")
+        .delete()
+        .eq("id", id);
+
+
+      if (error) {
+
+        alert(
+          "Reject failed: " +
+          error.message
+        );
+
+        return;
+
+      }
+
+
+      await loadApplications();
+
+    }
+
+
+    // --------------------------------
+    // Reset form to "add" mode
+    // --------------------------------
+
+    function resetFriendForm() {
+
+      editingFriendId = null;
+      editingFriendAvatarUrl = "";
+
+      document.getElementById("friend-name").value = "";
+      document.getElementById("friend-url").value = "";
+      document.getElementById("friend-description").value = "";
+      document.getElementById("friend-avatar").value = "";
+
+      document.getElementById("friend-form-title").textContent =
+        "Add a new friend";
+
+      document.getElementById("friend-avatar-hint").textContent =
+        "";
+
+      saveFriendBtn.textContent =
+        "Save Friend";
+
+      saveFriendBtn.disabled = false;
+
+    }
+
+
+    // --------------------------------
+    // Start editing a friend
+    // --------------------------------
+
+    function startEditFriend(friend) {
+
+      editingFriendId = friend.id;
+      editingFriendAvatarUrl = friend.avatar_url || "";
+
+      document.getElementById("friend-name").value =
+        friend.name || "";
+
+      document.getElementById("friend-url").value =
+        friend.url || "";
+
+      document.getElementById("friend-description").value =
+        friend.description || "";
+
+      document.getElementById("friend-avatar").value =
+        "";
+
+      document.getElementById("friend-form-title").textContent =
+        "Edit this friend";
+
+      document.getElementById("friend-avatar-hint").textContent =
+        "Leave empty to keep the current avatar.";
+
+      saveFriendBtn.textContent =
+        "Update Friend";
+
+      friendForm.style.display = "block";
+
+      addFriendBtn.style.display = "none";
+
+      friendForm.scrollIntoView({
+        behavior: "smooth"
+      });
+
+    }
+
+
+    // --------------------------------
+    // Add Friend
+    // --------------------------------
+
+    addFriendBtn.addEventListener(
+      "click",
+      () => {
+
+        resetFriendForm();
+
+        friendForm.style.display = "block";
+
+        addFriendBtn.style.display = "none";
+
+      }
+    );
+
+
+    // --------------------------------
+    // Cancel
+    // --------------------------------
+
+    cancelFriendBtn.addEventListener(
+      "click",
+      () => {
+
+        resetFriendForm();
+
+        friendForm.style.display = "none";
+
+        addFriendBtn.style.display = "inline-flex";
+
+      }
+    );
+
+
+    // --------------------------------
+    // Save Friend
+    // --------------------------------
+
+    saveFriendBtn.addEventListener(
+      "click",
+      async () => {
+
+        const name =
+          document
+            .getElementById("friend-name")
+            .value
+            .trim();
+
+
+        const url =
+          document
+            .getElementById("friend-url")
+            .value
+            .trim();
+
+
+        const description =
+          document
+            .getElementById("friend-description")
+            .value
+            .trim();
+
+
+        const avatarInput =
+          document.getElementById("friend-avatar");
+
+
+        if (!name) {
+
+          alert("Please enter a friend name.");
+
+          return;
+
+        }
+
+
+        if (!url) {
+
+          alert("Please enter a friend URL.");
+
+          return;
+
+        }
+
+
+        saveFriendBtn.disabled = true;
+
+        saveFriendBtn.textContent = "Saving...";
+
+
+        let avatarUrl = null;
+
+
+        // -----------------------------
+        // Upload avatar (only if a new
+        // file was selected)
+        // -----------------------------
+
+        const avatarFile =
+          avatarInput.files[0];
+
+
+        if (avatarFile) {
+
+          const fileExt =
+            avatarFile.name
+              .split(".")
+              .pop();
+
+
+          const fileName =
+            `${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
+
+
+          const {
+            error: uploadError
+          } = await supabase.storage
+            .from("friends")
+            .upload(
+              fileName,
+              avatarFile,
+              {
+                cacheControl: "3600",
+                upsert: false
+              }
+            );
+
+
+          if (uploadError) {
+
+            console.error(uploadError);
+
+            alert(
+              "Avatar upload failed: " +
+              uploadError.message
+            );
+
+            saveFriendBtn.disabled = false;
+
+            saveFriendBtn.textContent = editingFriendId
+              ? "Update Friend"
+              : "Save Friend";
+
+            return;
+
+          }
+
+
+          const {
+            data: publicUrlData
+          } = supabase.storage
+            .from("friends")
+            .getPublicUrl(fileName);
+
+
+          avatarUrl =
+            publicUrlData.publicUrl;
+
+        }
+
+
+        // -----------------------------
+        // Save database record
+        // (insert or update)
+        // -----------------------------
+
+        let saveError;
+
+        if (editingFriendId) {
+
+          const recordData = {
+            name,
+            url,
+            description
+          };
+
+          // 编辑时只有选了新头像才更换图片
+
+          if (avatarUrl) {
+            recordData.avatar_url = avatarUrl;
+          }
+
+          const { error } = await supabase
+            .from("friends")
+            .update(recordData)
+            .eq("id", editingFriendId);
+
+          saveError = error;
+
+        } else {
+
+          const { error } = await supabase
+            .from("friends")
+            .insert({
+              name,
+              url,
+              description,
+              avatar_url: avatarUrl
+            });
+
+          saveError = error;
+
+        }
+
+
+        if (saveError) {
+
+          console.error(saveError);
+
+          alert(
+            "Failed to save friend: " +
+            saveError.message
+          );
+
+          saveFriendBtn.disabled = false;
+
+          saveFriendBtn.textContent = editingFriendId
+            ? "Update Friend"
+            : "Save Friend";
+
+          return;
+
+        }
+
+
+        // 更换了新头像时，删除旧头像
+
+        if (editingFriendId && avatarUrl && editingFriendAvatarUrl) {
+
+          const oldFileName =
+            editingFriendAvatarUrl.split("/").pop();
+
+          if (oldFileName) {
+
+            await supabase.storage
+              .from("friends")
+              .remove([oldFileName]);
+
+          }
+
+        }
+
+
+        alert(
+          editingFriendId
+            ? "Friend updated successfully! ♡"
+            : "Friend added successfully! ♡"
+        );
+
+
+        resetFriendForm();
+
+
+        friendForm.style.display = "none";
+
+        addFriendBtn.style.display = "inline-flex";
+
+
+        await loadFriends();
+
+      }
+    );
+
+
+    // --------------------------------
+    // Logout
+    // --------------------------------
+
+    logoutBtn.addEventListener(
+      "click",
+      async () => {
+
+        await supabase.auth.signOut();
+
+        window.location.href = "/admin";
+
+      }
+    );
+
+
+    // --------------------------------
+    // Init
+    // --------------------------------
+
+    const isAdmin =
+      await checkAdmin();
+
+
+    if (isAdmin) {
+
+      loading.style.display = "none";
+
+      friendsSection.style.display = "block";
+
+      await loadApplications();
+
+      await loadFriends();
+
+    }
+
+  </script>
+
+</body>
+</html>

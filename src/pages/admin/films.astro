@@ -1,0 +1,931 @@
+---
+import "../../styles/admin.css";
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>Films Admin · Uko's Diary</title>
+
+</head>
+
+
+<body>
+
+<main class="admin-page">
+
+  <!-- =========================
+       页面头部
+  ========================== -->
+
+  <header class="admin-header">
+
+    <div>
+
+      <p class="admin-small-title">
+        UKO'S DIARY · ADMIN
+      </p>
+
+      <h1>
+        Films
+      </h1>
+
+      <p class="admin-description">
+        manage your movie records ♡
+      </p>
+
+    </div>
+
+
+    <div class="admin-header-actions">
+
+      <a
+        href="/admin"
+        class="back-admin-btn"
+      >
+        ← Dashboard
+      </a>
+
+      <button
+        id="logout-btn"
+        class="logout-btn"
+      >
+        Logout
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- =========================
+       电影管理
+  ========================== -->
+
+  <section class="admin-messages">
+
+    <div class="section-title">
+
+      <span>
+        MOVIE RECORDS
+      </span>
+
+      <span>
+        your little cinema
+      </span>
+
+    </div>
+
+
+    <!-- 新增按钮 -->
+
+    <div class="admin-content-actions">
+
+      <button
+        id="add-film-btn"
+        class="primary-admin-btn"
+      >
+        + Add Film
+      </button>
+
+    </div>
+
+
+    <!-- 电影列表 -->
+
+    <div id="films-list">
+
+      <div class="loading">
+        Loading films...
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       新增电影表单
+  ========================== -->
+
+  <section
+    id="film-form-section"
+    class="film-form-section"
+    style="display:none;"
+  >
+
+    <div class="section-title">
+
+      <span id="film-form-title">
+        ADD A FILM
+      </span>
+
+      <span id="film-form-subtitle">
+        a new little record
+      </span>
+
+    </div>
+
+
+    <form id="film-form">
+
+      <!-- 电影名称 -->
+
+      <div class="input-group">
+
+        <label for="film-title">
+          Title
+        </label>
+
+        <input
+          id="film-title"
+          type="text"
+          placeholder="Movie title"
+          required
+        />
+
+      </div>
+
+
+      <!-- 导演 -->
+
+      <div class="input-group">
+
+        <label for="film-director">
+          Director
+        </label>
+
+        <input
+          id="film-director"
+          type="text"
+          placeholder="Director"
+          required
+        />
+
+      </div>
+
+
+      <!-- 年份 -->
+
+      <div class="input-group">
+
+        <label for="film-year">
+          Year
+        </label>
+
+        <input
+          id="film-year"
+          type="number"
+          placeholder="2026"
+        />
+
+      </div>
+
+
+      <!-- 评分 -->
+
+      <div class="input-group">
+
+        <label for="film-rating">
+          Rating
+        </label>
+
+        <input
+          id="film-rating"
+          type="number"
+          step="0.1"
+          min="0"
+          max="10"
+          placeholder="9.0"
+        />
+
+      </div>
+
+
+      <!-- 简介 -->
+
+      <div class="input-group">
+
+        <label for="film-description">
+          Description
+        </label>
+
+        <textarea
+          id="film-description"
+          placeholder="Write something about this film..."
+          rows="6"
+        ></textarea>
+
+      </div>
+
+
+      <!-- 图片 -->
+
+      <div class="input-group">
+
+        <label for="film-image">
+          Poster
+        </label>
+
+        <input
+          id="film-image"
+          type="file"
+          accept="image/*"
+        />
+
+        <small id="film-image-hint" class="upload-hint">
+          Image upload will be connected next.
+        </small>
+
+      </div>
+
+
+      <!-- 操作按钮 -->
+
+      <div class="form-actions">
+
+        <button
+          type="button"
+          id="cancel-film-btn"
+          class="secondary-admin-btn"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          id="save-film-btn"
+          class="primary-admin-btn"
+        >
+          Save Film ♡
+        </button>
+
+      </div>
+
+
+      <p
+        id="film-form-message"
+        class="login-error"
+      ></p>
+
+    </form>
+
+  </section>
+
+</main>
+
+
+<script>
+
+  import { supabase }
+    from "../../lib/supabase.js";
+
+
+  let initialized = false;
+
+  let editingFilmId = null;
+
+
+  function initFilmsAdmin() {
+
+    if (initialized) return;
+
+    initialized = true;
+
+
+    // =========================
+    // DOM
+    // =========================
+
+    const filmsList =
+      document.getElementById("films-list");
+
+    const addFilmBtn =
+      document.getElementById("add-film-btn");
+
+    const formSection =
+      document.getElementById("film-form-section");
+
+    const filmForm =
+      document.getElementById("film-form");
+
+    const cancelBtn =
+      document.getElementById("cancel-film-btn");
+
+    const logoutBtn =
+      document.getElementById("logout-btn");
+
+    const formMessage =
+      document.getElementById("film-form-message");
+
+    const saveFilmBtn =
+      document.getElementById("save-film-btn");
+
+
+    // =========================
+    // 管理员检查
+    // =========================
+
+    async function checkAdmin() {
+
+      const {
+        data: {
+          user
+        }
+      } =
+        await supabase.auth.getUser();
+
+
+      if (!user) {
+
+        window.location.href =
+          "/admin";
+
+        return false;
+
+      }
+
+
+      const {
+        data,
+        error
+      } =
+        await supabase
+          .from("profiles")
+          .select("is_admin")
+          .eq("id", user.id)
+          .single();
+
+
+      if (
+        error ||
+        !data ||
+        data.is_admin !== true
+      ) {
+
+        await supabase.auth.signOut();
+
+        window.location.href =
+          "/admin";
+
+        return false;
+
+      }
+
+
+      return true;
+
+    }
+
+
+    // =========================
+    // 获取电影
+    // =========================
+
+    async function fetchFilms() {
+
+      filmsList.innerHTML = `
+        <div class="loading">
+          Loading films...
+        </div>
+      `;
+
+
+      const {
+        data,
+        error
+      } =
+        await supabase
+          .from("films")
+          .select(
+            "id, title, year, director, rating, description, image_url, created_at"
+          )
+          .order(
+            "created_at",
+            {
+              ascending: false
+            }
+          );
+
+
+      if (error) {
+
+        console.error(error);
+
+        filmsList.innerHTML = `
+          <div class="loading">
+            Failed to load films.
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      renderFilms(data || []);
+
+    }
+
+
+    // =========================
+    // 渲染电影
+    // =========================
+
+    function renderFilms(films) {
+
+      filmsList.innerHTML = "";
+
+
+      if (!films.length) {
+
+        filmsList.innerHTML = `
+          <div class="loading">
+            No films yet ♡
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      films.forEach(
+        (film) => {
+
+          const card =
+            document.createElement("article");
+
+          card.className =
+            "admin-content-card";
+
+
+          // 图片
+
+          if (film.image_url) {
+
+            const image =
+              document.createElement("img");
+
+            image.src =
+              film.image_url;
+
+            image.alt =
+              film.title;
+
+            image.className =
+              "admin-content-image";
+
+            card.appendChild(image);
+
+          }
+
+
+          // 内容
+
+          const info =
+            document.createElement("div");
+
+          info.className =
+            "admin-content-info";
+
+
+          const title =
+            document.createElement("h2");
+
+          title.textContent =
+            film.title;
+
+
+          const meta =
+            document.createElement("p");
+
+          meta.className =
+            "admin-content-meta";
+
+          meta.textContent =
+            `${film.year || ""} · ${
+              film.director || ""
+            }`;
+
+
+          const rating =
+            document.createElement("span");
+
+          rating.className =
+            "admin-content-rating";
+
+          rating.textContent =
+            film.rating
+              ? `★ ${film.rating}`
+              : "No rating";
+
+
+          const description =
+            document.createElement("p");
+
+          description.className =
+            "admin-content-description";
+
+          description.textContent =
+            film.description || "";
+
+
+          info.appendChild(title);
+          info.appendChild(meta);
+          info.appendChild(rating);
+          info.appendChild(description);
+
+
+          // 操作
+
+          const actions =
+            document.createElement("div");
+
+          actions.className =
+            "admin-content-actions";
+
+
+          const editBtn =
+            document.createElement("button");
+
+          editBtn.textContent =
+            "Edit";
+
+          editBtn.className =
+            "action-btn";
+
+
+          editBtn.addEventListener(
+            "click",
+            () => {
+
+              startEditFilm(film);
+
+            }
+          );
+
+
+          const deleteBtn =
+            document.createElement("button");
+
+          deleteBtn.textContent =
+            "Delete";
+
+          deleteBtn.className =
+            "action-btn delete-btn";
+
+
+          deleteBtn.addEventListener(
+            "click",
+            async () => {
+
+              const confirmed =
+                confirm(
+                  `Delete "${film.title}"?`
+                );
+
+
+              if (!confirmed) return;
+
+
+              await deleteFilm(
+                film.id
+              );
+
+            }
+          );
+
+
+          actions.appendChild(
+            editBtn
+          );
+
+          actions.appendChild(
+            deleteBtn
+          );
+
+
+          card.appendChild(info);
+          card.appendChild(actions);
+
+
+          filmsList.appendChild(card);
+
+        }
+      );
+
+    }
+
+
+    // =========================
+    // 删除电影
+    // =========================
+
+    async function deleteFilm(id) {
+
+      const {
+        error
+      } =
+        await supabase
+          .from("films")
+          .delete()
+          .eq("id", id);
+
+
+      if (error) {
+
+        console.error(error);
+
+        alert(
+          "Failed to delete film."
+        );
+
+        return;
+
+      }
+
+
+      await fetchFilms();
+
+    }
+
+
+    // =========================
+    // 重置为新增模式
+    // =========================
+
+    function resetFilmForm() {
+
+      editingFilmId =
+        null;
+
+      filmForm.reset();
+
+      document.getElementById("film-form-title").textContent =
+        "ADD A FILM";
+
+      document.getElementById("film-form-subtitle").textContent =
+        "a new little record";
+
+      document.getElementById("film-image-hint").textContent =
+        "Image upload will be connected next.";
+
+      saveFilmBtn.textContent =
+        "Save Film ♡";
+
+      formMessage.textContent =
+        "";
+
+    }
+
+
+    // =========================
+    // 打开编辑表单
+    // =========================
+
+    function startEditFilm(film) {
+
+      editingFilmId =
+        film.id;
+
+      document.getElementById("film-title").value =
+        film.title || "";
+
+      document.getElementById("film-director").value =
+        film.director || "";
+
+      document.getElementById("film-year").value =
+        film.year || "";
+
+      document.getElementById("film-rating").value =
+        film.rating || "";
+
+      document.getElementById("film-description").value =
+        film.description || "";
+
+      document.getElementById("film-image").value =
+        "";
+
+      document.getElementById("film-form-title").textContent =
+        "EDIT FILM";
+
+      document.getElementById("film-form-subtitle").textContent =
+        "update this little record";
+
+      document.getElementById("film-image-hint").textContent =
+        "Leave empty to keep the current poster.";
+
+      saveFilmBtn.textContent =
+        "Update Film ♡";
+
+      formMessage.textContent =
+        "";
+
+      formSection.style.display =
+        "block";
+
+      formSection.scrollIntoView({
+        behavior: "smooth"
+      });
+
+    }
+
+
+    // =========================
+    // 打开新增表单
+    // =========================
+
+    addFilmBtn.addEventListener(
+      "click",
+      () => {
+
+        resetFilmForm();
+
+        formSection.style.display =
+          "block";
+
+        formSection.scrollIntoView({
+          behavior: "smooth"
+        });
+
+      }
+    );
+
+
+    // =========================
+    // 关闭表单
+    // =========================
+
+    cancelBtn.addEventListener(
+      "click",
+      () => {
+
+        formSection.style.display =
+          "none";
+
+        resetFilmForm();
+
+      }
+    );
+
+
+    // =========================
+    // 保存电影
+    // =========================
+
+    filmForm.addEventListener(
+      "submit",
+      async (event) => {
+
+        event.preventDefault();
+
+
+        const imageInput = document.getElementById("film-image");
+        const title = document.getElementById("film-title").value.trim();
+        const director = document.getElementById("film-director").value.trim();
+        const yearValue = document.getElementById("film-year").value;
+        const ratingValue = document.getElementById("film-rating").value;
+        const description = document.getElementById("film-description").value.trim();
+        if (!title) {
+          alert("Please enter a film title.");
+          return;
+        }
+        let imageUrl = null;
+        // ① 获取选择的图片
+        const imageFile = imageInput.files[0];
+        if (imageFile) {
+          // ② 给图片生成一个唯一文件名
+          const fileExt = imageFile.name.split(".").pop();
+          const fileName = `${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
+          // ③ 上传到 Supabase Storage 的 films bucket
+          const { error: uploadError } = await supabase.storage
+            .from("films")
+            .upload(fileName, imageFile, {
+              cacheControl: "3600",
+              upsert: false
+            });
+          if (uploadError) {
+            console.error(uploadError);
+            alert("Image upload failed: " + uploadError.message);
+            return;
+          }
+          // ④ 获取图片公开 URL
+          const { data: publicUrlData } = supabase.storage
+            .from("films")
+            .getPublicUrl(fileName);
+          imageUrl = publicUrlData.publicUrl;
+        }
+        // ⑤ 把电影资料 + 图片 URL 写入 films（新增或更新）
+
+        const recordData = {
+          title,
+          director,
+          year: yearValue ? Number(yearValue) : null,
+          rating: ratingValue ? Number(ratingValue) : null,
+          description
+        };
+
+        let saveError;
+
+        if (editingFilmId) {
+
+          // 编辑：只有选了新图片才更换海报
+
+          if (imageUrl) {
+            recordData.image_url = imageUrl;
+          }
+
+          const { error } = await supabase
+            .from("films")
+            .update(recordData)
+            .eq("id", editingFilmId);
+
+          saveError = error;
+
+        } else {
+
+          recordData.image_url = imageUrl;
+
+          const { error } = await supabase
+            .from("films")
+            .insert(recordData);
+
+          saveError = error;
+
+        }
+
+        if (saveError) {
+          console.error(saveError);
+          alert("Failed to save film: " + saveError.message);
+          return;
+        }
+
+        alert(
+          editingFilmId
+            ? "Film updated successfully! ♡"
+            : "Film added successfully! ♡"
+        );
+
+        location.reload();
+
+      }
+    );
+
+
+    // =========================
+    // 登出
+    // =========================
+
+    logoutBtn.addEventListener(
+      "click",
+      async () => {
+
+        await supabase.auth.signOut();
+
+        window.location.href =
+          "/admin";
+
+      }
+    );
+
+
+    // =========================
+    // 初始化
+    // =========================
+
+    async function init() {
+
+      const isAdmin =
+        await checkAdmin();
+
+
+      if (!isAdmin) return;
+
+
+      await fetchFilms();
+
+    }
+
+
+    init();
+
+  }
+
+
+  initFilmsAdmin();
+
+</script>
+
+</body>
+
+</html>

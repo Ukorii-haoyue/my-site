@@ -1,0 +1,137 @@
+---
+import "../styles/navbar.css";
+---
+
+<nav class="uko-navbar" id="uko-navbar">
+  <div class="navbar-inner">
+
+    <!-- Logo -->
+    <a href="#hero" class="navbar-logo">
+      <span class="logo-star">✦</span>
+      <span>Uko's Diary</span>
+    </a>
+
+
+    <!-- Desktop navigation -->
+    <div class="navbar-links">
+
+      <a href="#hero" class="nav-link">
+        <span class="nav-text">
+          <span class="text-en">Home</span>
+          <span class="text-cn">首页</span>
+        </span>
+      </a>
+
+      <a href="#diary" class="nav-link">
+        <span class="nav-text">
+          <span class="text-en">TimeLine</span>
+          <span class="text-cn">时间线</span>
+        </span>
+      </a>
+
+      <a href="#blog" class="nav-link">
+        <span class="nav-text">
+          <span class="text-en">Blog</span>
+          <span class="text-cn">博客</span>
+        </span>
+      </a>
+
+      <a href="#films" class="nav-link">
+        <span class="nav-text">
+          <span class="text-en">Films</span>
+          <span class="text-cn">电影</span>
+        </span>
+      </a>
+
+      <a href="#books" class="nav-link">
+        <span class="nav-text">
+          <span class="text-en">Books</span>
+          <span class="text-cn">书籍</span>
+        </span>
+      </a>
+
+      <a href="#baking" class="nav-link">
+        <span class="nav-text">
+          <span class="text-en">Baking</span>
+          <span class="text-cn">烘焙</span>
+        </span>
+      </a>
+
+      <a href="#friends" class="nav-link">
+        <span class="nav-text">
+          <span class="text-en">Friends</span>
+          <span class="text-cn">友链</span>
+        </span>
+      </a>
+
+      <a href="/guestbook/" class="nav-link">
+        <span class="nav-text">
+          <span class="text-en">Guestbook</span>
+          <span class="text-cn">留言板</span>
+        </span>
+      </a>
+
+      <a href="/about" class="nav-link">
+        <span class="nav-text">
+          <span class="text-en">About</span>
+          <span class="text-cn">关于</span>
+        </span>
+      </a>
+
+    </div>
+
+    <!-- Mobile button -->
+    <button
+      class="menu-toggle"
+      id="menu-toggle"
+      aria-label="Open navigation"
+      aria-expanded="false"
+      type="button"
+    >
+      <span></span>
+      <span></span>
+    </button>
+
+  </div>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobile-menu">
+
+    <a href="#hero">
+      Home
+    </a>
+
+    <a href="#diary">
+      Diary
+    </a>
+
+    <a href="#blog">
+      Blog
+    </a>
+
+    <a href="#films">
+      Films
+    </a>
+
+    <a href="#books">
+      Books
+    </a>
+
+    <a href="#baking">
+      Baking
+    </a>
+
+    <a href="#friends">
+      Friends
+    </a>
+
+    <a href="/about">
+      About
+    </a>
+
+  </div>
+</nav>
+
+<script>
+  import "../scripts/navbar.js";
+</script>

@@ -1,0 +1,626 @@
+@font-face {
+  font-family: "GochiHand";
+  src: url("/fonts/GochiHand-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "MaokenAssortedSans";
+  src: url("/fonts/猫啃什锦黑1.70/MaokenAssortedSans.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+/* =====================================================
+   Page
+===================================================== */
+
+body {
+  background: #ffeef5;
+}
+
+.about-page {
+  position: relative;
+
+  min-height: 100vh;
+
+  background: #ffeef5;
+
+  color: #6d4654;
+
+  overflow: hidden;
+
+  font-size: 20px;
+}
+
+
+/* =====================================================
+   Hero（顶部通栏主图，充当标题背景）
+===================================================== */
+
+.about-hero {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  height: 34vh;
+
+  min-height: 280px;
+  max-height: 460px;
+
+  padding: 0 6%;
+
+  text-align: center;
+
+  background: #ffeef5 url("/images/25.jpg") center / cover no-repeat;
+
+  isolation: isolate;
+}
+
+/* 轻微浅色遮罩，提升文字可读性 */
+.about-hero::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 1;
+
+  background: rgba(255, 238, 245, 0.22);
+
+  pointer-events: none;
+}
+
+.about-hero > * {
+  position: relative;
+
+  z-index: 2;
+}
+
+
+/* 顶部小标题 */
+
+.hero-eyebrow {
+  margin: 0 0 14px;
+
+  font-family: "GochiHand", cursive;
+
+  font-size: 19px;
+
+  letter-spacing: 4px;
+
+  color: #ff7f9c;
+}
+
+
+/* 大标题：整体粉色；ABOUT 词用薄荷绿填充+粉色描边（同首页 Diary 行风格），ME 保持粉色 */
+
+.hero-big {
+  margin: 0;
+
+  font-family: "GochiHand", cursive;
+
+  font-size: clamp(58px, 8vw, 118px);
+
+  line-height: 0.85;
+
+  text-transform: uppercase;
+
+  letter-spacing: 2px;
+
+  color: #ff7896;
+
+  transform: rotate(-1deg);
+}
+
+.hero-big .line {
+  display: inline-block;
+}
+
+.hero-big .line-about {
+  color: #b7ffe9;
+
+  -webkit-text-stroke: 15px #ff7896;
+
+  paint-order: stroke fill;
+}
+
+.hero-big .line-me {
+  color: #ff7896;
+}
+
+
+/* Hero 内快速导航 */
+
+.hero-nav {
+  display: flex;
+
+  justify-content: center;
+
+  flex-wrap: wrap;
+
+  gap: 9px;
+
+  margin-top: 26px;
+}
+
+.hero-nav a {
+  padding: 8px 18px;
+
+  background: rgba(255, 250, 250, 0.9);
+
+  border: 1px solid rgba(217, 155, 168, 0.55);
+
+  border-radius: 999px;
+
+  color: #9d6c77;
+
+  font-family: "MaokenAssortedSans", "猫啃什锦黑", sans-serif;
+
+  font-size: 15px;
+
+  text-decoration: none;
+
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+/* 默认显示中文，悬停切换为英文（英文用 GochiHand） */
+.hero-nav a .en {
+  display: none;
+
+  font-family: "GochiHand", cursive;
+
+  font-size: 16px;
+}
+
+.hero-nav a:hover .zh {
+  display: none;
+}
+
+.hero-nav a:hover .en {
+  display: inline;
+}
+
+.hero-nav a:hover {
+  background: #ff8fa3;
+
+  color: #fff;
+
+  transform: translateY(-2px);
+}
+
+
+/* =====================================================
+   Grid（三栏：日历 | 自我介绍 | 公告）
+===================================================== */
+
+.about-grid {
+  display: grid;
+
+  /* 左右列缩为原来的 2/3，中栏放大突出主体 */
+  grid-template-columns: 0.67fr 2fr 0.67fr;
+
+  /* 栏间统一约 2~3mm 间隙 */
+  gap: 10px;
+
+  margin: 10px 0 0;
+
+  /* 左右各 10px：日历/公告卡片距网页边缘也是 2~3mm */
+  padding: 0 10px 90px;
+}
+
+.col {
+  min-width: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+/* 中栏：自我介绍卡片撑满中列，三栏顶部对齐 */
+.col-middle {
+  align-items: stretch;
+}
+
+.col-middle .welcome-card {
+  width: auto;
+}
+
+
+/* =====================================================
+   Card 通用
+===================================================== */
+
+.card {
+  box-sizing: border-box;
+
+  background: rgba(255, 255, 255, 0.74);
+
+  border: 1px solid rgba(217, 155, 168, 0.32);
+
+  border-radius: 20px;
+
+  padding: 24px 22px;
+
+  box-shadow:
+    0 6px 22px rgba(180, 120, 135, 0.05);
+}
+
+.card-title {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  margin: 0 0 16px;
+
+  font-family: "GochiHand", cursive;
+
+  font-size: 23px;
+
+  font-weight: normal;
+
+  letter-spacing: 1px;
+
+  color: #b78b95;
+}
+
+.card-title::before {
+  content: "✿";
+
+  color: #d99ba8;
+
+  font-size: 15px;
+}
+
+
+/* =====================================================
+   Calendar（实时）
+===================================================== */
+
+.calendar-month {
+  margin: 0 0 14px;
+
+  font-family: "GochiHand", cursive;
+
+  font-size: 19px;
+
+  color: #9d6c77;
+
+  text-align: center;
+
+  text-transform: capitalize;
+}
+
+.calendar-weekdays {
+  display: grid;
+
+  grid-template-columns: repeat(7, 1fr);
+
+  gap: 3px;
+
+  margin-bottom: 8px;
+}
+
+.calendar-weekdays span {
+  text-align: center;
+
+  font-family: "GochiHand", cursive;
+
+  font-size: 12px;
+
+  color: #c39aa4;
+}
+
+.calendar-days {
+  display: grid;
+
+  grid-template-columns: repeat(7, 1fr);
+
+  gap: 3px;
+}
+
+.calendar-days span {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  aspect-ratio: 1;
+
+  font-family: Arial, sans-serif;
+
+  font-size: 12px;
+
+  color: #76525c;
+
+  border-radius: 50%;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.calendar-days span.blank {
+  visibility: hidden;
+}
+
+.calendar-days span.today {
+  background: #ff8fa3;
+
+  color: #fff;
+
+  font-weight: bold;
+
+  box-shadow:
+    0 2px 8px rgba(255, 143, 163, 0.45);
+}
+
+.calendar-days span:not(.blank):not(.today):hover {
+  background: #ffeef5;
+
+  color: #c56a80;
+}
+
+
+/* =====================================================
+   Welcome（自我介绍）
+===================================================== */
+
+.welcome-card p {
+  margin: 0 0 12px;
+
+  font-family: "MaokenAssortedSans", "猫啃什锦黑", sans-serif;
+
+  font-size: 15px;
+
+  line-height: 1.95;
+
+  color: #664d54;
+}
+
+.welcome-card p:last-child {
+  margin-bottom: 0;
+}
+
+/* 卡片内容三分区：关于我 | 关于网站 | 联系我 */
+.about-section {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(217, 155, 168, 0.35);
+}
+
+
+.about-section:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.about-section-title {
+  margin: 0 0 8px;
+  font-weight: normal;
+}
+
+.about-section-title .en {
+  font-family: "GochiHand", cursive;
+  font-size:30px;
+  letter-spacing: 1px;
+  color:#ff7896;
+}
+
+.about-section-title .zh {
+  margin-left: 7px;
+  font-family: "MaokenAssortedSans", "猫啃什锦黑", sans-serif;
+  font-size: 20px;
+  color:#b7ffe9;
+   /* -webkit-text-stroke: .5px #ff7896; */
+}
+
+.welcome-card a {
+  color: #d97b93;
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(217, 123, 147, 0.5);
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.welcome-card a:hover {
+  color: #c56a80;
+  border-color: #c56a80;
+}
+
+/* 联系我：具体联系方式列表 */
+.contact-list {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: "MaokenAssortedSans", "猫啃什锦黑", sans-serif;
+  font-size: 15px;
+  line-height: 1.95;
+  color: #664d54;
+}
+
+.contact-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.contact-list li:last-child {
+  margin-bottom: 0;
+}
+
+.contact-label {
+  flex-shrink: 0;
+  min-width: 96px;
+  font-family: "GochiHand", cursive;
+  font-size: 16px;
+  letter-spacing: 1px;
+  color: #ff7896;
+}
+
+/* 关于网站：技术栈与工具 */
+.stack-block {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(217, 155, 168, 0.35);
+}
+
+.stack-title {
+  margin: 0 0 10px;
+  font-weight: normal;
+}
+
+.stack-title .zh {
+  font-family: "MaokenAssortedSans", "猫啃什锦黑", sans-serif;
+  font-size: 16px;
+  color: #c56a80;
+}
+
+.stack-title .en {
+  margin-left: 8px;
+  font-family: "GochiHand", cursive;
+  font-size: 15px;
+  letter-spacing: 1px;
+  color: #ff7896;
+}
+
+.stack-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: "MaokenAssortedSans", "猫啃什锦黑", sans-serif;
+  font-size: 15px;
+  color: #664d54;
+  line-height: 1.95;
+}
+
+.stack-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.stack-label {
+  flex-shrink: 0;
+  min-width: 92px;
+  color: #9d6c77;
+}
+
+.stack-value {
+  color: #664d54;
+}
+
+
+/* =====================================================
+   Announcements（最新公告）
+===================================================== */
+
+.notice-list {
+  margin: 0;
+
+  padding: 0;
+
+  list-style: none;
+}
+
+.notice-list li {
+  padding: 10px 0;
+
+  border-bottom: 1px dashed rgba(217, 155, 168, 0.3);
+}
+
+.notice-list li:last-child {
+  border-bottom: 0;
+}
+
+.notice-date {
+  display: block;
+
+  margin-bottom: 4px;
+
+  font-family: "GochiHand", cursive;
+
+  font-size: 13px;
+
+  color: #d99ba8;
+}
+
+.notice-list p {
+  margin: 0;
+
+  font-family: "MaokenAssortedSans", "猫啃什锦黑", sans-serif;
+
+  font-size: 13px;
+
+  line-height: 1.7;
+
+  color: #664d54;
+}
+
+/* 公告栏里的博客链接 */
+.notice-link {
+  color: inherit;
+
+  text-decoration: none;
+
+  transition: color 0.25s ease;
+}
+
+.notice-link:hover {
+  color: #ff7896;
+
+  text-decoration: underline;
+}
+
+
+/* =====================================================
+   Responsive
+===================================================== */
+
+@media (max-width: 950px) {
+
+  .about-hero {
+    height: auto;
+
+    min-height: 280px;
+
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+
+  .about-grid {
+    grid-template-columns: 1fr;
+
+    max-width: 640px;
+
+    margin: 30px auto 0;
+
+    padding: 0 6% 60px;
+  }
+
+  .col-middle {
+    order: -1;
+  }
+
+}

@@ -1,0 +1,231 @@
+/* src/styles/blog.css
+   首页博客区块：延续全站粉彩格纹风格（参照 books-section / carousel-section） */
+@font-face {
+  font-family: "GochiHand";
+  src: url("/fonts/GochiHand-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "MaokenAssortedSans";
+  src: url("/fonts/猫啃什锦黑1.70/MaokenAssortedSans.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 背景小网格 */
+.blog-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(
+      rgba(233, 107, 117, 0.08) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(233, 107, 117, 0.08) 1px,
+      transparent 1px
+    );
+  background-size: 45px 45px;
+}
+
+.blog-section {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  padding: 6vw 6vw 5vw;
+  box-sizing: border-box;
+
+  background: #ffeef5;
+  color: #9d3157;
+  overflow: hidden;
+}
+
+
+/* =========================
+   顶部标题
+========================= */
+
+.blog-header {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  color: #ff8fa3;
+  z-index: 2;
+}
+
+.blog-header-left {
+  font-family: "GochiHand", "MaokenAssortedSans", sans-serif;
+  font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.blog-header-center {
+  font-size: 1rem;
+  color: #b7868c;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+
+/* =========================
+   最新文章列表
+========================= */
+
+.blog-list {
+  position: relative;
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  z-index: 2;
+}
+
+.blog-row {
+  display: grid;
+  grid-template-columns: 70px 1fr 55px;
+  align-items: center;
+  gap: 20px;
+
+  min-height: 120px;
+  padding: 0 10px;
+
+  border-top: 1px solid rgba(157, 49, 87, 0.25);
+
+  text-decoration: none;
+  color: inherit;
+
+  transition:
+    padding 0.35s ease,
+    background 0.35s ease;
+}
+
+.blog-row:last-child {
+  border-bottom: 1px solid rgba(157, 49, 87, 0.25);
+}
+
+.blog-row:hover {
+  padding-left: 30px;
+  padding-right: 30px;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.blog-number {
+  font-family: "GochiHand", cursive;
+  font-size: 24px;
+  color: #ff7f9c;
+}
+
+.blog-row-info h3 {
+  margin: 0 0 6px;
+  font-family: "MaokenAssortedSans", "GochiHand", cursive;
+  font-size: clamp(26px, 3vw, 40px);
+  font-weight: 300;
+  color: #9d3157;
+}
+
+.blog-date {
+  font-family: "GochiHand", cursive;
+  font-size: 18px;
+  color: #ff7f9c;
+}
+
+.blog-arrow {
+  justify-self: end;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #b7ffe9;
+  color: #9d3157;
+  font-size: 25px;
+  transition:
+    transform 0.3s ease,
+    background 0.3s ease;
+}
+
+.blog-row:hover .blog-arrow {
+  transform: rotate(45deg);
+  background: #ff8fa3;
+}
+
+/* 空状态 */
+.blog-empty {
+  text-align: center;
+  padding: 60px 0;
+  font-family: "GochiHand", cursive;
+  font-size: 22px;
+  letter-spacing: 2px;
+  color: #ff7f9c;
+}
+
+
+/* =========================
+   查看全部
+========================= */
+
+.blog-all-link {
+  position: relative;
+  align-self: center;
+  color: #ff7f9c;
+  font-family: "GochiHand", "MaokenAssortedSans", sans-serif;
+  text-decoration: none;
+  font-size: clamp(1.2rem, 1.6vw, 1.5rem);
+  transition:
+    color 0.25s ease,
+    transform 0.25s ease;
+  z-index: 2;
+}
+
+.blog-all-link:hover {
+  color: #9d3157;
+  transform: translateX(5px);
+}
+
+
+/* =========================
+   手机端
+========================= */
+
+@media (max-width: 700px) {
+
+  .blog-section {
+    padding: 40px 25px 60px;
+  }
+
+  .blog-row {
+    grid-template-columns: 45px 1fr 40px;
+    min-height: 100px;
+  }
+
+  .blog-row-info h3 {
+    font-size: 28px;
+  }
+
+  .blog-arrow {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  .blog-row:hover {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+}

@@ -1,0 +1,19 @@
+{
+  "name": "astro",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "node --require ./proxy-fetch.cjs ./node_modules/astro/bin/astro.mjs dev",
+    "build": "node --require ./proxy-fetch.cjs ./node_modules/astro/bin/astro.mjs build",
+    "preview": "node --require ./proxy-fetch.cjs ./node_modules/astro/bin/astro.mjs preview",
+    "astro": "node --require ./proxy-fetch.cjs ./node_modules/astro/bin/astro.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.116.0",
+    "astro": "^6.4.6",
+    "undici": "^8.11.2"
+  }
+}

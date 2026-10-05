@@ -1,0 +1,563 @@
+---
+import "../styles/guestbook.css";
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guestbook · Uko's Diary</title>
+</head>
+
+<body>
+
+  <main class="guestbook-page">
+
+    <!-- 返回首页 -->
+    <a href="/" class="back-link">
+      ← back
+    </a>
+
+    <!-- 页面标题 -->
+    <header class="guestbook-header">
+      <p class="small-title">
+        LEAVE A LITTLE NOTE
+      </p>
+
+      <h1>
+        Guest<br />
+        <span>Book</span>
+      </h1>
+
+      <p class="intro">
+        leave something here ♡
+        <br />
+        a thought, a hello, or just a little note.
+      </p>
+    </header>
+
+    <!-- 留言区域 -->
+    <section class="guestbook-content">
+
+      <!-- 写留言 -->
+      <div class="message-form-wrapper">
+
+        <div class="form-decoration">
+          ♡
+        </div>
+
+        <h2>
+          Leave a message
+        </h2>
+
+        <form id="guestbook-form">
+
+          <div class="input-group">
+            <label for="nickname">
+              Your name
+            </label>
+
+            <input
+              id="nickname"
+              name="nickname"
+              type="text"
+              placeholder="little visitor..."
+              maxlength="30"
+              required
+            />
+          </div>
+
+          <div class="input-group">
+            <label for="message">
+              Your message
+            </label>
+
+            <textarea
+              id="message"
+              name="message"
+              placeholder="write something here..."
+              maxlength="300"
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-bottom">
+
+            <span class="character-count" id="character-count">
+              0 / 300
+            </span>
+
+            <button
+              type="submit"
+              id="submit-btn"
+            >
+              Leave it ♡
+            </button>
+
+          </div>
+
+        </form>
+      </div>
+
+      <!-- 留言列表 -->
+      <div class="messages-wrapper">
+
+        <div class="messages-title">
+          <span>
+            LITTLE NOTES
+          </span>
+
+          <span id="message-count">
+            0 notes
+          </span>
+        </div>
+
+        <div
+          id="messages-list"
+          class="messages-list"
+        >
+          <div class="empty-message">
+            <span>♡</span>
+            <p>Loading notes...</p>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- Footer -->
+    <footer class="guestbook-footer">
+
+      <span>
+        Uko's Diary
+      </span>
+
+      <span>
+        ♡
+      </span>
+
+      <span>
+        thank you for visiting
+      </span>
+
+    </footer>
+
+  </main>
+
+
+  <script>
+    import { supabase } from "../lib/supabase.js";
+
+    let initialized = false;
+
+    function initGuestbook() {
+
+      // 防止 Astro 页面生命周期重复初始化
+      if (initialized) return;
+      initialized = true;
+
+      const form = document.getElementById("guestbook-form");
+      const nicknameInput = document.getElementById("nickname");
+      const messageInput = document.getElementById("message");
+      const messagesList = document.getElementById("messages-list");
+      const messageCount = document.getElementById("message-count");
+      const characterCount = document.getElementById("character-count");
+      const submitBtn = document.getElementById("submit-btn");
+
+      if (
+        !(form instanceof HTMLFormElement) ||
+        !(nicknameInput instanceof HTMLInputElement) ||
+        !(messageInput instanceof HTMLTextAreaElement) ||
+        !(messagesList instanceof HTMLElement) ||
+        !(messageCount instanceof HTMLElement) ||
+        !(characterCount instanceof HTMLElement) ||
+        !(submitBtn instanceof HTMLButtonElement)
+      ) {
+        return;
+      }
+
+
+      /* =========================
+         获取留言
+      ========================= */
+
+      async function fetchMessages() {
+
+        messagesList.innerHTML = `
+          <div class="empty-message">
+            <span>♡</span>
+            <p>Loading notes...</p>
+          </div>
+        `;
+
+        try {
+
+          const {
+            data,
+            error
+          } = await supabase
+            .from("guestbook")
+            .select("id, name, message, created_at")
+            .order("created_at", {
+              ascending: false
+            });
+
+
+          if (error) {
+
+            console.error(
+              "Error fetching messages:",
+              error
+            );
+
+            messagesList.innerHTML = `
+              <div class="empty-message">
+                <span>!</span>
+                <p>Failed to load notes.</p>
+              </div>
+            `;
+
+            return;
+          }
+
+
+          renderMessages(data ?? []);
+
+        } catch (error) {
+
+          console.error(
+            "Fetch error:",
+            error
+          );
+
+          messagesList.innerHTML = `
+            <div class="empty-message">
+              <span>!</span>
+              <p>Something went wrong.</p>
+            </div>
+          `;
+        }
+      }
+
+
+      /* =========================
+         渲染留言
+      ========================= */
+
+      function renderMessages(messages) {
+
+        messagesList.innerHTML = "";
+
+        messageCount.textContent =
+          `${messages.length} ${messages.length === 1 ? "note" : "notes"}`;
+
+
+        if (messages.length === 0) {
+
+          messagesList.innerHTML = `
+            <div class="empty-message">
+              <span>♡</span>
+              <p>No little notes yet...</p>
+            </div>
+          `;
+
+          return;
+        }
+
+
+        messages.forEach((item) => {
+
+          const messageCard =
+            document.createElement("article");
+
+          messageCard.className =
+            "message-card";
+
+
+          /* 顶部 */
+          const messageTop =
+            document.createElement("div");
+
+          messageTop.className =
+            "message-top";
+
+
+          /* 名字 */
+          const name =
+            document.createElement("span");
+
+          name.className =
+            "message-name";
+
+          name.textContent =
+            item.name;
+
+
+          /* 日期 */
+          const date =
+            document.createElement("span");
+
+          date.className =
+            "message-date";
+
+
+          const formattedDate =
+            new Date(item.created_at)
+              .toLocaleDateString(
+                "zh-CN",
+                {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit"
+                }
+              );
+
+
+          date.textContent =
+            formattedDate;
+
+
+          messageTop.appendChild(name);
+          messageTop.appendChild(date);
+
+
+          /* 留言内容 */
+          const messageText =
+            document.createElement("p");
+
+          messageText.className =
+            "message-text";
+
+          messageText.textContent =
+            item.message;
+
+
+          /* 爱心 */
+          const heart =
+            document.createElement("span");
+
+          heart.className =
+            "message-heart";
+
+          heart.textContent =
+            "♡";
+
+
+          messageCard.appendChild(
+            messageTop
+          );
+
+          messageCard.appendChild(
+            messageText
+          );
+
+          messageCard.appendChild(
+            heart
+          );
+
+
+          messagesList.appendChild(
+            messageCard
+          );
+
+        });
+
+      }
+
+
+      /* =========================
+         字数统计
+      ========================= */
+
+      messageInput.addEventListener(
+        "input",
+        () => {
+
+          characterCount.textContent =
+            `${messageInput.value.length} / 300`;
+
+        }
+      );
+
+
+      /* =========================
+         提交留言
+      ========================= */
+
+      form.addEventListener(
+        "submit",
+        async (event) => {
+
+          event.preventDefault();
+
+
+          const name =
+            nicknameInput.value.trim();
+
+          const message =
+            messageInput.value.trim();
+
+
+          /* 防止空留言 */
+
+          if (!name || !message) {
+
+            alert(
+              "Please enter your name and message ♡"
+            );
+
+            return;
+          }
+
+
+          /* 长度检查 */
+
+          if (name.length > 30) {
+
+            alert(
+              "Your name is too long."
+            );
+
+            return;
+          }
+
+
+          if (message.length > 300) {
+
+            alert(
+              "Your message is too long."
+            );
+
+            return;
+          }
+
+
+          /* Loading */
+
+          submitBtn.disabled = true;
+
+          submitBtn.textContent =
+            "Sending...";
+
+
+          try {
+
+            const {
+              error
+            } = await supabase
+              .from("guestbook")
+              .insert([
+                {
+                  name: name,
+                  message: message
+                }
+              ]);
+
+
+            if (error) {
+
+              console.error(
+                "Insert error:",
+                error
+              );
+
+              alert(
+                "Failed to send your message. Please try again."
+              );
+
+              return;
+            }
+
+
+            /* 提交成功 */
+
+            form.reset();
+
+            characterCount.textContent =
+              "0 / 300";
+
+
+            /*
+             * 重新读取数据库
+             * 新留言会马上出现在列表
+             */
+
+            await fetchMessages();
+
+
+          } catch (error) {
+
+            console.error(
+              "Submit error:",
+              error
+            );
+
+            alert(
+              "Something went wrong. Please try again."
+            );
+
+
+          } finally {
+
+            submitBtn.disabled =
+              false;
+
+            submitBtn.textContent =
+              "Leave it ♡";
+
+          }
+
+        }
+      );
+
+
+      /* =========================
+         第一次加载
+      ========================= */
+
+      fetchMessages();
+
+    }
+
+
+    /*
+     * Astro 页面加载
+     *
+     * 使用 astro:page-load，
+     * 同时通过 initialized 防止重复初始化。
+     */
+
+    document.addEventListener(
+      "astro:page-load",
+      initGuestbook
+    );
+
+
+    /*
+     * 如果当前页面已经完成加载，
+     * 立即初始化。
+     */
+
+    if (
+      document.readyState === "loading"
+    ) {
+
+      document.addEventListener(
+        "DOMContentLoaded",
+        initGuestbook,
+        { once: true }
+      );
+
+    } else {
+
+      initGuestbook();
+
+    }
+
+  </script>
+
+</body>
+</html>

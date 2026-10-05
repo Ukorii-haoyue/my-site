@@ -1,0 +1,361 @@
+/* =========================================================
+   书本详情页 · book detail
+   布局：左上角封面与书籍信息 + 右侧主体 book note 卡片
+   沿用全站配色：粉底格纹 / 玫红文字 / 薄荷绿点缀
+========================================================= */
+
+.book-detail-page {
+  min-height: 100vh;
+  padding: 45px 7vw 40px;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* =========================
+   顶部栏
+========================= */
+
+.detail-topbar {
+  max-width: 1150px;
+  width: 100%;
+  margin: 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.topbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.topbar-nav-link {
+  font-family: "GochiHand", cursive;
+  font-size: 18px;
+  letter-spacing: 1.5px;
+
+  color: #ff7f9c;
+  text-decoration: none;
+
+  transition: color 0.25s ease;
+}
+
+.topbar-nav-link:not(.is-empty):hover {
+  color: #9d3157;
+}
+
+.topbar-no {
+  font-family: "GochiHand", cursive;
+  font-size: 16px;
+  letter-spacing: 2px;
+
+  color: #c98b9d;
+}
+
+
+/* =========================
+   顶部链接：白色半透明底 + 悬停切换中文
+========================= */
+
+.back-link,
+.topbar-nav-link:not(.is-empty) {
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(157, 49, 87, 0.18);
+  border-radius: 999px;
+  padding: 6px 16px;
+}
+
+/* 中英文同格叠放，悬停淡入淡出，避免宽度跳动 */
+.back-link .link-text,
+.topbar-nav-link .link-text {
+  display: inline-grid;
+  align-items: center;
+}
+
+.back-link .text-en,
+.back-link .text-cn,
+.topbar-nav-link .text-en,
+.topbar-nav-link .text-cn {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+  transition: opacity 0.3s ease;
+}
+
+/* 中文默认隐藏，悬停显示，字体为猫啃什锦黑 */
+.back-link .text-cn,
+.topbar-nav-link .text-cn {
+  opacity: 0;
+  font-family: "MaokenAssortedSans", sans-serif;
+  color: #ff7896;
+}
+
+.back-link:hover .text-en,
+.topbar-nav-link:not(.is-empty):hover .text-en {
+  opacity: 0;
+}
+
+.back-link:hover .text-cn,
+.topbar-nav-link:not(.is-empty):hover .text-cn {
+  opacity: 1;
+}
+
+
+/* =========================
+   主体两栏
+========================= */
+
+.detail-grid {
+  flex: 1;
+
+  max-width: 1150px;
+  width: 100%;
+  margin: 28px auto 0;
+
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 42px;
+  align-items: stretch;
+}
+
+
+/* =========================
+   左侧：封面 + 信息
+========================= */
+
+.book-side {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-cover-frame {
+  margin: 0;
+  width: 100%;
+
+  background: #b7ffe9;
+  padding: 10px 10px 12px;
+
+  border-radius: 18px;
+  border: 1px solid rgba(216, 92, 111, 0.15);
+
+  box-shadow: 0 18px 40px rgba(216, 92, 111, 0.13);
+
+  transform: rotate(-3deg);
+  transition: transform 0.4s ease;
+}
+
+.detail-cover-frame:hover {
+  transform: rotate(0deg);
+}
+
+.detail-cover-frame img {
+  width: 100%;
+  aspect-ratio: 0.68;
+  object-fit: cover;
+
+  display: block;
+  border-radius: 14px;
+
+  filter: saturate(0.95) contrast(0.95);
+}
+
+.book-side-info {
+  margin-top: 22px;
+}
+
+.detail-title {
+  margin: 0;
+
+  font-family: "MaokenAssortedSans", "GochiHand", cursive;
+  font-size: 30px;
+  font-weight: 300;
+  line-height: 1.15;
+
+  color: #9d3157;
+}
+
+.detail-meta {
+  margin: 12px 0 0;
+
+  font-family: "MaokenAssortedSans", sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+
+  color: #b86b82;
+}
+
+
+/* 无封面占位 */
+
+.cover-empty {
+  width: 100%;
+  aspect-ratio: 0.68;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.55);
+
+  font-family: "GochiHand", cursive;
+  font-size: 17px;
+  letter-spacing: 1px;
+
+  color: #b86b82;
+}
+
+
+/* =========================
+   主体：book note 卡片
+========================= */
+
+.note-card {
+  display: flex;
+  flex-direction: column;
+
+  background: rgba(255, 255, 255, 0.62);
+
+  border: 1.5px dashed rgba(157, 49, 87, 0.35);
+  border-radius: 26px;
+
+  padding: 34px 46px 26px;
+
+  box-shadow: 0 18px 45px rgba(216, 92, 111, 0.1);
+}
+
+.note-heading {
+  margin: 0 0 20px;
+
+  font-family: "GochiHand", cursive;
+  font-size: 26px;
+  font-weight: normal;
+  letter-spacing: 3px;
+
+  color: #ff7896;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.note-heading::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(157, 49, 87, 0.2);
+}
+
+.note-body {
+  flex: 1;
+}
+
+.note-paragraph {
+  margin: 0 0 14px;
+
+  font-family: "MaokenAssortedSans", sans-serif;
+  font-size: 16px;
+  line-height: 1.95;
+  text-indent: 2em;
+
+  color: #8f4a60;
+}
+
+.note-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+.note-paragraph.empty-note {
+  text-indent: 0;
+
+  font-family: "GochiHand", cursive;
+  font-size: 17px;
+  letter-spacing: 1px;
+
+  color: #c98b9d;
+}
+
+.note-date {
+  margin: 18px 0 0;
+  align-self: flex-end;
+
+  font-family: "GochiHand", cursive;
+  font-size: 17px;
+  letter-spacing: 1.5px;
+
+  color: #ff7f9c;
+}
+
+
+/* =========================
+   平板 / 手机
+========================= */
+
+@media (max-width: 860px) {
+
+  .book-detail-page {
+    padding: 32px 25px;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: 26px;
+    margin-top: 22px;
+  }
+
+  /* 封面在左上角，信息在右侧 */
+  .book-side {
+    display: grid;
+    grid-template-columns: 118px 1fr;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .book-side-info {
+    margin-top: 0;
+  }
+
+  .detail-title {
+    font-size: 26px;
+  }
+
+  .note-card {
+    padding: 26px 24px 20px;
+    border-radius: 22px;
+  }
+
+  .note-heading {
+    font-size: 22px;
+    margin-bottom: 16px;
+  }
+
+  .note-paragraph {
+    font-size: 15px;
+    line-height: 1.9;
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  .book-side {
+    grid-template-columns: 100px 1fr;
+    gap: 16px;
+  }
+
+  .detail-title {
+    font-size: 22px;
+  }
+
+  .topbar-nav {
+    gap: 14px;
+  }
+
+  .topbar-nav-link,
+  .topbar-no {
+    font-size: 15px;
+  }
+
+}

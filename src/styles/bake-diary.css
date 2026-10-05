@@ -1,0 +1,436 @@
+@font-face {
+  font-family: "GochiHand";
+  src: url("/fonts/GochiHand-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+@font-face {
+  font-family: "MaokenAssortedSans";
+
+  src: url("/fonts/猫啃什锦黑1.70/MaokenAssortedSans.ttf")
+       format("truetype");
+
+  font-weight: normal;
+  font-style: normal;
+
+  font-display: swap;
+}
+
+
+.book-diary{
+
+    min-height:100vh;
+
+    background:#ffeef5;
+
+    position:relative;
+
+    display:flex;
+
+    overflow:hidden;
+
+    padding:120px 8%;
+
+}
+
+
+
+/* 左侧 */
+
+.book-heading{
+    width:40%;
+    position:relative;
+    z-index:2;
+}
+
+.cute-star{
+
+    color:#e96b75;
+    font-size:35px;
+    animation:sparkle 2s infinite;
+}
+
+.book-heading h2{
+    margin-top:20px;
+    font-size:90px;
+    line-height:0.8;
+    letter-spacing:3px;
+    color:#ff8fa3;
+    font-family:"GochiHand",serif;
+}
+
+
+
+.book-heading p{
+
+    margin-top:35px;
+    color:#ff8fa3;
+    line-height:2;
+    font-size:18px;
+    font-family: "MaokenAssortedSans",sans-serif;
+}
+
+
+
+.book-heading span{
+
+    display:inline-block;
+
+    margin-top:30px;
+
+    padding:10px 20px;
+
+    border-radius:30px;
+
+    background:#ffe1e5;
+
+    color:#d45c67;
+
+    font-family: "GochiHand",sans-serif;
+}
+
+
+/* 书本区域 */
+
+.book-library{
+
+    width:60%;
+
+    height:700px;
+
+    overflow:hidden;
+
+    position:relative;
+
+    z-index:2;
+
+}
+
+.book-track{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:80px;
+
+    animation:
+
+            floatBooks 25s linear infinite;
+
+}
+
+
+.book-library:hover
+.book-track{
+
+    animation-play-state:paused;
+
+}
+
+.book-item{
+    position:relative;
+
+    display:flex;
+    align-items:center;
+
+    width:100%;
+
+    animation:
+        littleFloat 5s ease-in-out infinite;
+
+    animation-delay:var(--delay);
+}
+
+
+/* =========================
+   图片
+========================= */
+
+.book-cover{
+    width:180px;
+    max-height:260px;
+
+    flex-shrink:0;
+
+    position:relative;
+
+    perspective:800px;
+}
+
+
+.book-cover img{
+    width:180px;
+    height:auto;
+    max-height:260px;
+
+    display:block;
+
+    object-fit:contain;
+
+    border-radius:12px;
+
+    box-shadow:
+        0 20px 35px rgba(180,100,110,.2);
+
+    transition:.5s;
+}
+
+
+/* 图片 hover */
+
+.book-cover:hover img{
+    transform:
+        rotateY(-12deg)
+        translateY(-10px)
+        scale(1.04);
+}
+
+
+/* =========================
+   右侧文字
+========================= */
+
+.book-note{
+    position:absolute;
+
+    left:510px;
+    top:50%;
+
+    width:260px;
+
+    opacity:0;
+
+    transform:
+        translateY(-50%)
+        translateX(-15px);
+
+    transition:
+        opacity .4s ease,
+        transform .4s ease;
+
+    pointer-events:none;
+}
+
+
+/* 只有鼠标放在图片上才显示 */
+
+.book-cover:hover + .book-note{
+    opacity:1;
+
+    transform:
+        translateY(-50%)
+        translateX(0);
+}
+
+.book-note h3{
+    margin:0;
+
+    font-size:32px;
+
+    color:#54383d;
+}
+
+
+.book-note small{
+    color:#d46b74;
+}
+
+
+.book-note p{
+    margin-top:12px;
+
+    line-height:1.8;
+
+    color:#74585d;
+}
+
+
+.book-note time{
+    color:#e96b75;
+}
+
+
+
+
+.flower{
+
+    position:absolute;
+
+    color:#ef9ca4;
+
+    font-size:50px;
+
+}
+
+
+
+.flower-one{
+
+    right:10%;
+
+    top:15%;
+
+}
+
+
+
+.flower-two{
+
+    left:8%;
+
+    bottom:15%;
+
+}
+
+
+
+
+
+@keyframes floatBooks{
+
+
+    from{
+
+        transform:translateY(0);
+
+    }
+
+    to{
+
+        transform:translateY(-50%);
+
+    }
+
+
+}
+
+
+
+
+@keyframes littleFloat{
+
+
+    50%{
+
+        transform:translateY(-12px);
+
+    }
+
+
+}
+
+
+
+@keyframes sparkle{
+
+
+    50%{
+
+        transform:
+                rotate(20deg)
+                scale(1.2);
+
+    }
+
+
+}
+
+
+
+
+@media(max-width:900px){
+
+
+    .book-diary{
+
+        flex-direction:column;
+
+    }
+
+
+    .book-heading{
+
+        width:100%;
+
+    }
+
+
+    .book-library{
+
+        width:100%;
+
+    }
+
+
+    .book-heading h2{
+
+        font-size:60px;
+
+    }
+
+
+}
+
+
+.baking-all-link {
+
+  display: inline-block;
+
+  color: #ff7f9c;
+
+  font-family:
+    "GochiHand",
+    cursive;
+
+  font-size: clamp(1.2rem, 1.6vw, 1.5rem);
+
+  text-decoration: none;
+
+  cursor: pointer;
+
+  transition:
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+
+.baking-all-link:hover {
+
+  color: #9d3157;
+
+  transform:
+    translateX(5px);
+}
+
+
+/* 无图片占位（首页烘焙书架） */
+
+.book-cover .cover-empty{
+
+    width:180px;
+    height:220px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:14px;
+
+    text-align:center;
+
+    border-radius:12px;
+
+    background:rgba(255,255,255,.55);
+
+    box-shadow:
+        0 20px 35px rgba(180,100,110,.2);
+
+    font-family:"MaokenAssortedSans",sans-serif;
+    font-size:15px;
+
+    color:#9d3157;
+}

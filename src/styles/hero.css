@@ -1,0 +1,704 @@
+/* =========================================
+   UKO'S DIARY HERO
+========================================= */
+@font-face {
+  font-family: "GochiHand";
+
+  src: url("/fonts/GochiHand-Regular.ttf")
+       format("truetype");
+
+  font-weight: normal;
+  font-style: normal;
+
+  font-display: swap;
+}
+
+
+@font-face {
+  font-family: "GreatVibes";
+
+  src: url("/fonts/GreatVibes-Regular.ttf")
+       format("truetype");
+
+  font-weight: normal;
+  font-style: normal;
+
+  font-display: swap;
+}
+
+
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  min-height: 700px;
+
+  overflow: hidden;
+
+  background: #ffeef5 url("/images/25.jpg") center / cover no-repeat;
+
+  isolation: isolate;
+}
+
+/* 图片背景上的轻微浅色遮罩：提升文字可读性，不遮挡任何内容 */
+.hero::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 1;
+
+  background: rgba(255, 238, 245, 0.2);
+
+  pointer-events: none;
+}
+
+
+/* =========================================
+   主标题（居中，参考详情页 records-header 样式）
+========================================= */
+
+.hero-title {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 11;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  pointer-events: none;
+}
+
+
+/* 顶部小标题 */
+
+.hero-eyebrow {
+  margin: 0 0 24px;
+
+  font-family: "GochiHand", cursive;
+
+  font-size: 20px;
+
+  letter-spacing: 3px;
+
+  color: #ff7f9c;
+}
+
+
+/* 主标题大字 */
+
+.hero-big {
+  position: relative;
+
+  margin: 0;
+
+  font-family: "GochiHand", cursive;
+
+  font-size: clamp(80px, 12vw, 190px);
+
+  line-height: 0.8;
+
+  text-transform: uppercase;
+
+  color: #ff7896;
+
+  transform-origin: center center;
+
+  cursor: pointer;
+
+  /* 父容器 .hero-title 是 pointer-events:none，这里重新开启以响应悬停 */
+  pointer-events: auto;
+
+  transition:
+    transform 0.5s cubic-bezier(.22, 1, .36, 1),
+    letter-spacing 0.5s cubic-bezier(.22, 1, .36, 1),
+    filter 0.5s ease;
+}
+
+/* 悬停：放大 + 延伸 + 汁光冲击 */
+.hero-big:hover {
+  transform: scale(1.14) scaleY(1.06) rotate(-0.5deg);
+
+  letter-spacing: 0.015em;
+
+  filter:
+    drop-shadow(0 0 14px rgba(255, 120, 150, 0.35))
+    drop-shadow(0 0 34px rgba(183, 255, 233, 0.30));
+}
+
+
+.hero-big .line {
+  position: relative;
+
+  display: block;
+
+  width: fit-content;
+
+  margin-inline: auto;
+}
+
+
+/* 错落可爱：Uko's 偏左，Diary 偏右，带轻微旋转 */
+
+.line-uko {
+  transform: translateX(-0.3em) rotate(-1.6deg);
+}
+
+.line-diary {
+  color: #b7ffe9;
+
+  -webkit-text-stroke: 2px #ff7896;
+
+  transform: translateX(0.3em) rotate(1.6deg);
+}
+
+
+/* ---------- 悬停爆汁水滴（从文字边缘向外迸发） ---------- */
+
+.hero-big .juice {
+  position: absolute;
+
+  inset: 0;
+
+  pointer-events: none;
+}
+
+
+/* 自然水滴形：三侧圆润 + 一个尖角 */
+
+.jp {
+  position: absolute;
+
+  width: 9px;
+  height: 13px;
+
+  border-radius: 50% 50% 50% 0;
+
+  opacity: 0;
+
+  will-change: transform, opacity;
+}
+
+
+/* 沿文字四周边缘排布，飞行方向全部朝外，尖角朝向运动方向 */
+
+.jp-1  { left: 0;   top: 40%; background: #ff7896; --tx: -74px; --ty: -10px; --rot: 45deg;  --d: 0s;    --sz: 1.9; }
+.jp-2  { left: 4%;  top: 8%;  background: #b7ffe9; --tx: -60px; --ty: -60px; --rot: 90deg;  --d: .05s;  --sz: 1.6; }
+.jp-3  { left: 88%; top: 4%;  background: #ff7f9c; --tx: 62px;  --ty: -64px; --rot: 180deg; --d: .02s;  --sz: 1.7; }
+.jp-4  { left: 96%; top: 44%; background: #f7d8ff; --tx: 80px;  --ty: 8px;   --rot: 225deg; --d: .08s;  --sz: 2.0; }
+.jp-5  { left: 6%;  top: 82%; background: #ff7896; --tx: -54px; --ty: 58px;  --rot: 0deg;   --d: .1s;   --sz: 1.5; }
+.jp-6  { left: 90%; top: 84%; background: #b7ffe9; --tx: 60px;  --ty: 54px;  --rot: 270deg; --d: .04s;  --sz: 1.6; }
+.jp-7  { left: 22%; top: -4%; background: #ff7f9c; --tx: -18px; --ty: -78px; --rot: 125deg; --d: .12s;  --sz: 1.8; }
+.jp-8  { left: 66%; top: -4%; background: #f7d8ff; --tx: 24px;  --ty: -80px; --rot: 145deg; --d: .06s;  --sz: 1.7; }
+.jp-9  { left: 20%; top: 96%; background: #ff7896; --tx: -14px; --ty: 66px;  --rot: 320deg; --d: .14s;  --sz: 1.6; }
+.jp-10 { left: 68%; top: 96%; background: #b7ffe9; --tx: 20px;  --ty: 62px;  --rot: 310deg; --d: .03s;  --sz: 1.8; }
+
+
+.hero-big:hover .jp {
+  animation: juice-burst 0.66s cubic-bezier(.22, 1, .36, 1) var(--d) forwards;
+}
+
+
+@keyframes juice-burst {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0)
+      rotate(calc(var(--rot) - 50deg));
+  }
+
+  16% {
+    opacity: 1;
+  }
+
+  70% {
+    opacity: 0.9;
+    transform:
+      translate(
+        calc(-50% + var(--tx) * var(--burst, 1)),
+        calc(-50% + var(--ty) * var(--burst, 1))
+      )
+      scale(var(--sz))
+      rotate(var(--rot));
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translate(
+        calc(-50% + var(--tx) * var(--burst, 1) * 1.2),
+        calc(-50% + var(--ty) * var(--burst, 1) * 1.2)
+      )
+      scale(calc(var(--sz) * 0.6))
+      rotate(var(--rot));
+  }
+}
+
+
+/* 副标题 */
+
+.hero-intro {
+  margin-top: 42px;
+
+  font-family: "GochiHand", cursive;
+
+  font-size: 22px;
+
+  line-height: 1.5;
+
+  color: #b86b82;
+}
+
+/* =========================================
+   像素装饰
+========================================= */
+
+.pixel-decoration {
+  position: absolute;
+
+  z-index: 7;
+
+  color: #f7d8ff;
+
+  font-size: 12px;
+
+  line-height: 9px;
+
+  letter-spacing: 4px;
+
+  pointer-events: none;
+
+  opacity: 0.9;
+}
+
+.pixel-one {
+  top: 18%;
+  left: 4%;
+
+  transform: rotate(-10deg);
+}
+
+.pixel-two {
+  top: 32%;
+  right: 5%;
+
+  transform: rotate(8deg);
+}
+
+
+/* =========================================
+   星星
+========================================= */
+
+.star {
+  position: absolute;
+
+  z-index: 9;
+
+  color: white;
+
+  font-size: 32px;
+
+  text-shadow:
+    0 0 12px rgba(255,255,255,.8);
+
+  animation: floating-star 4s ease-in-out infinite;
+}
+
+.star-one {
+  top: 23%;
+  left: 26%;
+}
+
+.star-two {
+  top: 35%;
+  right: 22%;
+
+  animation-delay: 1s;
+}
+
+.star-three {
+  bottom: 30%;
+  left: 17%;
+
+  animation-delay: 2s;
+}
+
+.star-four {
+  bottom: 22%;
+  right: 15%;
+
+  animation-delay: 1.5s;
+}
+
+@keyframes floating-star {
+  0%,100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-8px) rotate(10deg);
+  }
+}
+
+
+/* =========================================
+   手机
+========================================= */
+
+@media (max-width: 768px) {
+
+  .hero {
+    min-height: 600px;
+  }
+
+  .hero-eyebrow {
+    font-size: 16px;
+
+    margin-bottom: 18px;
+  }
+
+  .hero-big {
+    font-size: 84px;
+
+    /* 小屏水滴迸发距离整体缩小 */
+    --burst: 0.6;
+  }
+
+  .jp {
+    width: 7px;
+    height: 10px;
+  }
+
+  .hero-intro {
+    font-size: 16px;
+
+    margin-top: 30px;
+  }
+
+  .pixel-decoration {
+    font-size: 8px;
+  }
+
+}
+
+
+/* =========================================
+   SOCIAL LINKS
+   ========================================= */
+
+.social-links {
+  position: absolute;
+
+  left: 28px;
+  bottom: 28px;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  z-index: 1000;
+}
+
+
+/* ---------- Icon ---------- */
+
+.social-icon {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #a8324d;
+  background: rgba(255, 238, 245, 0.88);
+
+  border: 1px solid rgba(168, 50, 77, 0.28);
+
+  border-radius: 50%;
+
+  text-decoration: none;
+
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+
+  transition:
+    transform 0.35s ease,
+    background 0.35s ease,
+    color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+
+/* SVG */
+
+.social-icon svg {
+  width: 19px;
+  height: 19px;
+
+  fill: none;
+  stroke: currentColor;
+
+  stroke-width: 1.7;
+
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  transition: transform 0.35s ease;
+}
+
+
+/* ---------- Hover ---------- */
+
+.social-icon:hover {
+  color: #fff5f8;
+
+  background: #a8324d;
+
+  border-color: #a8324d;
+
+  transform: translateY(-5px) rotate(-4deg);
+
+  box-shadow:
+    0 7px 18px rgba(168, 50, 77, 0.22);
+}
+
+
+.social-icon:hover svg {
+  transform: scale(1.08);
+}
+
+
+/* 让不同图标稍微有一点手工感 */
+
+.social-icon:nth-child(2):hover {
+  transform: translateY(-5px) rotate(4deg);
+}
+
+.social-icon:nth-child(3):hover {
+  transform: translateY(-5px) rotate(-3deg);
+}
+
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 768px) {
+
+  .social-links {
+    left: 16px;
+    bottom: 18px;
+    gap: 7px;
+  }
+
+  .social-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .social-icon svg {
+    width: 17px;
+    height: 17px;
+  }
+
+}
+
+
+
+/* =========================================================
+   HERO VICTORIAN VINE
+   ========================================================= */
+
+.hero-vine {
+  position: absolute;
+
+  left: 50%;
+
+  /*
+   * 控制藤蔓距离 Hero 底部的位置
+   * 数值越大，藤蔓越往上
+   */
+  bottom: 60px;
+
+  width: min(1000px, 92%);
+
+  transform: translateX(-50%);
+
+  z-index: 10;
+
+  pointer-events: none;
+
+  /* 藤蔓（含 drop-shadow 滤镜）静态只渲染一次，避免动画中逐帧重绘卡顿 */
+  opacity: 0.92;
+
+  /* 裁住向两侧滑出的同色遮罩，使之外移后不可见 */
+  overflow: hidden;
+}
+
+.hero-vine svg {
+  display: block;
+
+  width: 100%;
+  height: auto;
+
+  overflow: visible;
+}
+
+/* 主藤蔓 */
+
+.vine {
+  fill: none;
+
+  stroke: #ffffff;
+  stroke-width: 3;
+
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  opacity: 0.92;
+
+  filter:
+    drop-shadow(
+      0 1px 2px rgba(150, 70, 100, 0.12)
+    );
+}
+
+
+/* 叶片 */
+
+.vine-leaf {
+  fill: none;
+
+  stroke: #ffffff;
+  stroke-width: 2.4;
+
+  stroke-linecap: round;
+
+  opacity: 0.88;
+}
+
+
+/* 中央花饰 */
+
+.center-flower {
+  fill: none;
+
+  stroke: #ffffff;
+  stroke-width: 3;
+
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+
+
+
+.vine-center {
+  filter:
+    drop-shadow(
+      0 1px 2px rgba(255, 120, 150, 0.35)
+    );
+}
+
+
+
+/* =========================================================
+   同色遮罩：从中央向两侧滑开，露出下方静态藤蔓
+   只对 transform 做动画（GPU 合成），不触发滤镜逐帧重绘
+   ========================================================= */
+
+.vine-mask {
+  position: absolute;
+
+  top: -12%;
+  bottom: -12%;
+
+  width: 51%;
+
+  background: transparent;
+
+  z-index: 6;
+
+  will-change: transform;
+}
+
+.vine-mask--left {
+  left: 0;
+
+  animation:
+    vine-reveal-left
+    2.2s cubic-bezier(0.16, 1, 0.3, 1)
+  0.25s forwards;
+}
+
+.vine-mask--right {
+  right: 0;
+
+  animation:
+    vine-reveal-right
+    2.2s cubic-bezier(0.16, 1, 0.3, 1)
+  0.25s forwards;
+}
+
+@keyframes vine-reveal-left {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-100%); }
+}
+
+@keyframes vine-reveal-right {
+  from { transform: translateX(0); }
+  to   { transform: translateX(100%); }
+}
+
+/* 手机 */
+
+@media (max-width: 768px) {
+
+  .hero-vine {
+    width: 90%;
+    margin: 20px auto 14px;
+  }
+
+  .vine-mask--left,
+  .vine-mask--right {
+    animation-duration: 1.5s;
+  }
+
+  .vine {
+    stroke-width: 2.7;
+  }
+
+  .vine-leaf {
+    stroke-width: 2.2;
+  }
+
+  .center-flower {
+    stroke-width: 2.7;
+  }
+}
+
+
+/* =========================================================
+   减少动态效果
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .hero-vine {
+    opacity: 0.92;
+
+    transform: translateX(-50%);
+  }
+
+  /* 关闭动效时直接移除遮罩，藤蔓完整静态显示 */
+  .vine-mask {
+    display: none;
+  }
+}

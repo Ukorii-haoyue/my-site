@@ -1,0 +1,742 @@
+---
+import "../../styles/admin.css";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Books · Admin · Uko's Diary</title>
+</head>
+
+<body>
+
+  <main class="admin-page">
+
+    <header class="admin-header">
+      <div>
+        <p class="admin-eyebrow">Uko's Diary</p>
+        <h1>Books</h1>
+      </div>
+
+      <div class="admin-header-actions">
+        <a href="/admin" class="admin-button secondary">
+          Dashboard
+        </a>
+
+        <button id="logout-btn" class="admin-button">
+          Logout
+        </button>
+      </div>
+    </header>
+
+
+    <!-- Loading -->
+    <div id="loading" class="admin-loading">
+      Loading books...
+    </div>
+
+
+    <!-- Content -->
+    <section id="books-section" style="display:none;">
+
+      <div class="admin-section-heading">
+        <div>
+          <p class="admin-eyebrow">Library</p>
+          <h2>Book Records</h2>
+        </div>
+
+        <button id="add-book-btn" class="admin-button">
+          + Add Book
+        </button>
+      </div>
+
+
+      <!-- Add / Edit Book Form -->
+      <div id="book-form" class="admin-form-card" style="display:none;">
+
+        <h3 id="book-form-title">Add a new book</h3>
+
+        <div class="admin-form-grid">
+
+          <label>
+            Title
+            <input
+              type="text"
+              id="book-title"
+              placeholder="The Little Prince"
+            />
+          </label>
+
+
+          <label>
+            Author
+            <input
+              type="text"
+              id="book-author"
+              placeholder="Antoine de Saint-Exupéry"
+            />
+          </label>
+
+
+          <label class="full-width">
+            Description
+            <textarea
+              id="book-description"
+              rows="5"
+              placeholder="Write something about this book..."
+            ></textarea>
+          </label>
+
+
+          <label class="full-width">
+            Cover Image
+            <input
+              type="file"
+              id="book-image"
+              accept="image/*"
+            />
+            <small id="book-image-hint" class="upload-hint"></small>
+          </label>
+
+        </div>
+
+
+        <div class="admin-form-actions">
+
+          <button
+            id="cancel-book-btn"
+            class="admin-button secondary"
+          >
+            Cancel
+          </button>
+
+          <button
+            id="save-book-btn"
+            class="admin-button"
+          >
+            Save Book
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- Book List -->
+      <div id="books-list" class="admin-content-list"></div>
+
+    </section>
+
+  </main>
+
+
+  <script>
+    import { supabase } from "../../lib/supabase.js";
+
+
+    const loading = document.getElementById("loading");
+    const booksSection = document.getElementById("books-section");
+    const booksList = document.getElementById("books-list");
+
+    const addBookBtn = document.getElementById("add-book-btn");
+    const bookForm = document.getElementById("book-form");
+
+    const cancelBookBtn = document.getElementById("cancel-book-btn");
+    const saveBookBtn = document.getElementById("save-book-btn");
+
+    const logoutBtn = document.getElementById("logout-btn");
+
+    let editingBookId = null;
+    let editingBookImageUrl = "";
+
+
+    // --------------------------------
+    // Check administrator
+    // --------------------------------
+
+    async function checkAdmin() {
+
+      const {
+        data: { user }
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        window.location.href = "/admin";
+        return false;
+      }
+
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("is_admin")
+        .eq("id", user.id)
+        .single();
+
+
+      if (error || !data?.is_admin) {
+        alert("You do not have administrator permission.");
+        window.location.href = "/admin";
+        return false;
+      }
+
+      return true;
+    }
+
+
+    // --------------------------------
+    // Load books
+    // --------------------------------
+
+    async function loadBooks() {
+
+      const {
+        data,
+        error
+      } = await supabase
+        .from("books")
+        .select("id, title, author, description, image_url, created_at")
+        .order("created_at", {
+          ascending: false
+        });
+
+
+      if (error) {
+        console.error(error);
+        booksList.innerHTML = `
+          <p class="admin-error">
+            Failed to load books: ${error.message}
+          </p>
+        `;
+        return;
+      }
+
+
+      if (!data || data.length === 0) {
+
+        booksList.innerHTML = `
+          <div class="admin-empty">
+            <p>No books yet.</p>
+            <span>Add your first book ♡</span>
+          </div>
+        `;
+
+        return;
+      }
+
+
+      booksList.innerHTML = data.map(book => `
+
+        <article class="admin-content-card">
+
+          ${
+            book.image_url
+              ? `
+                <div class="admin-content-image">
+                  <img
+                    src="${book.image_url}"
+                    alt="${book.title}"
+                  />
+                </div>
+              `
+              : `
+                <div class="admin-content-image placeholder">
+                  No Cover
+                </div>
+              `
+          }
+
+
+          <div class="admin-content-info">
+
+            <h3>${book.title}</h3>
+
+            <p class="admin-content-meta">
+              ${book.author || "Unknown author"}
+            </p>
+
+            <p class="admin-content-description">
+              ${book.description || ""}
+            </p>
+
+          </div>
+
+
+          <div class="admin-content-actions">
+
+            <button
+              class="admin-edit-btn"
+              data-id="${book.id}"
+            >
+              Edit
+            </button>
+
+            <button
+              class="admin-delete-btn"
+              data-id="${book.id}"
+              data-image="${book.image_url || ""}"
+            >
+              Delete
+            </button>
+
+          </div>
+
+        </article>
+
+      `).join("");
+
+
+      // Delete buttons
+
+      document
+        .querySelectorAll(".admin-delete-btn")
+        .forEach(button => {
+
+          button.addEventListener("click", async () => {
+
+            const id = button.dataset.id;
+            const imageUrl = button.dataset.image;
+
+
+            const confirmed = confirm(
+              "Delete this book?"
+            );
+
+            if (!confirmed) return;
+
+
+            // Delete database record
+
+            const {
+              error: deleteError
+            } = await supabase
+              .from("books")
+              .delete()
+              .eq("id", id);
+
+
+            if (deleteError) {
+
+              alert(
+                "Delete failed: " +
+                deleteError.message
+              );
+
+              return;
+            }
+
+
+            // Delete image from Storage if it exists
+
+            if (imageUrl) {
+
+              const fileName =
+                imageUrl.split("/").pop();
+
+              if (fileName) {
+
+                await supabase.storage
+                  .from("books")
+                  .remove([fileName]);
+
+              }
+
+            }
+
+
+            await loadBooks();
+
+          });
+
+        });
+
+
+      // Edit buttons
+
+      document
+        .querySelectorAll(".admin-edit-btn")
+        .forEach(button => {
+
+          button.addEventListener("click", () => {
+
+            const book =
+              data.find(
+                item => item.id === Number(button.dataset.id)
+              );
+
+            if (book) {
+              startEditBook(book);
+            }
+
+          });
+
+        });
+
+    }
+
+
+    // --------------------------------
+    // Reset form to "add" mode
+    // --------------------------------
+
+    function resetBookForm() {
+
+      editingBookId = null;
+      editingBookImageUrl = "";
+
+      document.getElementById("book-title").value = "";
+      document.getElementById("book-author").value = "";
+      document.getElementById("book-description").value = "";
+      document.getElementById("book-image").value = "";
+
+      document.getElementById("book-form-title").textContent =
+        "Add a new book";
+
+      document.getElementById("book-image-hint").textContent =
+        "";
+
+      saveBookBtn.textContent =
+        "Save Book";
+
+      saveBookBtn.disabled = false;
+
+    }
+
+
+    // --------------------------------
+    // Start editing a book
+    // --------------------------------
+
+    function startEditBook(book) {
+
+      editingBookId = book.id;
+      editingBookImageUrl = book.image_url || "";
+
+      document.getElementById("book-title").value =
+        book.title || "";
+
+      document.getElementById("book-author").value =
+        book.author || "";
+
+      document.getElementById("book-description").value =
+        book.description || "";
+
+      document.getElementById("book-image").value =
+        "";
+
+      document.getElementById("book-form-title").textContent =
+        "Edit this book";
+
+      document.getElementById("book-image-hint").textContent =
+        "Leave empty to keep the current cover.";
+
+      saveBookBtn.textContent =
+        "Update Book";
+
+      bookForm.style.display = "block";
+
+      addBookBtn.style.display = "none";
+
+      bookForm.scrollIntoView({
+        behavior: "smooth"
+      });
+
+    }
+
+
+    // --------------------------------
+    // Add Book
+    // --------------------------------
+
+    addBookBtn.addEventListener(
+      "click",
+      () => {
+
+        resetBookForm();
+
+        bookForm.style.display = "block";
+
+        addBookBtn.style.display = "none";
+
+      }
+    );
+
+
+    // --------------------------------
+    // Cancel
+    // --------------------------------
+
+    cancelBookBtn.addEventListener(
+      "click",
+      () => {
+
+        resetBookForm();
+
+        bookForm.style.display = "none";
+
+        addBookBtn.style.display = "inline-flex";
+
+      }
+    );
+
+
+    // --------------------------------
+    // Save Book
+    // --------------------------------
+
+    saveBookBtn.addEventListener(
+      "click",
+      async () => {
+
+        const title =
+          document
+            .getElementById("book-title")
+            .value
+            .trim();
+
+
+        const author =
+          document
+            .getElementById("book-author")
+            .value
+            .trim();
+
+
+        const description =
+          document
+            .getElementById("book-description")
+            .value
+            .trim();
+
+
+        const imageInput =
+          document.getElementById("book-image");
+
+
+        if (!title) {
+
+          alert("Please enter a book title.");
+
+          return;
+
+        }
+
+
+        saveBookBtn.disabled = true;
+
+        saveBookBtn.textContent = "Saving...";
+
+
+        let imageUrl = null;
+
+
+        // -----------------------------
+        // Upload cover (only if a new
+        // file was selected)
+        // -----------------------------
+
+        const imageFile =
+          imageInput.files[0];
+
+
+        if (imageFile) {
+
+          const fileExt =
+            imageFile.name
+              .split(".")
+              .pop();
+
+
+          const fileName =
+            `${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
+
+
+          const {
+            error: uploadError
+          } = await supabase.storage
+            .from("books")
+            .upload(
+              fileName,
+              imageFile,
+              {
+                cacheControl: "3600",
+                upsert: false
+              }
+            );
+
+
+          if (uploadError) {
+
+            console.error(uploadError);
+
+            alert(
+              "Image upload failed: " +
+              uploadError.message
+            );
+
+            saveBookBtn.disabled = false;
+
+            saveBookBtn.textContent = editingBookId
+              ? "Update Book"
+              : "Save Book";
+
+            return;
+
+          }
+
+
+          const {
+            data: publicUrlData
+          } = supabase.storage
+            .from("books")
+            .getPublicUrl(fileName);
+
+
+          imageUrl =
+            publicUrlData.publicUrl;
+
+        }
+
+
+        // -----------------------------
+        // Save database record
+        // (insert or update)
+        // -----------------------------
+
+        let saveError;
+
+        if (editingBookId) {
+
+          const recordData = {
+            title,
+            author,
+            description
+          };
+
+          // 编辑时只有选了新封面才更换图片
+
+          if (imageUrl) {
+            recordData.image_url = imageUrl;
+          }
+
+          const { error } = await supabase
+            .from("books")
+            .update(recordData)
+            .eq("id", editingBookId);
+
+          saveError = error;
+
+        } else {
+
+          const { error } = await supabase
+            .from("books")
+            .insert({
+              title,
+              author,
+              description,
+              image_url: imageUrl
+            });
+
+          saveError = error;
+
+        }
+
+
+        if (saveError) {
+
+          console.error(saveError);
+
+          alert(
+            "Failed to save book: " +
+            saveError.message
+          );
+
+          saveBookBtn.disabled = false;
+
+          saveBookBtn.textContent = editingBookId
+            ? "Update Book"
+            : "Save Book";
+
+          return;
+
+        }
+
+
+        // 更换了新封面时，删除旧封面
+
+        if (editingBookId && imageUrl && editingBookImageUrl) {
+
+          const oldFileName =
+            editingBookImageUrl.split("/").pop();
+
+          if (oldFileName) {
+
+            await supabase.storage
+              .from("books")
+              .remove([oldFileName]);
+
+          }
+
+        }
+
+
+        alert(
+          editingBookId
+            ? "Book updated successfully! ♡"
+            : "Book added successfully! ♡"
+        );
+
+
+        resetBookForm();
+
+
+        bookForm.style.display = "none";
+
+        addBookBtn.style.display = "inline-flex";
+
+
+        await loadBooks();
+
+      }
+    );
+
+
+    // --------------------------------
+    // Logout
+    // --------------------------------
+
+    logoutBtn.addEventListener(
+      "click",
+      async () => {
+
+        await supabase.auth.signOut();
+
+        window.location.href = "/admin";
+
+      }
+    );
+
+
+    // --------------------------------
+    // Init
+    // --------------------------------
+
+    const isAdmin =
+      await checkAdmin();
+
+
+    if (isAdmin) {
+
+      loading.style.display = "none";
+
+      booksSection.style.display = "block";
+
+      await loadBooks();
+
+    }
+
+  </script>
+
+</body>
+</html>

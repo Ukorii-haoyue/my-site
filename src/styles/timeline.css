@@ -1,0 +1,231 @@
+/* ===================================================
+   ===== Timeline section (scrolls below hero) ======
+   =================================================== */
+@font-face {
+  font-family: "GochiHand";
+  src: url("/fonts/GochiHand-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+/* 8 列 × 7 行，所有轨道等高，网格边界与背景线严格对齐 */
+.timeline-section{
+    position:relative;
+    display:grid;
+    grid-template-columns:repeat(8, 1fr);
+    grid-template-rows:repeat(7, 1fr);
+    min-height:100vh;
+    width:100%;
+    overflow:hidden;
+    font-family: "GochiHand", sans-serif;
+}
+
+.tl-background{
+    grid-column:1 / -1;
+    grid-row:1 / -1;
+    position:relative;
+    background:var(--cream);
+}
+
+/* 可见网格线：用百分比绘制，正好压在 8×7 轨道的分界线上 */
+.tl-grid{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+
+    background-image:
+        linear-gradient(
+            to right,
+            rgba(227,53,41,.15) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            to bottom,
+            rgba(227,53,41,.15) 1px,
+            transparent 1px
+        );
+
+    background-size:
+        calc(100% / 8) 100%,
+        100% calc(100% / 7);
+}
+
+.chapter-marker{
+    position:relative;
+    z-index:5;
+    cursor:pointer;
+    /* 占满所在单元，整个格子都可悬停；dot 再对齐到左上角交叉点 */
+}
+
+/* 标题改为绝对定位，不占用网格轨道（保证 7 行完全等高） */
+.tl-label{
+    position:absolute;
+    z-index:4;
+
+    font-weight:900;
+    letter-spacing:2px;
+    font-size:0.85rem;
+    color:var(--ink);
+    text-transform:uppercase;
+}
+
+.tl-label--tc{
+    top:22px;
+    left:50%;
+    transform:translateX(-50%);
+}
+.tl-label--tr{
+    top:22px;
+    right:24px;
+    text-align:right;
+}
+.tl-title{
+    font-size:clamp(1.6rem, 3.5vw, 2.6rem);
+    font-weight:900;
+    line-height:1.1;
+    color:#ff8fa3;
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
+
+/* 圆点：圆心精确压在所在单元左上角的网格线交叉点上 */
+.chapter-marker .dot{
+    position:absolute;
+    left:0;
+    top:0;
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:#ff8fa3;
+    transform:translate(-50%, -50%);
+    transition:transform .2s ease, box-shadow .2s ease;
+}
+.chapter-marker:hover .dot{
+    transform:translate(-50%, -50%) scale(1.4);
+    box-shadow:0 0 0 8px rgba(227,53,41,0.2);
+}
+
+/* 章节标签贴在圆点右侧，垂直居中于交叉点 */
+.ch-label{
+    position:absolute;
+    left:18px;
+    top:0;
+    transform:translateY(-50%);
+
+    font-weight:900;
+    font-size:0.85rem;
+    letter-spacing:2px;
+    color: #ff8fa3;
+    background:#fff;
+    padding:4px 10px;
+    border-radius:999px;
+    white-space:nowrap;
+    transition:background .2s ease, color .2s ease;
+}
+
+
+/* ===================================================
+   悬停照片层：与背景同一套 8×7 网格，照片铺满整个单元、
+   边缘与网格线重合，无圆角 / 间隙 / 阴影 / 浮动
+   =================================================== */
+
+.tl-photos{
+    position:absolute;
+    inset:0;
+    z-index:3;
+
+    display:grid;
+    grid-template-columns:repeat(8, 1fr);
+    grid-template-rows:repeat(7, 1fr);
+
+    pointer-events:none;
+}
+
+.tl-photo{
+    margin:0;
+    padding:0;
+    align-self:stretch;
+    justify-self:stretch;
+    width:100%;
+    height:100%;
+
+    opacity:0;
+    /* 柔和淡入淡出，只做透明度，不做位移/缩放 */
+    transition:opacity .55s cubic-bezier(.4,0,.2,1);
+
+    will-change:opacity;
+}
+
+.tl-photo img{
+    width:100%;
+    height:100%;
+    display:block;
+    object-fit:cover;
+    border-radius:0;
+    box-shadow:none;
+}
+
+/* 该章被悬停 / 选中：照片整组直接显示 */
+.tl-photos.active .tl-photo{
+    opacity:1;
+}
+
+
+@media (max-width:768px){
+    .timeline-section{
+        grid-template-columns:repeat(4, 1fr);
+        grid-template-rows:repeat(9, 1fr);
+    }
+    .tl-grid{
+        background-size:
+            calc(100% / 4) 100%,
+            100% calc(100% / 9);
+    }
+    .tl-label--tr,.tl-label--tc{
+        left:50%;
+        right:auto;
+        transform:translateX(-50%);
+        text-align:center;
+    }
+    .chapter-marker{
+        grid-column:span 2 !important;
+    }
+
+    /* 小屏无悬停，对角线坐标基于 8 列布局，移动端先隐藏照片层 */
+    .tl-photos{
+        display:none;
+    }
+}
+
+
+.page-section {
+
+    position:relative;
+
+    width:100%;
+
+    min-height:100vh;
+
+    overflow:hidden;
+
+}
+
+
+.page-section::after {
+
+    content:"";
+
+    position:absolute;
+
+    bottom:0;
+
+    left:0;
+
+    width:100%;
+
+    height:120px;
+    pointer-events:none;
+
+}

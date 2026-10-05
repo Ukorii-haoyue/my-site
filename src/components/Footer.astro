@@ -1,0 +1,23 @@
+---
+// src/components/Footer.astro
+const currentYear = new Date().getFullYear();
+import "../styles/footer.css";
+---
+
+<footer class="site-footer">
+
+  <div class="footer-container">
+    <!-- 1. 品牌名称 (极细不加粗) -->
+    <div class="word">Uko's Diary</div>
+
+    <!-- 2. 免责声明 -->
+    <div class="footer-disclaimer">
+      <p>免责声明：本站个别图片素材来源于网络，如涉及版权问题请联系处理。</p>
+    </div>
+
+    <!-- 3. 版权细字 -->
+    <div class="footer-bottom">
+      <p>© {currentYear} Uko's Diary</p>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,84 @@
+---
+// src/components/Blog.astro
+// 首页博客区块：构建时从 Supabase blogs 表读取最新文章
+import "../styles/blog.css";
+import { supabase } from "../lib/supabase.js";
+
+const {
+  data: posts,
+  error,
+} = await supabase
+  .from("blogs")
+  .select("id, title, created_at")
+  .eq("is_visible", true)
+  .order("created_at", { ascending: false })
+  .limit(4);
+
+if (error) {
+  console.error("读取博客失败：", error);
+}
+
+const postList = posts ?? [];
+
+// created_at 按北京时间格式化为 YYYY.MM.DD
+const formatDate = (value) => {
+  if (!value) return "";
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date(value));
+  const get = (type) =>
+    parts.find((part) => part.type === type)?.value ?? "";
+  return `${get("year")}.${get("month")}.${get("day")}`;
+};
+---
+
+<section class="blog-section" id="blog">
+
+  <!-- 顶部标题 -->
+  <div class="blog-header">
+    <div class="blog-header-left">MY BLOG</div>
+    <div class="blog-header-center">Blog</div>
+  </div>
+
+
+  <!-- 最新文章列表 -->
+  <div class="blog-list">
+
+    {postList.length > 0 ? (
+      postList.map((post, index) => (
+        <a
+          class="blog-row"
+          href={`/blog/${post.id}/`}
+        >
+
+          <span class="blog-number">
+            {String(index + 1).padStart(2, "0")}
+          </span>
+
+          <div class="blog-row-info">
+            <h3>{post.title}</h3>
+            <span class="blog-date">{formatDate(post.created_at)}</span>
+          </div>
+
+          <span class="blog-arrow">↗</span>
+
+        </a>
+      ))
+    ) : (
+      <div class="blog-empty">
+        No posts yet ♡
+      </div>
+    )}
+
+  </div>
+
+
+  <!-- 查看全部 -->
+  <a class="blog-all-link" href="/blog/">
+    all →
+  </a>
+
+</section>

@@ -1,0 +1,84 @@
+---
+import "../styles/bake-diary.css";
+import { supabase } from "../lib/supabase.js";
+
+const {
+  data: bakingRecords,
+  error,
+} = await supabase
+  .from("baking")
+  .select("id, title, date, description, image_url, created_at")
+  .order("created_at", { ascending: false });
+
+if (error) {
+  console.error("读取烘焙日记失败：", error);
+}
+
+const books = bakingRecords ?? [];
+
+// 首页只显示年月 YYYY.MM
+const formatMonth = (value) =>
+  value ? String(value).slice(0, 7).replace("-", ".") : "";
+---
+
+{books.length > 0 && (
+  <section class="book-diary" id="baking">
+      <!-- 左侧标题 -->
+      <div class="book-heading">
+          <div class="cute-star">✦</div>
+          <h2>
+              BAKE
+              <br/>
+              &
+              <br/>
+              DIARY
+          </h2>
+          <p>胡闹厨房~~<br/>
+              嘻嘻嘻
+          </p>
+          <a href="/baking-records/"class="baking-all-link">all →</a>
+      </div>
+
+      <!-- 右侧书架 -->
+
+      <div class="book-library">
+          <div class="book-track">
+              {books.map((book, index)=>(
+
+                      <article
+                              class="book-item"
+                              style={`--delay:${index * 1.2}s`}
+                      >
+
+
+                          <div class="book-cover">
+                              {book.image_url ? (
+                                  <img
+                                          src={book.image_url}
+                                          alt={book.title}
+                                  />
+                              ) : (
+                                  <div class="cover-empty">
+                                      <span>{book.title}</span>
+                                  </div>
+                              )}
+
+
+                          </div>
+
+                          <div class="book-note">
+                              <h3>{book.title}</h3>
+                              <small>烘焙日记</small>
+                              <p>{book.description}</p>
+                              <time>{formatMonth(book.date)}</time>
+                          </div>
+                      </article>
+
+                  ))}
+                  </div>
+                  </div>
+                  <div class="flower flower-one">✿</div>
+                  <div class="flower flower-two">♡</div>
+
+                  </section>
+)}

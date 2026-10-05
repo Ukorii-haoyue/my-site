@@ -1,0 +1,352 @@
+---
+import "../styles/about.css";
+import Footer from "../components/Footer.astro";
+import { supabase } from "../lib/supabase.js";
+
+// 最新博客：公告栏展示最近 3 篇已发布文章
+const { data: latestPosts, error: blogError } = await supabase
+  .from("blogs")
+  .select("id, title, created_at")
+  .eq("is_visible", true)
+  .order("created_at", { ascending: false })
+  .limit(3);
+
+if (blogError) {
+  console.error("读取最新博客失败：", blogError);
+}
+
+const noticePosts = latestPosts ?? [];
+
+// 日期格式化为 DD.MM.YYYY，与公告栏原有样式一致
+const formatNoticeDate = (value) => {
+  if (!value) return "";
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Shanghai",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).formatToParts(new Date(value));
+  const get = (type) =>
+    parts.find((part) => part.type === type)?.value ?? "";
+  return `${get("day")}.${get("month")}.${get("year")}`;
+};
+
+// 实时日期：构建时取当天，生成当前月日历
+const now = new Date();
+const year = now.getFullYear();
+const monthIndex = now.getMonth();
+const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+const firstWeekday = new Date(year, monthIndex, 1).getDay(); // 0 = Sunday
+const today = now.getDate();
+const monthLabel = now.toLocaleDateString("en-US", {
+  month: "long",
+  year: "numeric"
+});
+---
+
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>About · Uko's Diary</title>
+</head>
+
+<body>
+
+
+<section class="about-page">
+
+
+<!-- =========================
+     顶部主图（25 号图，充当标题背景）
+========================== -->
+
+<header class="about-hero">
+
+  <p class="hero-eyebrow">
+    Uko's Diary
+  </p>
+
+  <h1 class="hero-big">
+    <span class="line line-about">ABOUT</span>
+    <span class="line line-me">ME</span>
+  </h1>
+
+  <!-- 快速导航（除 about 外的 7 项，默认中文，悬停英文） -->
+  <nav class="hero-nav">
+
+    <a href="/">
+      <span class="zh">首页</span>
+      <span class="en">home</span>
+    </a>
+
+    <a href="/#diary">
+      <span class="zh">时间线</span>
+      <span class="en">timeline</span>
+    </a>
+
+    <a href="/#blog">
+      <span class="zh">博客</span>
+      <span class="en">blog</span>
+    </a>
+
+    <a href="/#films">
+      <span class="zh">电影</span>
+      <span class="en">films</span>
+    </a>
+
+    <a href="/#books">
+      <span class="zh">书籍</span>
+      <span class="en">books</span>
+    </a>
+
+    <a href="/#baking">
+      <span class="zh">烘焙</span>
+      <span class="en">baking</span>
+    </a>
+
+    <a href="/#friends">
+      <span class="zh">友链</span>
+      <span class="en">friends</span>
+    </a>
+
+    <a href="/guestbook/">
+      <span class="zh">留言板</span>
+      <span class="en">guestbook</span>
+    </a>
+
+  </nav>
+
+</header>
+
+
+
+<!-- =========================
+     三栏主体：日历 | 自我介绍 | 公告
+========================== -->
+
+<div class="about-grid">
+
+
+  <!-- ========== 左栏：calendar（实时日期） ========== -->
+
+  <aside class="col col-left">
+
+    <div class="card calendar-card">
+
+      <h2 class="card-title">
+        calendar
+      </h2>
+
+      <p class="calendar-month">
+        {monthLabel}
+      </p>
+
+      <div class="calendar-weekdays">
+        <span>sun</span>
+        <span>mon</span>
+        <span>tue</span>
+        <span>wed</span>
+        <span>thu</span>
+        <span>fri</span>
+        <span>sat</span>
+      </div>
+
+      <div class="calendar-days">
+
+        {Array.from({ length: firstWeekday }).map(() => (
+          <span class="blank"></span>
+        ))}
+
+        {Array.from({ length: daysInMonth }, (_, i) => {
+          const day = i + 1;
+          return (
+            <span class={day === today ? "today" : ""}>
+              {day}
+            </span>
+          );
+        })}
+
+      </div>
+
+    </div>
+
+  </aside>
+
+
+
+  <!-- ========== 中栏：自我介绍（最中间） ========== -->
+
+  <main class="col col-middle">
+
+    <div class="card welcome-card">
+
+      <!-- 卡片内容三部分：关于我 | 关于网站 | 联系我 -->
+
+      <section class="about-section">
+
+        <h3 class="about-section-title">
+          <span class="en">About me</span><br>
+          <span class="zh">关于我</span>
+        </h3>
+
+        <p>
+          Hi，这里是Uko! 大三数媒专业再读(╹ڡ╹ )<br>
+          喜欢羽毛球，网球，摄影，手工，阅读，看电影，追美剧，听R&B和jazz<br>
+          喜欢的风格很多，有甜美梦幻的coquette芭蕾风，可爱美萌的日韩系风，
+          暗黑酷炫的哥特风，科幻金属的赛博风<br>
+          还在审美积累中……<br>
+          一直想做一个属于自己的网站，记录自己的点点滴滴，其实这不仅是提醒自己过活在当下，
+          同时也是创造一个更加了解自己的机会,
+          我要作为一个研究者开始这次探索自我的旅程啦！<br><br>
+          谢谢来访！天天开心！;)
+          </p>
+
+      </section>
+
+      <section class="about-section">
+
+        <h3 class="about-section-title">
+          <span class="en">About this site</span><br>
+          <span class="zh">关于网站</span>
+        </h3>
+
+        <p>
+          Uko's Diary 是一个属于自己的小网站，
+          这里收藏了我的阅读、电影、烘焙，
+          以及一些胡思乱想和天马行空。<br>
+          会持续更新哒！
+        </p>
+
+        <div class="stack-block">
+
+          <h4 class="stack-title">
+            <span class="zh">技术栈与工具</span>
+            <span class="en">tech stack &amp; tools</span>
+          </h4>
+
+          <ul class="stack-list">
+
+            <li>
+              <span class="stack-label">框架/驱动</span>
+              <span class="stack-value">Astro + HTML/CSS/JS</span>
+            </li>
+
+            <li>
+              <span class="stack-label">数据库/服务</span>
+              <span class="stack-value">Supabase</span>
+            </li>
+
+            <li>
+              <span class="stack-label">托管部署</span>
+              <span class="stack-value">Vercel / Netlify / GitHub Pages</span>
+            </li>
+
+          </ul>
+
+        </div>
+
+      </section>
+
+      <section class="about-section">
+
+        <h3 class="about-section-title">
+          <span class="en">Contact me</span><br>
+          <span class="zh">联系我</span>
+        </h3>
+
+        <p>
+          交换友链、有想法或有什么想对我说的，
+          欢迎在留言板留下你的足迹，我会认真阅读每一条~(￣▽￣)~* ♡
+        </p>
+
+        <ul class="contact-list">
+
+          <li>
+            <span class="contact-label">Email</span>
+            <a href="mailto:2122984238@qq.com">2122984238@qq.com</a>
+          </li>
+
+          <li>
+            <span class="contact-label">Guestbook</span>
+            <a href="/guestbook/">留言板</a>
+          </li>
+
+        </ul>
+
+      </section>
+
+    </div>
+
+  </main>
+
+
+
+  <!-- ========== 右栏：announcements（最新公告） ========== -->
+
+  <aside class="col col-right">
+
+    <div class="card announcements-card">
+
+      <h2 class="card-title">
+        announcements
+      </h2>
+
+      <ul class="notice-list">
+
+        {noticePosts.length > 0 ? (
+          noticePosts.map((post) => (
+            <li>
+              <span class="notice-date">
+                {formatNoticeDate(post.created_at)}
+              </span>
+              <p>
+                <a
+                  class="notice-link"
+                  href={`/blog/${post.id}/`}
+                >
+                  {post.title}
+                </a>
+              </p>
+            </li>
+          ))
+        ) : (
+          <>
+            <li>
+              <span class="notice-date">
+                02.10.2026
+              </span>
+              <p>
+                友链申请通道已开启 ♡
+              </p>
+            </li>
+
+            <li>
+              <span class="notice-date">
+                01.10.2026
+              </span>
+              <p>
+                欢迎来到 Uko's Diary
+              </p>
+            </li>
+          </>
+        )}
+
+      </ul>
+
+    </div>
+
+  </aside>
+
+
+</div>
+
+
+</section>
+
+
+<Footer />
+
+
+</body>
+</html>

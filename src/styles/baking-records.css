@@ -1,0 +1,615 @@
+@font-face {
+  font-family: "GochiHand";
+
+  src: url("/fonts/GochiHand-Regular.ttf")
+    format("truetype");
+
+  font-weight: normal;
+
+  font-style: normal;
+
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "MaokenAssortedSans";
+  src: url("/fonts/猫啃什锦黑1.70/MaokenAssortedSans.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+/* =========================
+   基础
+========================= */
+
+* {
+  box-sizing: border-box;
+}
+
+
+html {
+  scroll-behavior: smooth;
+}
+
+
+body {
+  margin: 0;
+
+  background: #ffeef5;
+
+  color: #9d3157;
+
+  font-family: Arial, sans-serif;
+}
+
+
+/* =========================
+   页面
+========================= */
+
+.baking-records {
+
+  min-height: 100vh;
+
+  padding: 70px 8vw 60px;
+
+  background-color: #ffeef5;
+
+  background-image:
+    linear-gradient(
+      rgba(255, 255, 255, 0.4) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.4) 1px,
+      transparent 1px
+    );
+
+  background-size: 55px 55px;
+}
+
+
+/* =========================
+   返回
+========================= */
+
+.back-link {
+
+  display: inline-block;
+
+  color: #ff7f9c;
+
+  text-decoration: none;
+
+  font-family: "GochiHand", cursive;
+
+  font-size: 20px;
+
+  transition:
+    transform 0.25s ease;
+}
+
+
+.back-link:hover {
+
+  transform:
+    translateX(-5px);
+}
+
+
+/* =========================
+   标题
+========================= */
+
+.records-header {
+
+  max-width: 1000px;
+
+  margin: 55px auto 90px;
+
+}
+
+
+.small-title {
+
+  margin: 0 0 15px;
+
+  font-family: "GochiHand", cursive;
+
+  font-size: 20px;
+
+  letter-spacing: 3px;
+
+  color: #ff7f9c;
+}
+
+
+.records-header h1 {
+
+  margin: 0;
+
+  font-family: "GochiHand", cursive;
+
+  font-size:
+    clamp(65px, 10vw, 145px);
+
+  line-height: 0.82;
+
+  text-transform: uppercase;
+
+  color: #ff7896;
+}
+
+
+.records-header h1 span {
+
+  color: #b7ffe9;
+
+  -webkit-text-stroke:
+    2px #ff7896;
+}
+
+
+.intro {
+
+  margin-top: 45px;
+
+  font-family: "GochiHand", cursive;
+
+  font-size: 22px;
+
+  line-height: 1.5;
+
+  color: #ff7896;
+}
+
+
+/* =========================
+   烘焙网格
+========================= */
+
+.baking-grid {
+
+  max-width: 1150px;
+
+  margin: 0 auto;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 70px 45px;
+}
+
+
+/* =========================
+   烘焙卡片
+========================= */
+
+.baking-card {
+
+  position: relative;
+
+  transition:
+    transform 0.35s ease;
+}
+
+
+.baking-card:hover {
+
+  transform:
+    translateY(-8px);
+}
+
+
+/* =========================
+   图片
+========================= */
+
+.baking-image {
+
+  position: relative;
+
+  width: 100%;
+
+  height: 350px;
+
+  overflow: hidden;
+
+  border-radius: 25px;
+
+  background: #f4ced3;
+
+  box-shadow:
+    8px 8px 0 #b7ffe9;
+}
+
+
+.baking-image img {
+
+  width: 100%;
+
+  height: 100%;
+
+  object-fit: cover;
+
+  display: block;
+
+  transition:
+    transform 0.5s ease;
+}
+
+
+.baking-card:hover
+.baking-image img {
+
+  transform:
+    scale(1.05);
+}
+
+
+/* 无图片占位 */
+
+.img-empty {
+
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.45);
+
+  font-family: "GochiHand", cursive;
+  font-size: 20px;
+  letter-spacing: 1.5px;
+
+  color: #b86b82;
+}
+
+
+/* 空状态 */
+
+.empty-baking {
+
+  grid-column: 1 / -1;
+
+  padding: 90px 0;
+
+  text-align: center;
+
+  font-family: "GochiHand", cursive;
+  font-size: 24px;
+  letter-spacing: 2px;
+
+  color: #ff7f9c;
+}
+
+
+/* =========================
+   图片编号
+========================= */
+
+.baking-number {
+
+  position: absolute;
+
+  top: 15px;
+
+  left: 15px;
+
+  width: 45px;
+
+  height: 45px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #fff;
+
+  color: #ff7896;
+
+  font-family:
+    "GochiHand",
+    cursive;
+
+  font-size: 18px;
+}
+
+
+/* =========================
+   文字区域
+========================= */
+
+.baking-info {
+
+  position: relative;
+
+  padding:
+    25px 15px 10px 5px;
+}
+
+
+.baking-meta {
+
+  display: flex;
+
+  gap: 10px;
+
+  margin-bottom: 8px;
+
+  font-family:
+    "GochiHand",
+    cursive;
+
+  font-size: 17px;
+
+  color: #ff7f9c;
+}
+
+
+.baking-info h2 {
+
+  margin: 0;
+
+  font-family:
+    "MaokenAssortedSans",
+    "GochiHand",
+    cursive;
+
+  font-size:
+    clamp(35px, 4vw, 55px);
+
+  font-weight: 300;
+
+  color: #9d3157;
+}
+
+
+.baking-info p {
+
+  max-width: 500px;
+
+  margin:
+    12px 0 0;
+
+  font-size: 14px;
+
+  line-height: 1.7;
+
+  color: #8f6572;
+}
+
+
+/* =========================
+   爱心 + 点赞数
+========================= */
+
+.baking-like {
+
+  position: absolute;
+
+  right: 10px;
+
+  bottom: 10px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+}
+
+
+.baking-heart {
+
+  position: static;
+
+  width: 48px;
+
+  height: 48px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #b7ffe9;
+
+  color: #9d3157;
+
+  font-size: 23px;
+
+  transition:
+    transform 0.3s ease,
+    background 0.3s ease,
+    color 0.3s ease;
+}
+
+
+.baking-like-count {
+
+  min-width: 18px;
+
+  text-align: center;
+
+  font-family:
+    "GochiHand",
+    cursive;
+
+  font-size: 19px;
+
+  line-height: 1;
+
+  color: #ff7f9c;
+
+  transition: color 0.3s ease;
+}
+
+
+.baking-like-count.is-liked {
+
+  color: #ff5c7e;
+}
+
+
+.baking-card:hover
+.baking-heart {
+
+  transform:
+    rotate(-10deg)
+    scale(1.1);
+
+  background: #ff8fa3;
+
+  color: white;
+}
+
+
+/* 可点击的爱心 */
+
+.baking-heart {
+
+  cursor: pointer;
+
+  user-select: none;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+
+/* 已点赞状态（常驻粉色实心） */
+
+.baking-heart.is-liked {
+
+  background: #ff8fa3;
+
+  color: white;
+}
+
+
+/* 点赞瞬间的弹跳动画 */
+
+@keyframes heartPop {
+
+  0% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform:
+      rotate(-14deg)
+      scale(1.4);
+  }
+
+  100% {
+    transform:
+      rotate(-10deg)
+      scale(1.1);
+  }
+}
+
+
+.baking-heart.heart-pop {
+
+  animation: heartPop 0.45s ease;
+}
+
+
+/* =========================
+   Footer
+========================= */
+
+.records-footer {
+
+  max-width: 1150px;
+
+  margin:
+    110px auto 0;
+
+  padding-top: 25px;
+
+  border-top:
+    1px solid
+    rgba(157, 49, 87, 0.25);
+
+  display: flex;
+
+  justify-content: space-between;
+
+  font-family:
+    "GochiHand",
+    cursive;
+
+  font-size: 18px;
+
+  color: #ff7f9c;
+}
+
+
+/* =========================
+   手机端
+========================= */
+
+@media (max-width: 750px) {
+
+  .baking-records {
+
+    padding:
+      40px 25px;
+  }
+
+
+  .records-header {
+
+    margin-top: 50px;
+
+    margin-bottom: 60px;
+  }
+
+
+  .records-header h1 {
+
+    font-size: 70px;
+  }
+
+
+  .baking-grid {
+
+    grid-template-columns: 1fr;
+
+    gap: 55px;
+  }
+
+
+  .baking-image {
+
+    height: 300px;
+  }
+
+
+  .baking-info h2 {
+
+    font-size: 40px;
+  }
+
+
+  .records-footer {
+
+    font-size: 14px;
+  }
+
+}

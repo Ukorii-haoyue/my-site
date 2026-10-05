@@ -1,0 +1,108 @@
+---
+import "../styles/timeline.css";
+
+/*
+ * 每个章节：
+ *  - marker：章节标签在网格中的位置 (c = column, r = row)
+ *  - photos：悬停该章节时依次出现的图片，定位在 marker 附近的对角线上
+ *      "\" 左上→右下 主对角线；"/" 右上→左下 反对角线
+ *  图片来自 /images，文件名 1~21.jpg
+ */
+const chapters = [
+  {
+    id: 1,
+    label: "CH.01",
+    marker: { c: 2, r: 2 },
+    photos: [
+      { src: 1,  c: 1, r: 1 },
+      { src: 2,  c: 2, r: 2 },
+      { src: 3,  c: 3, r: 3 },
+      { src: 4,  c: 4, r: 4 },
+    ],
+  },
+  {
+    id: 2,
+    label: "CH.02",
+    marker: { c: 4, r: 3 },
+    photos: [
+      { src: 5,  c: 5, r: 2 },
+      { src: 6,  c: 3, r: 4 },
+      { src: 7,  c: 2, r: 5 },
+      { src: 8,  c: 1, r: 6 },
+    ],
+  },
+  {
+    id: 3,
+    label: "CH.03",
+    marker: { c: 7, r: 2 },
+    photos: [
+      { src: 9,  c: 6, r: 2 },
+      { src: 10, c: 7, r: 3 },
+      { src: 11, c: 8, r: 4 },
+      { src: 12, c: 8, r: 2 },
+    ],
+  },
+  {
+    id: 4,
+    label: "CH.04",
+    marker: { c: 6, r: 5 },
+    photos: [
+      { src: 13, c: 7, r: 4 },
+      { src: 14, c: 8, r: 3 },
+      { src: 15, c: 5, r: 6 },
+      { src: 16, c: 6, r: 6 },
+      { src: 17, c: 4, r: 7 },
+    ],
+  },
+  {
+    id: 5,
+    label: "CH.05",
+    marker: { c: 3, r: 6 },
+    photos: [
+      { src: 18, c: 2, r: 5 },
+      { src: 19, c: 1, r: 4 },
+      { src: 20, c: 3, r: 5 },
+      { src: 21, c: 4, r: 7 },
+    ],
+  },
+];
+---
+
+<section class="timeline-section" id="diary">
+    <div class="tl-background"></div>
+    <div class="tl-grid"></div>
+
+    <div class="tl-label tl-label--tc">
+        <div class="tl-title">TimeLine</div>
+    </div>
+
+    {/* 章节标记 */}
+    {chapters.map((ch) => (
+        <div
+            class="chapter-marker"
+            data-ch={ch.id}
+            style={`grid-column:${ch.marker.c}; grid-row:${ch.marker.r};`}
+        >
+            <span class="dot"></span>
+            <span class="ch-label">{ch.label}</span>
+        </div>
+    ))}
+
+    {/* 各章悬停照片层：与背景同一套网格，照片沿对角线定位、依次出现 */}
+    {chapters.map((ch) => (
+        <div class="tl-photos" data-ch={ch.id} aria-hidden="true">
+            {ch.photos.map((p, i) => (
+                <figure
+                    class="tl-photo"
+                    style={`grid-column:${p.c}; grid-row:${p.r}; --i:${i};`}
+                >
+                    <img src={`/images/${p.src}.jpg`} alt="" loading="lazy" />
+                </figure>
+            ))}
+        </div>
+    ))}
+</section>
+
+
+<script src="../scripts/timeline.js">
+</script>

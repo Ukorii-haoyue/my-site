@@ -1,0 +1,197 @@
+---
+// src/pages/blog/[slug].astro
+// 博客详情页：参数 [slug] 实际放的是 blogs.id
+// 构建时从 Supabase 查询这篇文章，content 即博客正文
+import "../../styles/blog-records.css";
+import "../../styles/blog-detail.css";
+import { supabase } from "../../lib/supabase.js";
+
+// =========================
+// 静态生成：为每篇已发布文章产出一个 /blog/{id}/ 页面
+// =========================
+
+export async function getStaticPaths() {
+  const { data } = await supabase
+    .from("blogs")
+    .select("id")
+    .eq("is_visible", true)
+    .order("created_at", { ascending: false });
+
+  return (data ?? []).map((post) => ({
+    params: { slug: String(post.id) },
+  }));
+}
+
+// =========================
+// 获取当前文章 ID
+// =========================
+
+const { slug } = Astro.params;
+const postId = Number(slug);
+
+// =========================
+// 从 Supabase 获取这篇文章
+// =========================
+
+const {
+  data: post,
+  error,
+} = await supabase
+  .from("blogs")
+  .select("id, title, content, created_at")
+  .eq("id", postId)
+  .eq("is_visible", true)
+  .single();
+
+// 找不到文章（理论上静态路径不会出现，兜底回到列表）
+if (error || !post) {
+  return Astro.redirect("/blog/");
+}
+
+// =========================
+// 获取文章列表，用来实现 prev / next
+// =========================
+
+const { data: allPosts } = await supabase
+  .from("blogs")
+  .select("id, title")
+  .eq("is_visible", true)
+  .order("created_at", { ascending: false });
+
+const postList = allPosts ?? [];
+
+const currentIndex = postList.findIndex(
+  (item) => item.id === post.id
+);
+
+const prevPost =
+  currentIndex > 0
+    ? postList[currentIndex - 1]
+    : null;
+
+const nextPost =
+  currentIndex < postList.length - 1
+    ? postList[currentIndex + 1]
+    : null;
+
+// 当前文章编号
+const postNumber = String(
+  currentIndex + 1
+).padStart(2, "0");
+
+// content 按空行 / 换行拆成自然段
+const noteParagraphs = post.content
+  ? post.content
+      .split(/\n+/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+  : [];
+
+// 写作时间（created_at）按北京时间格式化为 YYYY.MM.DD HH:mm
+const formatNoteDate = (value) => {
+  if (!value) return "";
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(new Date(value));
+  const get = (type) =>
+    parts.find((part) => part.type === type)?.value ?? "";
+  return `${get("year")}.${get("month")}.${get("day")} ${get("hour")}:${get("minute")}`;
+};
+
+const noteDate = formatNoteDate(post.created_at);
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{post.title} · My Blog</title>
+</head>
+
+<body>
+
+  <main class="blog-records blog-detail-page">
+
+    <!-- 顶部：返回 + 上下篇 -->
+    <nav class="detail-topbar">
+
+      <a href="/blog/" class="back-link">
+        <span class="link-text">
+          <span class="text-en">← back to blog</span>
+          <span class="text-cn">← 返回博客</span>
+        </span>
+      </a>
+
+      <div class="topbar-nav">
+
+        {prevPost ? (
+          <a
+            href={`/blog/${prevPost.id}/`}
+            class="topbar-nav-link"
+          >
+            <span class="link-text">
+              <span class="text-en">← prev</span>
+              <span class="text-cn">← 上一篇</span>
+            </span>
+          </a>
+        ) : (
+          <span class="topbar-nav-link is-empty"></span>
+        )}
+
+        <span class="topbar-no">NO.{postNumber}</span>
+
+        {nextPost ? (
+          <a
+            href={`/blog/${nextPost.id}/`}
+            class="topbar-nav-link"
+          >
+            <span class="link-text">
+              <span class="text-en">next →</span>
+              <span class="text-cn">下一篇 →</span>
+            </span>
+          </a>
+        ) : (
+          <span class="topbar-nav-link is-empty"></span>
+        )}
+
+      </div>
+
+    </nav>
+
+
+    <!-- 文章正文卡片 -->
+    <article class="blog-note-card">
+
+      <h1 class="blog-note-title">{post.title}</h1>
+
+      <p class="blog-note-meta">
+        {noteDate ? noteDate : "Uko's little blog ♡"}
+      </p>
+
+      <div class="blog-note-body">
+        {noteParagraphs.length > 0 ? (
+          noteParagraphs.map((paragraph) => (
+            <p class="note-paragraph">{paragraph}</p>
+          ))
+        ) : (
+          <p class="note-paragraph empty-note">
+            A little post is waiting to be written...
+          </p>
+        )}
+      </div>
+
+    </article>
+
+  </main>
+
+</body>
+
+</html>

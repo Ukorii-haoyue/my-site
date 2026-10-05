@@ -1,0 +1,187 @@
+---
+// src/pages/film-records.astro
+// 电影列表：构建时从 Supabase films 表读取
+import "../styles/film-records.css";
+import { supabase } from "../lib/supabase.js";
+
+const {
+  data: films,
+  error,
+} = await supabase
+  .from("films")
+  .select("id, title, year, director, rating, image_url, description")
+  .order("id", { ascending: true });
+
+if (error) {
+  console.error("读取电影失败：", error);
+}
+
+// 评分十分制 → 五颗爱心（每颗 2 分，按最近的半颗四舍五入）
+function ratingHearts(rating) {
+  if (rating == null) return Array(5).fill("empty");
+  const units = Math.max(0, Math.min(5, Math.round((rating / 2) * 2) / 2));
+  const full = Math.floor(units);
+  const hasHalf = units - full >= 0.5;
+  return Array.from({ length: 5 }, (_, i) => {
+    if (i < full) return "full";
+    if (i === full && hasHalf) return "half";
+    return "empty";
+  });
+}
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Film Records</title>
+</head>
+
+<body>
+
+  <main class="film-records">
+
+    <!-- 返回首页 -->
+    <a href="/" class="back-link">
+      ← back
+    </a>
+
+
+    <!-- 顶部标题 -->
+    <header class="records-header">
+
+      <p class="small-title">MY FILM DIARY</p>
+
+      <h1>
+        My Film<br />
+        <span>Records</span>
+      </h1>
+
+      <p class="intro">
+        收录了一些自己喜欢的电影和最近看过的电影，持续更新中……<br />
+        films I watched, remembered, and quietly kept in my diary.
+      </p>
+
+    </header>
+
+
+    <!-- 电影列表（点击进入该部电影的 film note 详情页） -->
+    <section class="film-list" id="film-list">
+
+      {films && films.length > 0 ? (
+        films.map((film, index) => (
+          <a
+            href={`/film-records/${film.id}/`}
+            class="film-record"
+          >
+
+            <div class="film-number">
+              {String(index + 1).padStart(2, "0")}
+            </div>
+
+            <div class="film-info">
+
+              <h2>{film.title}</h2>
+
+              <div class="film-meta">
+                <span>{film.year}</span>
+                <span>·</span>
+                <span>{film.director}</span>
+              </div>
+
+              <div
+                class="film-rating"
+                aria-label={film.rating != null ? `评分 ${film.rating} 分` : "暂无评分"}
+              >
+                <span class="rating-hearts" aria-hidden="true">
+                  {ratingHearts(film.rating).map((type) => (
+                    <span class={`heart heart-${type}`}>♥</span>
+                  ))}
+                </span>
+                <span class="rating-value">
+                  {film.rating != null ? Number(film.rating).toFixed(1) : "—"}
+                </span>
+              </div>
+
+            </div>
+
+            <div class="film-arrow">
+              ↗
+            </div>
+
+          </a>
+        ))
+      ) : (
+        <div class="empty-films">
+          No films yet ♡
+        </div>
+      )}
+
+    </section>
+
+
+    <!-- 翻页工具 -->
+    <nav class="records-pager" id="film-pager" aria-label="翻页">
+      <button type="button" class="pager-btn" data-pager="prev">← prev</button>
+      <span class="pager-info">NO.1 / 1</span>
+      <button type="button" class="pager-btn" data-pager="next">next →</button>
+    </nav>
+
+
+    <!-- 底部 -->
+    <footer class="records-footer">
+      <span>Uko's Diary</span>
+      <span>♡</span>
+      <span>My little cinema</span>
+    </footer>
+
+  </main>
+
+  <script>
+    // 电影列表翻页：每页 6 条，上一页 / 下一页切换
+    const PER_PAGE = 6;
+    const list = document.getElementById("film-list");
+    const pager = document.getElementById("film-pager");
+
+    if (list && pager) {
+      const items = list.querySelectorAll(".film-record");
+      const totalPages = Math.max(1, Math.ceil(items.length / PER_PAGE));
+      let current = 1;
+
+      const prevBtn = pager.querySelector('[data-pager="prev"]');
+      const nextBtn = pager.querySelector('[data-pager="next"]');
+      const info = pager.querySelector(".pager-info");
+
+      function render() {
+        items.forEach((item, i) => {
+          const page = Math.floor(i / PER_PAGE) + 1;
+          item.style.display = page === current ? "" : "none";
+        });
+        info.textContent = `NO.${current} / ${totalPages}`;
+        prevBtn.disabled = current <= 1;
+        nextBtn.disabled = current >= totalPages;
+      }
+
+      if (items.length <= PER_PAGE) {
+        pager.style.display = "none";
+      } else {
+        prevBtn.addEventListener("click", () => {
+          if (current <= 1) return;
+          current -= 1;
+          render();
+          list.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+        nextBtn.addEventListener("click", () => {
+          if (current >= totalPages) return;
+          current += 1;
+          render();
+          list.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+        render();
+      }
+    }
+  </script>
+
+</body>
+</html>

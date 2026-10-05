@@ -1,0 +1,264 @@
+<section class="hero" id="hero">
+
+  <!-- 像素装饰 -->
+  <div class="pixel-decoration pixel-one">
+    ▪ ▪ ▪ ▪ ▪<br>
+    ▪ ▪ ▪ ▪ ▪ ▪ ▪<br>
+    ▪ ▪ ▪ ▪
+  </div>
+
+  <div class="pixel-decoration pixel-two">
+    ▪ ▪ ▪<br>
+    ▪ ▪ ▪ ▪ ▪<br>
+    ▪ ▪ ▪ ▪
+  </div>
+
+
+  <!-- 星星 -->
+  <div class="star star-one">✦</div>
+  <div class="star star-two">✧</div>
+  <div class="star star-three">✦</div>
+  <div class="star star-four">✧</div>
+
+
+  <!-- 主标题（居中，参考详情页 records-header 样式） -->
+  <div class="hero-title">
+
+    <p class="hero-eyebrow">
+      MY LITTLE DIARY
+    </p>
+
+    <h1 class="hero-big">
+
+      <span class="line line-uko">
+        Uko's
+
+        <!-- 从 Uko's 文字边缘迸发的水滴 -->
+        <span class="juice" aria-hidden="true">
+          <i class="jp jp-1"></i>
+          <i class="jp jp-2"></i>
+          <i class="jp jp-3"></i>
+          <i class="jp jp-4"></i>
+          <i class="jp jp-5"></i>
+          <i class="jp jp-6"></i>
+          <i class="jp jp-7"></i>
+          <i class="jp jp-8"></i>
+          <i class="jp jp-9"></i>
+          <i class="jp jp-10"></i>
+        </span>
+      </span>
+
+      <span class="line line-diary">
+        Diary
+
+        <!-- 从 Diary 文字边缘迸发的水滴 -->
+        <span class="juice" aria-hidden="true">
+          <i class="jp jp-1"></i>
+          <i class="jp jp-2"></i>
+          <i class="jp jp-3"></i>
+          <i class="jp jp-4"></i>
+          <i class="jp jp-5"></i>
+          <i class="jp jp-6"></i>
+          <i class="jp jp-7"></i>
+          <i class="jp jp-8"></i>
+          <i class="jp jp-9"></i>
+          <i class="jp jp-10"></i>
+        </span>
+      </span>
+
+    </h1>
+
+    <p class="hero-intro">
+      A LITTLE RECORD OF<br />
+      MY LIFE &amp; MY LITTLE WORLD
+    </p>
+
+  </div>
+
+
+
+
+
+<!-- Victorian vine divider -->
+<div class="hero-vine" aria-hidden="true">
+  <svg
+    viewBox="0 0 1200 150"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+
+    <!-- 左侧藤蔓 -->
+    <path
+      class="vine"
+      d="
+        M 20 88
+        C 100 88, 105 52, 165 55
+        C 220 58, 225 100, 185 108
+        C 150 115, 130 87, 155 72
+        C 180 58, 198 78, 188 94
+
+        C 250 82, 275 48, 330 55
+        C 375 61, 390 94, 355 105
+        C 325 114, 305 91, 325 75
+
+        C 370 55, 420 63, 455 73
+        C 490 83, 520 75, 550 60
+      "
+    />
+
+    <!-- 左侧叶片 -->
+    <path
+      class="vine-leaf"
+      d="M 245 70 C 225 48, 207 43, 190 45"
+    />
+
+    <path
+      class="vine-leaf"
+      d="M 285 58 C 275 35, 258 27, 240 30"
+    />
+
+    <path
+      class="vine-leaf"
+      d="M 365 64 C 365 40, 380 29, 398 28"
+    />
+
+    <path
+      class="vine-leaf"
+      d="M 425 68 C 430 45, 447 37, 463 39"
+    />
+
+
+    <!-- 中央花饰 -->
+    <g class="vine-center">
+
+      <path
+        class="center-flower"
+        d="
+          M 600 78
+
+          C 578 63, 578 42, 600 20
+
+          C 622 42, 622 63, 600 78
+
+          C 580 66, 558 70, 548 88
+
+          C 565 96, 586 94, 600 78
+
+          C 614 94, 635 96, 652 88
+
+          C 642 70, 620 66, 600 78
+        "
+      />
+
+
+    </g>
+
+
+    <!-- 右侧完全镜像 -->
+    <g transform="translate(1200 0) scale(-1 1)">
+
+      <path
+        class="vine"
+        d="
+          M 20 88
+          C 100 88, 105 52, 165 55
+          C 220 58, 225 100, 185 108
+          C 150 115, 130 87, 155 72
+          C 180 58, 198 78, 188 94
+
+          C 250 82, 275 48, 330 55
+          C 375 61, 390 94, 355 105
+          C 325 114, 305 91, 325 75
+
+          C 370 55, 420 63, 455 73
+          C 490 83, 520 75, 550 60
+        "
+      />
+
+      <path
+        class="vine-leaf"
+        d="M 245 70 C 225 48, 207 43, 190 45"
+      />
+
+      <path
+        class="vine-leaf"
+        d="M 285 58 C 275 35, 258 27, 240 30"
+      />
+
+      <path
+        class="vine-leaf"
+        d="M 365 64 C 365 40, 380 29, 398 28"
+      />
+
+      <path
+        class="vine-leaf"
+        d="M 425 68 C 430 45, 447 37, 463 39"
+      />
+
+    </g>
+
+  </svg>
+
+  <!-- 同色遮罩：从中央向两侧滑开露出藤蔓（transform 走 GPU，丝滑不卡顿） -->
+  <div class="vine-mask vine-mask--left" aria-hidden="true"></div>
+  <div class="vine-mask vine-mask--right" aria-hidden="true"></div>
+</div>
+
+
+
+
+
+
+
+
+
+  <!-- Social Links -->
+  <div class="social-links">
+
+  <!-- Instagram -->
+  <a
+    href="https://www.instagram.com/hallie_haoyue?stkn=MTE4YmY1ZmM5c3FzbQ=="
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Instagram"
+    class="social-icon"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="5"></rect>
+      <circle cx="12" cy="12" r="4"></circle>
+      <circle cx="17.5" cy="6.5" r="1"></circle>
+    </svg>
+  </a>
+
+  <!-- TikTok -->
+  <a
+    href="https://v.douyin.com/Y7ubuuXiI_c/"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="TikTok"
+    class="social-icon"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M15 4v10.2a4.8 4.8 0 1 1-4-4.73"></path>
+      <path d="M15 4c.55 2.25 1.95 3.85 4 4.5"></path>
+    </svg>
+  </a>
+
+  <!-- 小红书 -->
+  <a
+    href="https://www.xiaohongshu.com/user/profile/5e1a8bf60000000001007236"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="小红书"
+    class="social-icon"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3" y="5" width="18" height="14" rx="3"></rect>
+      <path d="M7 9h5"></path>
+      <path d="M7 12h8"></path>
+      <path d="M7 15h6"></path>
+    </svg>
+  </a>
+
+  </div>
+
+</section>

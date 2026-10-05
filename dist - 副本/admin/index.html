@@ -1,0 +1,73 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Admin · Uko's Diary</title><link rel="stylesheet" href="/_astro/admin.3FmOZC6n.css"></head> <body> <main class="admin-page"> <!-- 登录区域 --> <section id="login-section" class="login-section"> <div class="login-card"> <span class="login-heart">♡</span> <p class="admin-small-title">
+UKO'S DIARY
+</p> <h1>
+Admin
+</h1> <p class="login-subtitle">
+little notes management
+</p> <form id="login-form"> <div class="input-group"> <label for="email">
+Email
+</label> <input id="email" type="email" placeholder="admin@email.com" required> </div> <div class="input-group"> <label for="password">
+Password
+</label> <input id="password" type="password" placeholder="your password" required> </div> <button type="submit" id="login-btn">
+Login ♡
+</button> <p id="login-error" class="login-error"></p> </form> <a href="/guestbook" class="back-link">
+← back to guestbook
+</a> </div> </section> <!-- 管理后台 --> <section id="dashboard-section" class="dashboard-section"> <header class="admin-header"> <div> <p class="admin-small-title">
+UKO'S DIARY · ADMIN
+</p> <h1>
+Admin Dashboard
+</h1> <p class="admin-description">
+little things from Uko's diary ♡
+</p> </div> <button id="logout-btn" class="logout-btn">
+Logout
+</button> </header> <!-- 数据统计 --> <div class="stats"> <div class="stat-card"> <span id="total-count">0</span> <small>Total notes</small> </div> <div class="stat-card"> <span id="visible-count">0</span> <small>Visible</small> </div> <div class="stat-card"> <span id="hidden-count">0</span> <small>Hidden</small> </div> </div> <!-- 内容管理 --> <section class="content-management"> <div class="section-title"> <span>
+DIARY CONTENT
+</span> <span>
+manage your little records
+</span> </div> <div class="content-grid"> <!-- Films --> <a href="/admin/films" class="content-card"> <span class="content-icon">
+🎬
+</span> <div class="content-info"> <h2>
+Films
+</h2> <p>
+manage your movie records
+</p> </div> <span class="content-arrow">
+→
+</span> </a> <!-- Books --> <a href="/admin/books" class="content-card"> <span class="content-icon">
+📚
+</span> <div class="content-info"> <h2>
+Books
+</h2> <p>
+manage your reading records
+</p> </div> <span class="content-arrow">
+→
+</span> </a> <!-- Blogs --> <a href="/admin/blogs" class="content-card"> <span class="content-icon">
+📝
+</span> <div class="content-info"> <h2>
+Blogs
+</h2> <p>
+manage your blog posts
+</p> </div> <span class="content-arrow">
+→
+</span> </a> <!-- Baking --> <a href="/admin/baking" class="content-card"> <span class="content-icon">
+🧁
+</span> <div class="content-info"> <h2>
+Baking
+</h2> <p>
+manage your baking records
+</p> </div> <span class="content-arrow">
+→
+</span> </a> <!-- Friends --> <a href="/admin/friends" class="content-card"> <span class="content-icon">
+🔗
+</span> <div class="content-info"> <h2>
+Friends
+</h2> <p>
+manage your friend links
+</p> </div> <span class="content-arrow">
+→
+</span> </a> </div> </section> <!-- 留言列表 --> <section class="admin-messages"> <div class="section-title"> <span>
+LITTLE NOTES
+</span> <span>
+manage your guestbook
+</span> </div> <div id="admin-messages-list"> <div class="loading">
+Loading notes...
+</div> </div> </section> </section> </main> <script type="module" src="/_astro/index.astro_astro_type_script_index_0_lang.q--DyRYB.js"></script> </body> </html>

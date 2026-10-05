@@ -1,0 +1,21 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Books · Admin · Uko's Diary</title><link rel="stylesheet" href="/_astro/admin.3FmOZC6n.css"></head> <body> <main class="admin-page"> <header class="admin-header"> <div> <p class="admin-eyebrow">Uko's Diary</p> <h1>Books</h1> </div> <div class="admin-header-actions"> <a href="/admin" class="admin-button secondary">
+Dashboard
+</a> <button id="logout-btn" class="admin-button">
+Logout
+</button> </div> </header> <!-- Loading --> <div id="loading" class="admin-loading">
+Loading books...
+</div> <!-- Content --> <section id="books-section" style="display:none;"> <div class="admin-section-heading"> <div> <p class="admin-eyebrow">Library</p> <h2>Book Records</h2> </div> <button id="add-book-btn" class="admin-button">
++ Add Book
+</button> </div> <!-- Add / Edit Book Form --> <div id="book-form" class="admin-form-card" style="display:none;"> <h3 id="book-form-title">Add a new book</h3> <div class="admin-form-grid"> <label>
+Title
+<input type="text" id="book-title" placeholder="The Little Prince"> </label> <label>
+Author
+<input type="text" id="book-author" placeholder="Antoine de Saint-Exupéry"> </label> <label class="full-width">
+Description
+<textarea id="book-description" rows="5" placeholder="Write something about this book..."></textarea> </label> <label class="full-width">
+Cover Image
+<input type="file" id="book-image" accept="image/*"> <small id="book-image-hint" class="upload-hint"></small> </label> </div> <div class="admin-form-actions"> <button id="cancel-book-btn" class="admin-button secondary">
+Cancel
+</button> <button id="save-book-btn" class="admin-button">
+Save Book
+</button> </div> </div> <!-- Book List --> <div id="books-list" class="admin-content-list"></div> </section> </main> <script type="module" src="/_astro/books.astro_astro_type_script_index_0_lang.D637aS4k.js"></script> </body> </html>

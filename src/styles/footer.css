@@ -1,0 +1,73 @@
+/* Google 纤细花体/衬线字库 */
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,300;1,300&display=swap');
+
+footer.site-footer {
+  position: relative;
+  margin-top: 70px;
+  padding: 0 3% 30px; /* 顶部 padding 留给蕾丝花边占用 */
+  background: #ffeef5; /* 柔和浅粉底色 */
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+.footer-container {
+  max-width: 650px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+/* 🌟 极细的 Uko's Diary 字体 */
+footer .word {
+  font-family: 'Great Vibes', 'Playfair Display', cursive, serif;
+  font-weight: 300 !important; /* 极细字体，绝不加粗 */
+  font-size: 2.2rem;
+  color: var(--red, #e05275);
+  letter-spacing: 1.5px;
+  line-height: 1;
+}
+
+/* 免责声明 */
+.footer-disclaimer {
+  max-width: 520px;
+  margin-top: 2px;
+}
+
+.footer-disclaimer p {
+  font-size: 0.75rem;
+  color: #a37888;
+  line-height: 1.6;
+  margin: 0;
+  letter-spacing: 0.3px;
+  font-weight: 300;
+}
+
+/* 版权细字 */
+.footer-bottom p {
+  color: #b88e9e;
+  font-size: 0.72rem;
+  margin: 4px 0 0 0;
+  letter-spacing: 0.5px;
+  font-weight: 300;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .lace-border-container {
+    height: 32px;
+    margin-bottom: 14px;
+  }
+  
+  .lace-svg {
+    height: 32px;
+  }
+  
+  footer .word {
+    font-size: 1.8rem;
+  }
+}

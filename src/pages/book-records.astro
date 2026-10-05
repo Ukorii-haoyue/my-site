@@ -1,0 +1,184 @@
+---
+// src/pages/book-records.astro
+// 书单列表：构建时从 Supabase books 表读取
+import "../styles/book-records.css";
+import { supabase } from "../lib/supabase.js";
+
+const {
+  data: books,
+  error,
+} = await supabase
+  .from("books")
+  .select("id, title, author, description, image_url")
+  .order("id", { ascending: true });
+
+if (error) {
+  console.error("读取书籍失败：", error);
+}
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>My Book Records</title>
+</head>
+
+<body>
+
+  <main class="book-records">
+
+    <!-- 返回首页 -->
+    <a href="/" class="back-link">
+      ← back
+    </a>
+
+
+    <!-- 页面标题 -->
+    <header class="records-header">
+
+      <p class="small-title">
+        MY BOOK DIARY
+      </p>
+
+      <h1>
+        My Book<br />
+        <span>Records</span>
+      </h1>
+
+      <p class="intro">
+        收录了一些在大学期间胡乱看的书籍嘻嘻<br />
+        books I read, remembered, and quietly kept in my diary.
+      </p>
+
+    </header>
+
+
+    <!-- 书籍列表（点击进入这本书的随笔 / 摘抄详情页） -->
+    <section class="book-list" id="book-list">
+
+      {books && books.length > 0 ? (
+        books.map((book, index) => (
+
+          <a
+            class="book-record"
+            href={`/book-records/${book.id}/`}
+          >
+
+            <!-- 编号 -->
+            <div class="book-number">
+              {String(index + 1).padStart(2, "0")}
+            </div>
+
+
+            <!-- 书籍信息 -->
+            <div class="book-info">
+
+              <h2>
+                {book.title}
+              </h2>
+
+              <div class="book-meta">
+                <span>
+                  {book.author}
+                </span>
+              </div>
+
+            </div>
+
+
+            <!-- 右侧装饰 -->
+            <div class="book-mark">
+              ♡
+            </div>
+
+          </a>
+
+        ))
+      ) : (
+        <div class="empty-books">
+          No books yet ♡
+        </div>
+      )}
+
+    </section>
+
+
+    <!-- 翻页工具 -->
+    <nav class="records-pager" id="book-pager" aria-label="翻页">
+      <button type="button" class="pager-btn" data-pager="prev">← prev</button>
+      <span class="pager-info">NO.1 / 1</span>
+      <button type="button" class="pager-btn" data-pager="next">next →</button>
+    </nav>
+
+
+    <!-- 底部 -->
+    <footer class="records-footer">
+
+      <span>
+        Uko's Diary
+      </span>
+
+      <span>
+        ♡
+      </span>
+
+      <span>
+        My little library
+      </span>
+
+    </footer>
+
+  </main>
+
+  <script>
+    // 书籍列表翻页：每页 6 条，上一页 / 下一页切换
+    const PER_PAGE = 6;
+    const list = document.getElementById("book-list");
+    const pager = document.getElementById("book-pager");
+
+    if (list && pager) {
+      const items = list.querySelectorAll(".book-record");
+      const totalPages = Math.max(1, Math.ceil(items.length / PER_PAGE));
+      let current = 1;
+
+      const prevBtn = pager.querySelector('[data-pager="prev"]');
+      const nextBtn = pager.querySelector('[data-pager="next"]');
+      const info = pager.querySelector(".pager-info");
+
+      function render() {
+        items.forEach((item, i) => {
+          const page = Math.floor(i / PER_PAGE) + 1;
+          item.style.display = page === current ? "" : "none";
+        });
+        info.textContent = `NO.${current} / ${totalPages}`;
+        prevBtn.disabled = current <= 1;
+        nextBtn.disabled = current >= totalPages;
+      }
+
+      if (items.length <= PER_PAGE) {
+        pager.style.display = "none";
+      } else {
+        prevBtn.addEventListener("click", () => {
+          if (current <= 1) return;
+          current -= 1;
+          render();
+          list.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+        nextBtn.addEventListener("click", () => {
+          if (current >= totalPages) return;
+          current += 1;
+          render();
+          list.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+        render();
+      }
+    }
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,904 @@
+---
+import "../../styles/admin.css";
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>Blogs Admin · Uko's Diary</title>
+
+</head>
+
+
+<body>
+
+<main class="admin-page">
+
+  <!-- =========================
+       页面头部
+  ========================== -->
+
+  <header class="admin-header">
+
+    <div>
+
+      <p class="admin-small-title">
+        UKO'S DIARY · ADMIN
+      </p>
+
+      <h1>
+        Blogs
+      </h1>
+
+      <p class="admin-description">
+        manage your blog posts ♡
+      </p>
+
+    </div>
+
+
+    <div class="admin-header-actions">
+
+      <a
+        href="/admin"
+        class="back-admin-btn"
+      >
+        ← Dashboard
+      </a>
+
+      <button
+        id="logout-btn"
+        class="logout-btn"
+      >
+        Logout
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- =========================
+       博客管理
+  ========================== -->
+
+  <section class="admin-messages">
+
+    <div class="section-title">
+
+      <span>
+        BLOG POSTS
+      </span>
+
+      <span>
+        your little words
+      </span>
+
+    </div>
+
+
+    <!-- 新增按钮 -->
+
+    <div class="admin-content-actions">
+
+      <button
+        id="add-blog-btn"
+        class="primary-admin-btn"
+      >
+        + Add Post
+      </button>
+
+    </div>
+
+
+    <!-- 文章列表 -->
+
+    <div id="blogs-list">
+
+      <div class="loading">
+        Loading posts...
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       新增 / 编辑文章表单
+  ========================== -->
+
+  <section
+    id="blog-form-section"
+    class="film-form-section"
+    style="display:none;"
+  >
+
+    <div class="section-title">
+
+      <span id="blog-form-title">
+        ADD A POST
+      </span>
+
+      <span id="blog-form-subtitle">
+        a new little record
+      </span>
+
+    </div>
+
+
+    <form id="blog-form">
+
+      <!-- 文章标题 -->
+
+      <div class="input-group">
+
+        <label for="blog-title">
+          Title
+        </label>
+
+        <input
+          id="blog-title"
+          type="text"
+          placeholder="Post title"
+          required
+        />
+
+      </div>
+
+
+      <!-- 正文 -->
+
+      <div class="input-group">
+
+        <label for="blog-content">
+          Content
+        </label>
+
+        <textarea
+          id="blog-content"
+          placeholder="Write something...（空行分段）"
+          rows="10"
+        ></textarea>
+
+      </div>
+
+
+      <!-- 是否发布 -->
+
+      <div class="input-group input-group-checkbox">
+
+        <label for="blog-visible">
+          <input
+            id="blog-visible"
+            type="checkbox"
+            checked
+          />
+          Visible（发布后访客可见）
+        </label>
+
+      </div>
+
+
+      <!-- 操作按钮 -->
+
+      <div class="form-actions">
+
+        <button
+          type="button"
+          id="cancel-blog-btn"
+          class="secondary-admin-btn"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          id="save-blog-btn"
+          class="primary-admin-btn"
+        >
+          Save Post ♡
+        </button>
+
+      </div>
+
+
+      <p
+        id="blog-form-message"
+        class="login-error"
+      ></p>
+
+    </form>
+
+  </section>
+
+</main>
+
+
+<script>
+
+  import { supabase }
+    from "../../lib/supabase.js";
+
+
+  let initialized = false;
+
+  let editingBlogId = null;
+
+
+  function initBlogsAdmin() {
+
+    if (initialized) return;
+
+    initialized = true;
+
+
+    // =========================
+    // DOM
+    // =========================
+
+    const blogsList =
+      document.getElementById("blogs-list");
+
+    const addBlogBtn =
+      document.getElementById("add-blog-btn");
+
+    const formSection =
+      document.getElementById("blog-form-section");
+
+    const blogForm =
+      document.getElementById("blog-form");
+
+    const cancelBtn =
+      document.getElementById("cancel-blog-btn");
+
+    const logoutBtn =
+      document.getElementById("logout-btn");
+
+    const formMessage =
+      document.getElementById("blog-form-message");
+
+    const saveBlogBtn =
+      document.getElementById("save-blog-btn");
+
+
+    // =========================
+    // 管理员检查
+    // =========================
+
+    async function checkAdmin() {
+
+      const {
+        data: {
+          user
+        }
+      } =
+        await supabase.auth.getUser();
+
+
+      if (!user) {
+
+        window.location.href =
+          "/admin";
+
+        return false;
+
+      }
+
+
+      const {
+        data,
+        error
+      } =
+        await supabase
+          .from("profiles")
+          .select("is_admin")
+          .eq("id", user.id)
+          .single();
+
+
+      if (
+        error ||
+        !data ||
+        data.is_admin !== true
+      ) {
+
+        await supabase.auth.signOut();
+
+        window.location.href =
+          "/admin";
+
+        return false;
+
+      }
+
+
+      return true;
+
+    }
+
+
+    // =========================
+    // 获取文章
+    // =========================
+
+    async function fetchPosts() {
+
+      blogsList.innerHTML = `
+        <div class="loading">
+          Loading posts...
+        </div>
+      `;
+
+
+      const {
+        data,
+        error
+      } =
+        await supabase
+          .from("blogs")
+          .select(
+            "id, title, content, created_at, is_visible"
+          )
+          .order(
+            "created_at",
+            {
+              ascending: false
+            }
+          );
+
+
+      if (error) {
+
+        console.error(error);
+
+        blogsList.innerHTML = `
+          <div class="loading">
+            Failed to load posts.
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      renderPosts(data || []);
+
+    }
+
+
+    // =========================
+    // 渲染文章
+    // =========================
+
+    function renderPosts(posts) {
+
+      blogsList.innerHTML = "";
+
+
+      if (!posts.length) {
+
+        blogsList.innerHTML = `
+          <div class="loading">
+            No posts yet ♡
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      posts.forEach(
+        (post) => {
+
+          const card =
+            document.createElement("article");
+
+          card.className =
+            "admin-content-card blog-card";
+
+          if (!post.is_visible) {
+
+            card.classList.add("hidden-note");
+
+          }
+
+
+          // 内容
+
+          const info =
+            document.createElement("div");
+
+          info.className =
+            "admin-content-info";
+
+
+          const title =
+            document.createElement("h2");
+
+          title.textContent =
+            post.title;
+
+
+          const meta =
+            document.createElement("p");
+
+          meta.className =
+            "admin-content-meta";
+
+          meta.textContent =
+            new Date(
+              post.created_at
+            ).toLocaleDateString(
+              "zh-CN",
+              {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit"
+              }
+            );
+
+
+          const status =
+            document.createElement("span");
+
+          status.className =
+            "message-status";
+
+          status.textContent =
+            post.is_visible
+              ? "● Visible"
+              : "○ Hidden";
+
+
+          const description =
+            document.createElement("p");
+
+          description.className =
+            "admin-content-description";
+
+          description.textContent =
+            (post.content || "")
+              .split(/\n+/)
+              .map((line) => line.trim())
+              .filter(Boolean)
+              .join(" ")
+              .slice(0, 120) ||
+            "";
+
+
+          info.appendChild(title);
+          info.appendChild(meta);
+          info.appendChild(status);
+          info.appendChild(description);
+
+
+          // 操作
+
+          const actions =
+            document.createElement("div");
+
+          actions.className =
+            "admin-content-actions";
+
+
+          const toggleBtn =
+            document.createElement("button");
+
+          toggleBtn.textContent =
+            post.is_visible
+              ? "Hide"
+              : "Show";
+
+          toggleBtn.className =
+            "action-btn";
+
+
+          toggleBtn.addEventListener(
+            "click",
+            async () => {
+
+              await toggleVisibility(
+                post.id,
+                !post.is_visible
+              );
+
+            }
+          );
+
+
+          const editBtn =
+            document.createElement("button");
+
+          editBtn.textContent =
+            "Edit";
+
+          editBtn.className =
+            "action-btn";
+
+
+          editBtn.addEventListener(
+            "click",
+            () => {
+
+              startEditPost(post);
+
+            }
+          );
+
+
+          const deleteBtn =
+            document.createElement("button");
+
+          deleteBtn.textContent =
+            "Delete";
+
+          deleteBtn.className =
+            "action-btn delete-btn";
+
+
+          deleteBtn.addEventListener(
+            "click",
+            async () => {
+
+              const confirmed =
+                confirm(
+                  `Delete "${post.title}"?`
+                );
+
+
+              if (!confirmed) return;
+
+
+              await deletePost(
+                post.id
+              );
+
+            }
+          );
+
+
+          actions.appendChild(toggleBtn);
+          actions.appendChild(editBtn);
+          actions.appendChild(deleteBtn);
+
+
+          card.appendChild(info);
+          card.appendChild(actions);
+
+
+          blogsList.appendChild(card);
+
+        }
+      );
+
+    }
+
+
+    // =========================
+    // 显示 / 隐藏
+    // =========================
+
+    async function toggleVisibility(
+      id,
+      isVisible
+    ) {
+
+      const {
+        error
+      } =
+        await supabase
+          .from("blogs")
+          .update({
+            is_visible: isVisible
+          })
+          .eq("id", id);
+
+
+      if (error) {
+
+        console.error(error);
+
+        alert(
+          "Failed to update post."
+        );
+
+        return;
+
+      }
+
+
+      await fetchPosts();
+
+    }
+
+
+    // =========================
+    // 删除
+    // =========================
+
+    async function deletePost(id) {
+
+      const {
+        error
+      } =
+        await supabase
+          .from("blogs")
+          .delete()
+          .eq("id", id);
+
+
+      if (error) {
+
+        console.error(error);
+
+        alert(
+          "Failed to delete post."
+        );
+
+        return;
+
+      }
+
+
+      await fetchPosts();
+
+    }
+
+
+    // =========================
+    // 重置为新增模式
+    // =========================
+
+    function resetBlogForm() {
+
+      editingBlogId =
+        null;
+
+      blogForm.reset();
+
+      document.getElementById("blog-visible").checked =
+        true;
+
+      document.getElementById("blog-form-title").textContent =
+        "ADD A POST";
+
+      document.getElementById("blog-form-subtitle").textContent =
+        "a new little record";
+
+      saveBlogBtn.textContent =
+        "Save Post ♡";
+
+      formMessage.textContent =
+        "";
+
+    }
+
+
+    // =========================
+    // 打开编辑表单
+    // =========================
+
+    function startEditPost(post) {
+
+      editingBlogId =
+        post.id;
+
+      document.getElementById("blog-title").value =
+        post.title || "";
+
+      document.getElementById("blog-content").value =
+        post.content || "";
+
+      document.getElementById("blog-visible").checked =
+        post.is_visible !== false;
+
+      document.getElementById("blog-form-title").textContent =
+        "EDIT POST";
+
+      document.getElementById("blog-form-subtitle").textContent =
+        "update this little record";
+
+      saveBlogBtn.textContent =
+        "Update Post ♡";
+
+      formMessage.textContent =
+        "";
+
+      formSection.style.display =
+        "block";
+
+      formSection.scrollIntoView({
+        behavior: "smooth"
+      });
+
+    }
+
+
+    // =========================
+    // 打开新增表单
+    // =========================
+
+    addBlogBtn.addEventListener(
+      "click",
+      () => {
+
+        resetBlogForm();
+
+        formSection.style.display =
+          "block";
+
+        formSection.scrollIntoView({
+          behavior: "smooth"
+        });
+
+      }
+    );
+
+
+    // =========================
+    // 关闭表单
+    // =========================
+
+    cancelBtn.addEventListener(
+      "click",
+      () => {
+
+        formSection.style.display =
+          "none";
+
+        resetBlogForm();
+
+      }
+    );
+
+
+    // =========================
+    // 保存文章
+    // =========================
+
+    blogForm.addEventListener(
+      "submit",
+      async (event) => {
+
+        event.preventDefault();
+
+
+        const title =
+          document.getElementById("blog-title").value.trim();
+
+        const content =
+          document.getElementById("blog-content").value.trim();
+
+        const isVisible =
+          document.getElementById("blog-visible").checked;
+
+
+        if (!title) {
+
+          alert(
+            "Please enter a post title."
+          );
+
+          return;
+
+        }
+
+
+        const recordData = {
+          title,
+          content,
+          is_visible: isVisible
+        };
+
+
+        let saveError;
+
+
+        if (editingBlogId) {
+
+          const {
+            error
+          } = await supabase
+            .from("blogs")
+            .update(recordData)
+            .eq("id", editingBlogId);
+
+          saveError = error;
+
+        } else {
+
+          const {
+            error
+          } = await supabase
+            .from("blogs")
+            .insert(recordData);
+
+          saveError = error;
+
+        }
+
+
+        if (saveError) {
+
+          console.error(saveError);
+
+          alert(
+            "Failed to save post: " + saveError.message
+          );
+
+          return;
+
+        }
+
+
+        alert(
+          editingBlogId
+            ? "Post updated successfully! ♡"
+            : "Post added successfully! ♡"
+        );
+
+        location.reload();
+
+      }
+    );
+
+
+    // =========================
+    // 登出
+    // =========================
+
+    logoutBtn.addEventListener(
+      "click",
+      async () => {
+
+        await supabase.auth.signOut();
+
+        window.location.href =
+          "/admin";
+
+      }
+    );
+
+
+    // =========================
+    // 初始化
+    // =========================
+
+    async function init() {
+
+      const isAdmin =
+        await checkAdmin();
+
+
+      if (!isAdmin) return;
+
+
+      await fetchPosts();
+
+    }
+
+
+    init();
+
+  }
+
+
+  initBlogsAdmin();
+
+</script>
+
+</body>
+
+</html>

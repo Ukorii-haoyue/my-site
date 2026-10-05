@@ -1,0 +1,871 @@
+---
+import "../../styles/admin.css";
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin · Uko's Diary</title>
+</head>
+
+<body>
+
+<main class="admin-page">
+
+  <!-- 登录区域 -->
+  <section id="login-section" class="login-section">
+
+    <div class="login-card">
+
+      <span class="login-heart">♡</span>
+
+      <p class="admin-small-title">
+        UKO'S DIARY
+      </p>
+
+      <h1>
+        Admin
+      </h1>
+
+      <p class="login-subtitle">
+        little notes management
+      </p>
+
+      <form id="login-form">
+
+        <div class="input-group">
+          <label for="email">
+            Email
+          </label>
+
+          <input
+            id="email"
+            type="email"
+            placeholder="admin@email.com"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="password">
+            Password
+          </label>
+
+          <input
+            id="password"
+            type="password"
+            placeholder="your password"
+            required
+          />
+        </div>
+
+        <button type="submit" id="login-btn">
+          Login ♡
+        </button>
+
+        <p id="login-error" class="login-error"></p>
+
+      </form>
+
+      <a href="/guestbook" class="back-link">
+        ← back to guestbook
+      </a>
+
+    </div>
+
+  </section>
+
+
+  <!-- 管理后台 -->
+  <section id="dashboard-section" class="dashboard-section">
+
+    <header class="admin-header">
+
+      <div>
+        <p class="admin-small-title">
+          UKO'S DIARY · ADMIN
+        </p>
+
+        <h1>
+  Admin Dashboard
+</h1>
+
+<p class="admin-description">
+  little things from Uko's diary ♡
+</p>
+      </div>
+
+      <button id="logout-btn" class="logout-btn">
+        Logout
+      </button>
+
+    </header>
+
+
+    <!-- 数据统计 -->
+    <div class="stats">
+
+      <div class="stat-card">
+        <span id="total-count">0</span>
+        <small>Total notes</small>
+      </div>
+
+      <div class="stat-card">
+        <span id="visible-count">0</span>
+        <small>Visible</small>
+      </div>
+
+      <div class="stat-card">
+        <span id="hidden-count">0</span>
+        <small>Hidden</small>
+      </div>
+
+    </div>
+
+
+<!-- 内容管理 -->
+<section class="content-management">
+
+  <div class="section-title">
+    <span>
+      DIARY CONTENT
+    </span>
+
+    <span>
+      manage your little records
+    </span>
+  </div>
+
+
+  <div class="content-grid">
+
+    <!-- Films -->
+    <a href="/admin/films" class="content-card">
+
+      <span class="content-icon">
+        🎬
+      </span>
+
+      <div class="content-info">
+
+        <h2>
+          Films
+        </h2>
+
+        <p>
+          manage your movie records
+        </p>
+
+      </div>
+
+      <span class="content-arrow">
+        →
+      </span>
+
+    </a>
+
+
+    <!-- Books -->
+    <a href="/admin/books" class="content-card">
+
+      <span class="content-icon">
+        📚
+      </span>
+
+      <div class="content-info">
+
+        <h2>
+          Books
+        </h2>
+
+        <p>
+          manage your reading records
+        </p>
+
+      </div>
+
+      <span class="content-arrow">
+        →
+      </span>
+
+    </a>
+
+
+    <!-- Blogs -->
+    <a href="/admin/blogs" class="content-card">
+
+      <span class="content-icon">
+        📝
+      </span>
+
+      <div class="content-info">
+
+        <h2>
+          Blogs
+        </h2>
+
+        <p>
+          manage your blog posts
+        </p>
+
+      </div>
+
+      <span class="content-arrow">
+        →
+      </span>
+
+    </a>
+
+
+    <!-- Baking -->
+    <a href="/admin/baking" class="content-card">
+
+      <span class="content-icon">
+        🧁
+      </span>
+
+      <div class="content-info">
+
+        <h2>
+          Baking
+        </h2>
+
+        <p>
+          manage your baking records
+        </p>
+
+      </div>
+
+      <span class="content-arrow">
+        →
+      </span>
+
+    </a>
+
+
+    <!-- Friends -->
+    <a href="/admin/friends" class="content-card">
+
+      <span class="content-icon">
+        🔗
+      </span>
+
+      <div class="content-info">
+
+        <h2>
+          Friends
+        </h2>
+
+        <p>
+          manage your friend links
+        </p>
+
+      </div>
+
+      <span class="content-arrow">
+        →
+      </span>
+
+    </a>
+
+  </div>
+
+</section>
+
+
+
+
+    <!-- 留言列表 -->
+    <section class="admin-messages">
+
+      <div class="section-title">
+        <span>
+          LITTLE NOTES
+        </span>
+
+        <span>
+          manage your guestbook
+        </span>
+      </div>
+
+      <div id="admin-messages-list">
+
+        <div class="loading">
+          Loading notes...
+        </div>
+
+      </div>
+
+    </section>
+
+  </section>
+
+</main>
+
+
+<script>
+  import { supabase } from "../../lib/supabase.js";
+
+  let initialized = false;
+
+
+  function initAdmin() {
+
+    if (initialized) return;
+    initialized = true;
+
+
+    // =========================
+    // DOM
+    // =========================
+
+    const loginSection =
+      document.getElementById("login-section");
+
+    const dashboardSection =
+      document.getElementById("dashboard-section");
+
+    const loginForm =
+      document.getElementById("login-form");
+
+    const emailInput =
+      document.getElementById("email");
+
+    const passwordInput =
+      document.getElementById("password");
+
+    const loginBtn =
+      document.getElementById("login-btn");
+
+    const loginError =
+      document.getElementById("login-error");
+
+    const logoutBtn =
+      document.getElementById("logout-btn");
+
+    const messagesList =
+      document.getElementById("admin-messages-list");
+
+    const totalCount =
+      document.getElementById("total-count");
+
+    const visibleCount =
+      document.getElementById("visible-count");
+
+    const hiddenCount =
+      document.getElementById("hidden-count");
+
+
+    // =========================
+    // 显示 / 隐藏页面
+    // =========================
+
+    function showLogin() {
+
+      loginSection.style.display = "flex";
+      dashboardSection.style.display = "none";
+
+    }
+
+
+    function showDashboard() {
+
+      loginSection.style.display = "none";
+      dashboardSection.style.display = "block";
+
+    }
+
+
+    // =========================
+    // 检查管理员
+    // =========================
+
+    async function checkAdmin() {
+
+      const {
+        data: {
+          user
+        }
+      } = await supabase.auth.getUser();
+
+
+      if (!user) {
+
+        showLogin();
+
+        return;
+
+      }
+
+
+      const {
+        data,
+        error
+      } = await supabase
+        .from("profiles")
+        .select("is_admin")
+        .eq("id", user.id)
+        .single();
+
+
+      if (
+        error ||
+        !data ||
+        data.is_admin !== true
+      ) {
+
+        await supabase.auth.signOut();
+
+        showLogin();
+
+        loginError.textContent =
+          "You are not an administrator.";
+
+        return;
+
+      }
+
+
+      showDashboard();
+
+      await fetchMessages();
+
+    }
+
+
+    // =========================
+    // 登录
+    // =========================
+
+    loginForm.addEventListener(
+      "submit",
+      async (event) => {
+
+        event.preventDefault();
+
+        loginError.textContent = "";
+
+        loginBtn.disabled = true;
+
+        loginBtn.textContent =
+          "Logging in...";
+
+
+        const email =
+          emailInput.value.trim();
+
+        const password =
+          passwordInput.value;
+
+
+        const {
+  data,
+  error
+} = await supabase.auth.signInWithPassword({
+  email,
+  password
+});
+
+console.log("Login result:", data);
+console.log("Login error:", error);
+
+if (error) {
+
+  console.error("Supabase login error:", error);
+
+  loginError.textContent =
+    error.message;
+
+  loginBtn.disabled = false;
+
+  loginBtn.textContent =
+    "Login ♡";
+
+  return;
+}
+
+
+        if (error) {
+
+          console.error(error);
+
+          loginError.textContent =
+            "Incorrect email or password.";
+
+          loginBtn.disabled = false;
+
+          loginBtn.textContent =
+            "Login ♡";
+
+          return;
+
+        }
+
+
+        loginBtn.disabled = false;
+
+        loginBtn.textContent =
+          "Login ♡";
+
+
+        await checkAdmin();
+
+      }
+    );
+
+
+    // =========================
+    // 获取全部留言
+    // =========================
+
+    async function fetchMessages() {
+
+      messagesList.innerHTML = `
+        <div class="loading">
+          Loading notes...
+        </div>
+      `;
+
+
+      const {
+        data,
+        error
+      } = await supabase
+        .from("guestbook")
+        .select(
+          "id, name, message, created_at, is_visible"
+        )
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        );
+
+
+      if (error) {
+
+        console.error(error);
+
+        messagesList.innerHTML = `
+          <div class="loading">
+            Failed to load notes.
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      renderMessages(data || []);
+
+    }
+
+
+    // =========================
+    // 渲染留言
+    // =========================
+
+    function renderMessages(messages) {
+
+      messagesList.innerHTML = "";
+
+
+      const visible =
+        messages.filter(
+          item => item.is_visible
+        ).length;
+
+
+      const hidden =
+        messages.length - visible;
+
+
+      totalCount.textContent =
+        messages.length;
+
+      visibleCount.textContent =
+        visible;
+
+      hiddenCount.textContent =
+        hidden;
+
+
+      if (!messages.length) {
+
+        messagesList.innerHTML = `
+          <div class="loading">
+            No notes yet ♡
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      messages.forEach(
+        (item) => {
+
+          const card =
+            document.createElement("article");
+
+          card.className =
+            "admin-message-card";
+
+
+          if (!item.is_visible) {
+
+            card.classList.add("hidden-note");
+
+          }
+
+
+          const top =
+            document.createElement("div");
+
+          top.className =
+            "message-top";
+
+
+          const name =
+            document.createElement("span");
+
+          name.className =
+            "message-name";
+
+          name.textContent =
+            item.name;
+
+
+          const date =
+            document.createElement("span");
+
+          date.className =
+            "message-date";
+
+          date.textContent =
+            new Date(
+              item.created_at
+            ).toLocaleDateString(
+              "zh-CN",
+              {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit"
+              }
+            );
+
+
+          top.appendChild(name);
+          top.appendChild(date);
+
+
+          const text =
+            document.createElement("p");
+
+          text.className =
+            "message-text";
+
+          text.textContent =
+            item.message;
+
+
+          const status =
+            document.createElement("span");
+
+          status.className =
+            "message-status";
+
+
+          status.textContent =
+            item.is_visible
+              ? "● Visible"
+              : "○ Hidden";
+
+
+          const actions =
+            document.createElement("div");
+
+          actions.className =
+            "message-actions";
+
+
+          const toggleBtn =
+            document.createElement("button");
+
+          toggleBtn.textContent =
+            item.is_visible
+              ? "Hide"
+              : "Show";
+
+
+          toggleBtn.className =
+            "action-btn";
+
+
+          toggleBtn.addEventListener(
+            "click",
+            async () => {
+
+              await toggleVisibility(
+                item.id,
+                !item.is_visible
+              );
+
+            }
+          );
+
+
+          const deleteBtn =
+            document.createElement("button");
+
+          deleteBtn.textContent =
+            "Delete";
+
+          deleteBtn.className =
+            "action-btn delete-btn";
+
+
+          deleteBtn.addEventListener(
+            "click",
+            async () => {
+
+              const confirmed =
+                confirm(
+                  "Delete this message?"
+                );
+
+
+              if (!confirmed) return;
+
+
+              await deleteMessage(
+                item.id
+              );
+
+            }
+          );
+
+
+          actions.appendChild(toggleBtn);
+          actions.appendChild(deleteBtn);
+
+
+          card.appendChild(top);
+          card.appendChild(text);
+          card.appendChild(status);
+          card.appendChild(actions);
+
+
+          messagesList.appendChild(card);
+
+        }
+      );
+
+    }
+
+
+    // =========================
+    // 隐藏 / 显示
+    // =========================
+
+    async function toggleVisibility(
+      id,
+      isVisible
+    ) {
+
+      const {
+        error
+      } = await supabase
+        .from("guestbook")
+        .update({
+          is_visible: isVisible
+        })
+        .eq("id", id);
+
+
+      if (error) {
+
+        console.error(error);
+
+        alert(
+          "Failed to update message."
+        );
+
+        return;
+
+      }
+
+
+      await fetchMessages();
+
+    }
+
+
+    // =========================
+    // 删除
+    // =========================
+
+    async function deleteMessage(id) {
+
+      const {
+        error
+      } = await supabase
+        .from("guestbook")
+        .delete()
+        .eq("id", id);
+
+
+      if (error) {
+
+        console.error(error);
+
+        alert(
+          "Failed to delete message."
+        );
+
+        return;
+
+      }
+
+
+      await fetchMessages();
+
+    }
+
+
+    // =========================
+    // 退出登录
+    // =========================
+
+    logoutBtn.addEventListener(
+      "click",
+      async () => {
+
+        await supabase.auth.signOut();
+
+        showLogin();
+
+      }
+    );
+
+
+    // =========================
+    // 初始化
+    // =========================
+
+    checkAdmin();
+
+  }
+
+
+  initAdmin();
+
+</script>
+
+</body>
+</html>

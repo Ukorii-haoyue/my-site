@@ -1,0 +1,227 @@
+---
+// src/pages/book-records/[slug].astro
+// 单本书详情页：参数 [slug] 实际放的是 books.id
+// 构建时从 Supabase 查询这本书，description 即随笔 / 摘抄正文
+import "../../styles/book-records.css";
+import "../../styles/book-detail.css";
+import { supabase } from "../../lib/supabase.js";
+
+// =========================
+// 静态生成：为每本书产出一个 /book-records/{id}/ 页面
+// =========================
+
+export async function getStaticPaths() {
+  const { data } = await supabase
+    .from("books")
+    .select("id")
+    .order("id", { ascending: true });
+
+  return (data ?? []).map((book) => ({
+    params: { slug: String(book.id) },
+  }));
+}
+
+// =========================
+// 获取当前书籍 ID
+// =========================
+
+const { slug } = Astro.params;
+const bookId = Number(slug);
+
+// =========================
+// 从 Supabase 获取这本书
+// =========================
+
+const {
+  data: book,
+  error,
+} = await supabase
+  .from("books")
+  .select("id, title, author, description, image_url, created_at")
+  .eq("id", bookId)
+  .single();
+
+// 找不到书（兜底回到列表）
+if (error || !book) {
+  return Astro.redirect("/book-records/");
+}
+
+// =========================
+// 获取书单，用来实现 prev / next
+// =========================
+
+const { data: allBooks } = await supabase
+  .from("books")
+  .select("id, title")
+  .order("id", { ascending: true });
+
+const bookList = allBooks ?? [];
+
+const currentIndex = bookList.findIndex(
+  (item) => item.id === book.id
+);
+
+const prevBook =
+  currentIndex > 0
+    ? bookList[currentIndex - 1]
+    : null;
+
+const nextBook =
+  currentIndex < bookList.length - 1
+    ? bookList[currentIndex + 1]
+    : null;
+
+// 当前书籍编号
+const bookNumber = String(
+  currentIndex + 1
+).padStart(2, "0");
+
+// description 按空行 / 换行拆成自然段
+const noteParagraphs = book.description
+  ? book.description
+      .split(/\n+/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+  : [];
+
+// 写作时间（created_at）按北京时间格式化为 YYYY.MM.DD HH:mm
+const formatNoteDate = (value) => {
+  if (!value) return "";
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(new Date(value));
+  const get = (type) =>
+    parts.find((part) => part.type === type)?.value ?? "";
+  return `${get("year")}.${get("month")}.${get("day")} ${get("hour")}:${get("minute")}`;
+};
+
+const noteDate = formatNoteDate(book.created_at);
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{book.title} · My Book Diary</title>
+</head>
+
+<body>
+
+  <main class="book-records book-detail-page">
+
+    <!-- 顶部：返回 + 上下本 -->
+    <nav class="detail-topbar">
+
+      <a href="/book-records/" class="back-link">
+        <span class="link-text">
+          <span class="text-en">← back to books</span>
+          <span class="text-cn">← 返回书籍</span>
+        </span>
+      </a>
+
+      <div class="topbar-nav">
+
+        {prevBook ? (
+          <a
+            href={`/book-records/${prevBook.id}/`}
+            class="topbar-nav-link"
+          >
+            <span class="link-text">
+              <span class="text-en">← prev</span>
+              <span class="text-cn">← 上一篇</span>
+            </span>
+          </a>
+        ) : (
+          <span class="topbar-nav-link is-empty"></span>
+        )}
+
+        <span class="topbar-no">NO.{bookNumber}</span>
+
+        {nextBook ? (
+          <a
+            href={`/book-records/${nextBook.id}/`}
+            class="topbar-nav-link"
+          >
+            <span class="link-text">
+              <span class="text-en">next →</span>
+              <span class="text-cn">下一篇 →</span>
+            </span>
+          </a>
+        ) : (
+          <span class="topbar-nav-link is-empty"></span>
+        )}
+
+      </div>
+
+    </nav>
+
+
+    <section class="detail-grid">
+
+      <!-- 左上角：封面 + 书籍信息 -->
+      <aside class="book-side">
+
+        <figure class="detail-cover-frame">
+          {book.image_url ? (
+            <img
+              src={book.image_url}
+              alt={`${book.title} 封面`}
+            />
+          ) : (
+            <div class="cover-empty">
+              No cover ♡
+            </div>
+          )}
+        </figure>
+
+        <div class="book-side-info">
+
+          <h1 class="detail-title">{book.title}</h1>
+
+          <p class="detail-meta">
+            <span>{book.author}</span>
+          </p>
+
+        </div>
+
+      </aside>
+
+
+      <!-- 主体：book note（后台 description 即随笔 / 摘抄正文） -->
+      <article class="note-card">
+
+        <h2 class="note-heading">book note</h2>
+
+        <div class="note-body">
+          {noteParagraphs.length > 0 ? (
+            noteParagraphs.map((paragraph) => (
+              <p class="note-paragraph">{paragraph}</p>
+            ))
+          ) : (
+            <p class="note-paragraph empty-note">
+              A little note is waiting to be written...
+            </p>
+          )}
+        </div>
+
+        <p class="note-date">
+          {noteDate ? `${noteDate} ♡` : "Uko's little book note ♡"}
+        </p>
+
+      </article>
+
+    </section>
+
+  </main>
+
+</body>
+
+</html>

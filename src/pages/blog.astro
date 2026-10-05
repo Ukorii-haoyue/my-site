@@ -1,0 +1,120 @@
+---
+// src/pages/blog.astro
+// 博客列表：构建时从 Supabase blogs 表读取（只读已发布）
+import "../styles/blog-records.css";
+import { supabase } from "../lib/supabase.js";
+
+const {
+  data: posts,
+  error,
+} = await supabase
+  .from("blogs")
+  .select("id, title, created_at")
+  .eq("is_visible", true)
+  .order("created_at", { ascending: false });
+
+if (error) {
+  console.error("读取博客失败：", error);
+}
+
+// created_at 按北京时间格式化为 YYYY.MM.DD
+const formatDate = (value) => {
+  if (!value) return "";
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date(value));
+  const get = (type) =>
+    parts.find((part) => part.type === type)?.value ?? "";
+  return `${get("year")}.${get("month")}.${get("day")}`;
+};
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Blog</title>
+</head>
+
+<body>
+
+  <main class="blog-records">
+
+    <!-- 返回首页 -->
+    <a href="/" class="back-link">
+      ← back
+    </a>
+
+
+    <!-- 顶部标题 -->
+    <header class="records-header">
+
+      <p class="small-title">MY BLOG DIARY</p>
+
+      <h1>
+        My Blog<br />
+        <span>Posts</span>
+      </h1>
+
+      <p class="intro">
+        记录一些日常、想法和碎碎念……<br />
+        words I wrote, remembered, and quietly kept in my diary.
+      </p>
+
+    </header>
+
+
+    <!-- 博客列表（点击进入文章详情页） -->
+    <section class="blog-list">
+
+      {posts && posts.length > 0 ? (
+        posts.map((post, index) => (
+          <a
+            href={`/blog/${post.id}/`}
+            class="blog-record"
+          >
+
+            <div class="blog-number">
+              {String(index + 1).padStart(2, "0")}
+            </div>
+
+            <div class="blog-info">
+
+              <h2>{post.title}</h2>
+
+              <div class="blog-meta">
+                <span>{formatDate(post.created_at)}</span>
+              </div>
+
+            </div>
+
+            <div class="blog-arrow">
+              ↗
+            </div>
+
+          </a>
+        ))
+      ) : (
+        <div class="empty-blogs">
+          No posts yet ♡
+        </div>
+      )}
+
+    </section>
+
+
+    <!-- 底部 -->
+    <footer class="records-footer">
+      <span>Uko's Diary</span>
+      <span>♡</span>
+      <span>My little blog</span>
+    </footer>
+
+  </main>
+
+</body>
+</html>

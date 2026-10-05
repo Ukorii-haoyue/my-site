@@ -1,0 +1,629 @@
+/* =========================================================
+   UKO'S LIBRARY
+   Book Pages / Editorial Accordion
+   ========================================================= */
+@font-face {
+  font-family: "GochiHand";
+  src: url("/fonts/GochiHand-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "MaokenAssortedSans";
+  src: url("/fonts/猫啃什锦黑1.70/MaokenAssortedSans.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 背景小网格 */
+
+.books-section::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background-image:
+
+            linear-gradient(
+                    rgba(233,107,117,.08) 1px,
+                    transparent 1px
+            ),
+
+            linear-gradient(
+                    90deg,
+                    rgba(233,107,117,.08) 1px,
+                    transparent 1px
+            );
+
+    background-size:
+            45px 45px;
+
+}
+
+
+.books-section {
+    position: relative;
+
+    width: 100%;
+    min-height: 100vh;
+
+    display: flex;
+
+    background: #ffeef5;
+
+    color: #171717;
+
+    overflow: hidden;
+
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* =========================================================
+   LEFT INTRO PAGE
+   ========================================================= */
+
+.books-intro {
+    position: relative;
+    width: 25%;
+    min-width: 300px;
+    min-height: 100vh;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    background: var(--cream);
+    color: #4A3038;
+    overflow: hidden;
+}
+
+
+/* top */
+
+.books-intro-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    font-size: 11px;
+    letter-spacing: 0.08em;
+
+    margin-bottom: 80px;
+
+    color: #68434D;
+}
+
+
+/* heading */
+
+.books-intro h2 {
+    margin: 0;
+
+    font-size: clamp(54px, 5vw, 88px);
+
+    line-height: 0.86;
+
+    font-weight: 500;
+
+    letter-spacing: -0.055em;
+
+    font-family: "GochiHand",sans-serif;
+
+    color: #ff8fa3;
+
+    text-shadow: 2px 3px 0 rgba(255, 255, 255, 0.35);
+}
+
+
+/* description */
+
+.books-intro p {
+    max-width: 310px;
+
+    margin-top: auto;
+    margin-bottom: 35px;
+
+    font-size: 17px;
+
+    line-height: 1.15;
+
+    letter-spacing: -0.02em;
+
+    color: #65434C;
+}
+
+/* =========================================================
+   BOOK PAGES
+   ========================================================= */
+
+.books-pages {
+    flex: 1;
+
+    min-width: 0;
+
+    height: 85vh;
+
+    display: flex;
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   SINGLE BOOK PAGE
+   ========================================================= */
+
+.book-page {
+    position: relative;
+
+    flex: 1 1 0;
+
+    min-width: 65px;
+
+    height: 100%;
+
+    background: var(--book-color);
+
+    border-right: 1px solid rgba(0, 0, 0, 0.65);
+
+    cursor: pointer;
+
+    overflow: hidden;
+
+    transition:
+        flex 0.65s cubic-bezier(0.77, 0, 0.175, 1),
+        min-width 0.65s cubic-bezier(0.77, 0, 0.175, 1);
+
+    will-change: flex;
+
+    border-radius: 30px;
+}
+
+
+/* 鼠标经过时展开 */
+
+.book-page:hover,
+.book-page.is-active {
+    flex: 6;
+}
+
+
+/* =========================================================
+   COLLAPSED STATE
+   ========================================================= */
+
+.book-collapsed {
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: space-between;
+
+    padding: 22px 10px;
+
+    box-sizing: border-box;
+
+    transition: opacity 0.35s ease;
+}
+
+
+/* number */
+
+.book-number {
+    font-size: 12px;
+
+    font-weight: 500;
+
+    color: #9d294d;
+
+    writing-mode: vertical-rl;
+
+    transform: rotate(180deg);
+}
+
+
+/* vertical title */
+
+.book-title-vertical {
+    position: absolute;
+
+    left: 50%;
+    top: 45%;
+
+    transform:
+        translate(-50%, -50%)
+        rotate(-90deg);
+
+    transform-origin: center;
+
+    white-space: nowrap;
+
+    font-family: "MaokenAssortedSans", "GochiHand", sans-serif;
+
+    font-size: clamp(22px, 2.5vw, 48px);
+
+    line-height: 0.8;
+
+    letter-spacing: -0.055em;
+
+    font-weight: 300;
+
+    color: #9d294d;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   EXPANDED STATE
+   ========================================================= */
+
+.book-expanded {
+    position: absolute;
+
+    inset: 0;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition:
+        opacity 0.35s ease 0.15s;
+}
+
+
+/* 激活后显示 */
+
+.book-page:hover .book-expanded,
+.book-page.is-active .book-expanded {
+    opacity: 1;
+
+    pointer-events: auto;
+}
+
+
+/* 展开以后隐藏竖排内容 */
+
+.book-page:hover .book-collapsed,
+.book-page.is-active .book-collapsed {
+    opacity: 0;
+}
+
+
+/* =========================================================
+   CONTENT
+   ========================================================= */
+
+.book-content {
+    width: 100%;
+    height: 100%;
+
+    box-sizing: border-box;
+
+    padding: 30px;
+
+    display: grid;
+
+    grid-template-columns: 1fr 0.8fr;
+
+    gap: 35px;
+
+    align-items: center;
+}
+
+
+/* left */
+
+.book-info {
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+}
+
+
+/* title */
+
+.book-info h3 {
+    margin: 0;
+
+    max-width: 600px;
+
+    font-family: "MaokenAssortedSans", "GochiHand", sans-serif;
+
+    font-size: clamp(36px, 4vw, 68px);
+
+    line-height: 0.82;
+
+    letter-spacing: -0.065em;
+
+    font-weight: 300;
+
+    color: #9d294d;
+}
+
+
+/* author */
+
+.book-author {
+    margin: 25px 0 0;
+
+    font-size: 17px;
+
+    font-style: italic;
+
+    color: #9d294d;
+}
+
+
+/* line */
+
+.book-line {
+    width: 100%;
+    height: 1px;
+
+    background: rgba(0, 0, 0, 0.55);
+
+    margin-top: 35px;
+}
+
+
+/* footer */
+
+.book-footer {
+    display: flex;
+    justify-content: space-between;
+
+    margin-top: 12px;
+
+    font-size: 9px;
+
+    letter-spacing: 0.08em;
+
+    opacity: 0.6;
+}
+
+
+/* =========================================================
+   BOOK COVER
+   ========================================================= */
+
+.book-cover {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+
+.cover-frame {
+    width: min(260px, 90%);
+
+    overflow: hidden;
+
+    background: rgba(255, 255, 255, 0.3);
+
+    box-shadow:
+        8px 10px 0 rgba(0, 0, 0, 0.12);
+
+    transform:
+        rotate(2deg);
+
+    transition:
+        transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+
+.book-page:hover .cover-frame {
+    transform:
+        rotate(-2deg)
+        translateY(-6px);
+}
+
+
+/* 保留封面图片原始尺寸比例，不拉伸不裁剪 */
+
+.cover-frame img {
+    width: 100%;
+    height: auto;
+
+    display: block;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .books-section {
+        min-height: auto;
+
+        display: block;
+    }
+
+    .books-intro {
+        width: 100%;
+        min-width: 0;
+
+        min-height: 45vh;
+
+        border-right: none;
+
+        border-bottom: 1px solid #171717;
+    }
+
+    .books-intro-top {
+        margin-bottom: 50px;
+    }
+
+    .books-intro h2 {
+        font-size: 64px;
+    }
+
+    .books-intro p {
+        margin-top: 50px;
+    }
+
+    .books-pages {
+        width: 100%;
+
+        height: 70vh;
+    }
+
+    .book-page {
+        min-width: 42px;
+    }
+
+    .book-page:hover,
+    .book-page.is-active {
+        flex: 7;
+    }
+
+    .book-content {
+        padding: 20px;
+
+        grid-template-columns: 1fr 0.75fr;
+
+        gap: 15px;
+    }
+
+    .book-info h3 {
+        font-size: 40px;
+    }
+
+    .cover-frame {
+        width: 90%;
+    }
+}
+
+
+/* =========================================================
+   SMALL SCREEN
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .books-pages {
+        height: 80vh;
+
+        overflow-x: auto;
+    }
+
+    .book-page {
+        min-width: 50px;
+    }
+
+    .book-page:hover,
+    .book-page.is-active {
+        flex: 8;
+
+        min-width: 280px;
+    }
+
+    .book-content {
+        grid-template-columns: 1fr;
+
+        overflow-y: auto;
+    }
+
+    .book-cover {
+        display: none;
+    }
+}
+
+.book-all-link {
+  color: #ff7f9c;
+
+  font-family: "GochiHand", cursive;
+
+  font-size: clamp(1.2rem, 1.6vw, 1.5rem);
+
+  text-decoration: none;
+
+  cursor: pointer;
+
+  transition:
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.book-all-link:hover {
+  color: #9d3157;
+
+  transform: translateX(5px);
+}
+
+
+/* 进入这本书的随笔 / 摘抄详情页 */
+
+.book-note-link {
+  display: inline-block;
+
+  margin-top: 28px;
+
+  align-self: flex-start;
+
+  color: #ff7f9c;
+
+  font-family: "GochiHand", cursive;
+  font-size: 17px;
+  letter-spacing: 1.5px;
+
+  text-decoration: none;
+
+  transition: color 0.25s ease;
+}
+
+.book-note-link span {
+  display: inline-block;
+
+  transition: transform 0.3s ease;
+}
+
+.book-note-link:hover {
+  color: #9d3157;
+}
+
+.book-note-link:hover span {
+  transform: translate(3px, -3px);
+}
+
+
+/* 无封面占位（首页书架） */
+
+.cover-frame .cover-empty {
+  width: 100%;
+  aspect-ratio: 0.68;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 12px;
+
+  text-align: center;
+
+  background: rgba(255, 255, 255, 0.55);
+
+  font-family: "MaokenAssortedSans", sans-serif;
+  font-size: 14px;
+
+  color: #9d3157;
+}

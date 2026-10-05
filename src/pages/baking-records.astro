@@ -1,0 +1,327 @@
+---
+import "../styles/baking-records.css";
+import { supabase } from "../lib/supabase.js";
+
+const {
+  data: bakingRecords,
+  error,
+} = await supabase
+  .from("baking")
+  .select("id, title, date, description, image_url, created_at")
+  .order("created_at", { ascending: false });
+
+if (error) {
+  console.error("读取烘焙记录失败：", error);
+}
+
+// 后台日期为 YYYY-MM-DD，展示为 YYYY.MM.DD
+const formatDate = (value) =>
+  value ? String(value).slice(0, 10).replaceAll("-", ".") : "";
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>My Baking Records</title>
+</head>
+
+
+<body>
+
+  <main class="baking-records">
+
+
+    <!-- 返回首页 -->
+
+    <a
+      href="/"
+      class="back-link"
+    >
+      ← back
+    </a>
+
+
+    <!-- 页面标题 -->
+
+    <header class="records-header">
+
+      <p class="small-title">
+        MY BAKING DIARY
+      </p>
+
+
+      <h1>
+        My Baking<br />
+        <span>Records</span>
+      </h1>
+
+
+      <p class="intro">
+        厨房小白黑暗料理中……<br />
+       little cakes, warm bread, and sweet things from my kitchen.
+      </p>
+
+    </header>
+
+
+    <!-- 烘焙记录 -->
+
+    <section class="baking-grid">
+
+      {bakingRecords && bakingRecords.length > 0 ? (
+        bakingRecords.map((item, index) => (
+
+          <article class="baking-card">
+
+
+            <!-- 图片 -->
+
+            <div class="baking-image">
+
+              {item.image_url ? (
+                <img
+                  src={item.image_url}
+                  alt={item.title}
+                  loading="lazy"
+                />
+              ) : (
+                <div class="img-empty">
+                  No photo ♡
+                </div>
+              )}
+
+              <span class="baking-number">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+
+            </div>
+
+
+            <!-- 信息 -->
+
+            <div class="baking-info">
+
+              <div class="baking-meta">
+
+                <span>
+                  {formatDate(item.date)}
+                </span>
+
+              </div>
+
+
+              <h2>
+                {item.title}
+              </h2>
+
+
+              <p>
+                {item.description}
+              </p>
+
+
+              <div class="baking-like">
+
+                <div
+                  class="baking-heart"
+                  data-id={item.id}
+                  role="button"
+                  aria-label="like"
+                >
+                  ♡
+                </div>
+
+                <span
+                  class="baking-like-count"
+                  data-count-for={item.id}
+                >
+                  0
+                </span>
+
+              </div>
+
+            </div>
+
+          </article>
+
+        ))
+      ) : (
+        <div class="empty-baking">
+          Nothing baked yet ♡
+        </div>
+      )}
+
+    </section>
+
+
+    <!-- Footer -->
+
+    <footer class="records-footer">
+
+      <span>
+        Uko's Diary
+      </span>
+
+      <span>
+        ♡
+      </span>
+
+      <span>
+        baked with love
+      </span>
+
+    </footer>
+
+
+  </main>
+
+
+  <!-- 爱心点赞：Supabase 全局计数，所有访客共享 -->
+  <script>
+    import { supabase } from "../lib/supabase.js";
+
+    // 每个浏览器一个访客标识，用来判断"我"是否点过赞
+    const VISITOR_KEY = "uko-visitor-id";
+
+    function getVisitorId() {
+      let id = localStorage.getItem(VISITOR_KEY);
+      if (!id) {
+        id = crypto.randomUUID();
+        localStorage.setItem(VISITOR_KEY, id);
+      }
+      return id;
+    }
+
+    const visitorId = getVisitorId();
+
+    const hearts = Array.from(
+      document.querySelectorAll(".baking-heart")
+    );
+
+    const countEls = {};
+    document
+      .querySelectorAll(".baking-like-count")
+      .forEach((el) => {
+        countEls[el.dataset.countFor] = el;
+      });
+
+    // 服务端返回的全部点赞行
+    let likeRows = [];
+
+    const sameId = (row, id) =>
+      String(row.baking_id) === String(id);
+
+    const likedByMe = (id) =>
+      likeRows.some(
+        (row) =>
+          sameId(row, id) && row.visitor_id === visitorId
+      );
+
+    const countFor = (id) =>
+      likeRows.filter((row) => sameId(row, id)).length;
+
+    function renderHeart(heart) {
+      const id = heart.dataset.id;
+      const liked = likedByMe(id);
+
+      heart.classList.toggle("is-liked", liked);
+      heart.textContent = liked ? "♥" : "♡";
+
+      const countEl = countEls[id];
+      if (countEl) {
+        countEl.textContent = String(countFor(id));
+        countEl.classList.toggle("is-liked", liked);
+      }
+    }
+
+    async function loadLikes() {
+      const { data, error } = await supabase
+        .from("baking_likes")
+        .select("baking_id, visitor_id");
+
+      if (error) {
+        console.error("读取点赞失败：", error);
+        return;
+      }
+
+      likeRows = data || [];
+      hearts.forEach(renderHeart);
+    }
+
+    hearts.forEach((heart) => {
+      heart.addEventListener("click", async (event) => {
+        event.stopPropagation();
+
+        const id = Number(heart.dataset.id);
+        const wasLiked = likedByMe(id);
+
+        // 乐观更新界面
+        if (wasLiked) {
+          likeRows = likeRows.filter(
+            (row) =>
+              !(
+                sameId(row, id) &&
+                row.visitor_id === visitorId
+              )
+          );
+        } else {
+          likeRows.push({
+            baking_id: id,
+            visitor_id: visitorId,
+          });
+
+          heart.classList.remove("heart-pop");
+          // 强制重排以重新触发动画
+          void heart.offsetWidth;
+          heart.classList.add("heart-pop");
+        }
+
+        hearts.forEach(renderHeart);
+
+        // 同步到 Supabase
+        if (wasLiked) {
+          const { error } = await supabase
+            .from("baking_likes")
+            .delete()
+            .eq("baking_id", id)
+            .eq("visitor_id", visitorId);
+
+          if (error) {
+            console.error("取消点赞失败：", error);
+            await loadLikes();
+            alert("取消点赞失败，请稍后再试 ♡");
+          }
+        } else {
+          const { error } = await supabase
+            .from("baking_likes")
+            .insert(
+              { baking_id: id, visitor_id: visitorId },
+              {
+                onConflict: "baking_id,visitor_id",
+                ignoreDuplicates: true,
+              }
+            );
+
+          if (error) {
+            console.error("点赞失败：", error);
+            await loadLikes();
+            alert("点赞失败，请稍后再试 ♡");
+          }
+        }
+      });
+    });
+
+    loadLikes();
+  </script>
+
+</body>
+
+</html>

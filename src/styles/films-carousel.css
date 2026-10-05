@@ -1,0 +1,452 @@
+/* src/styles/films-carousel.css */
+@font-face {
+  font-family: "GochiHand";
+  src: url("/fonts/GochiHand-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 猫啃什锦黑：用于中文片名等 GochiHand 不含的字形 */
+@font-face {
+  font-family: "MaokenAssortedSans";
+  src: url("/fonts/猫啃什锦黑1.70/MaokenAssortedSans-Lite.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+.carousel-section {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    font-family:"GochiHand","MaokenAssortedSans",sans-serif;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 6vw 4vw 5vw;
+    box-sizing: border-box;
+}
+
+
+/* =========================
+   顶部标题
+========================= */
+
+.carousel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width:100%;
+    color: #ff8fa3;
+    z-index:20;
+}
+
+
+.header-left {
+
+    font-size:clamp(3rem, 5vw, 4rem);
+
+    font-weight:700;
+
+    letter-spacing:3px;
+
+    text-transform:uppercase;
+
+}
+
+
+.header-center {
+
+    font-size:1rem;
+
+    color:#b7868c;
+
+    letter-spacing:4px;
+
+    text-transform:uppercase;
+
+}
+
+
+
+/* =========================
+   轮播空间
+========================= */
+
+
+.carousel-container {
+
+    position:relative;
+
+    width:100%;
+
+    flex:1;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    perspective:1200px;
+
+}
+
+
+
+.carousel-track {
+
+    position:relative;
+
+    width:100%;
+
+    height:100%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+
+
+/* =========================
+   电影卡片
+========================= */
+
+
+.carousel-item {
+
+    position:absolute;
+
+    /* 竖版电影海报比例 2:3（宽:高） */
+    width:300px;
+
+    height:450px;
+
+    max-width:75vw;
+
+    transition:
+            transform .7s cubic-bezier(.25,1,.5,1),
+            opacity .7s ease;
+
+    cursor:pointer;
+
+    user-select:none;
+
+}
+
+
+
+.card-frame {
+
+    /* <a> 默认是 inline，宽高/overflow 会失效，必须转为块级盒 */
+    display:block;
+
+    width:100%;
+
+    height:100%;
+
+
+    background:#b7ffe9;
+
+
+    padding:14px;
+
+
+    box-sizing:border-box;
+
+
+    border-radius:22px;
+
+
+    overflow:hidden;
+
+
+    position:relative;
+
+
+    border:
+
+            1px solid rgba(216,92,111,.15);
+
+
+    box-shadow:
+
+
+            0 25px 60px
+
+            rgba(216,92,111,.14);
+
+    /* 去掉 <a> 默认下划线，避免穿透到卡片标题文字 */
+    text-decoration:none;
+
+}
+
+
+/* 无海报时的占位卡片，尺寸与 .card-img 保持一致 */
+
+.card-empty {
+
+    width:100%;
+
+    height:100%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    border-radius:18px;
+
+    background:rgba(216,92,111,.08);
+
+    color:#9d294d;
+
+    font-size:1.1rem;
+
+    letter-spacing:2px;
+
+    text-align:center;
+
+    padding:20px;
+
+    box-sizing:border-box;
+
+}
+
+
+
+/* 图片 */
+
+.card-img {
+
+    width: 100%;
+
+    height: 100%;
+
+
+    object-fit: cover;
+
+
+    display: block;
+
+
+    border-radius: 18px;
+
+
+    filter:
+
+        saturate(.95) contrast(.95);
+
+
+    transition:
+
+        transform .6s ease,
+
+        filter .6s ease;
+
+
+}
+
+
+
+.carousel-item.active:hover .card-img {
+    transform: scale(1.04);
+    filter:
+        saturate(1.1) contrast(1);
+}
+
+
+
+/* =========================
+   影评文字层
+========================= */
+
+
+.card-overlay {
+
+
+    position:absolute;
+    inset:0;
+    padding:24px;
+    box-sizing:border-box;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    background:
+
+
+            linear-gradient(
+
+                    transparent 30%,
+
+                    rgba(255,248,243,.95)
+
+            );
+    color: #9d294d;
+    opacity:0;
+    transform:translateY(20px);
+    transition:
+
+
+            opacity .5s ease,
+
+            transform .5s ease;
+
+
+    pointer-events:none;
+}
+
+
+.carousel-item.active .card-overlay {
+    opacity:1;
+    transform:translateY(0);
+    pointer-events:auto;
+}
+
+.card-overlay h3 {
+
+
+    font-size:1.4rem;
+
+
+    margin:0 0 10px;
+
+
+    font-weight:700;
+
+
+    letter-spacing:2px;
+
+
+}
+
+
+
+.card-overlay p {
+
+
+    font-size:.85rem;
+
+
+    line-height:1.7;
+
+
+    color:#ff7f9c;
+
+
+    margin:0;
+
+
+}
+
+
+
+/* =========================
+   底部导航
+========================= */
+
+
+.carousel-pagination {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:30px;
+    z-index:20;
+    margin-top: 2vh;
+}
+
+
+
+.page-nav-btn {
+    background:none;
+    border:none;
+    color:#ff8fa3;
+    cursor:pointer;
+    padding:5px 10px;
+    font-size:1rem;
+    font-family:"GochiHand","MaokenAssortedSans",sans-serif;
+    position:relative;
+    transition:.3s ease;
+}
+
+
+
+.page-nav-btn::after {
+    content:"";
+    position:absolute;
+    left:50%;
+    bottom:0;
+    width:0;
+    height:2px;
+    background:#ff8fa3;
+    transition:.3s ease;
+}
+
+.page-nav-btn.active {
+    color:#ff8fa3;
+    font-weight:bold;
+}
+
+.page-nav-btn.active::after {
+    width:100%;
+    left:0;
+}
+
+.film-all-link {
+  color: #ff7f9c;
+  font-family: "GochiHand","MaokenAssortedSans",sans-serif;
+  text-decoration: none;
+
+  cursor: pointer;
+    
+  transition:
+    color 0.25s ease,
+    transform 0.25s ease;
+
+    font-size: clamp(1.2rem, 1.6vw, 1.5rem);
+}
+
+.film-all-link:hover {
+  color: #9d3157;
+  transform: translateX(5px);
+}
+
+
+/* =========================================================
+   Films 底部导航：Hover 小爱心
+   ========================================================= */
+
+.page-nav-btn::before {
+    content: "♡";
+
+    position: absolute;
+    left: 50%;
+    top: -10px;
+    transform: translateX(-50%) translateY(4px);
+    font-size: 12px;
+    line-height: 1;
+    color:#ff8fa3;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+        opacity 0.25s ease,
+        transform 0.25s ease;
+}
+
+/* 鼠标放上按钮 */
+
+.page-nav-btn:hover::before {
+    opacity: 1;
+
+    transform:
+        translateX(-50%)
+        translateY(0);
+}
