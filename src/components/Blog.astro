@@ -51,7 +51,7 @@ const formatDate = (value) => {
       postList.map((post, index) => (
         <a
           class="blog-row"
-          href={`/blog/${post.id}/`}
+          href={`${import.meta.env.BASE_URL}/blog/${post.id}/`}
         >
 
           <span class="blog-number">

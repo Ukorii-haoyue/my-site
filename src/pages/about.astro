@@ -303,7 +303,7 @@ const monthLabel = now.toLocaleDateString("en-US", {
               <p>
                 <a
                   class="notice-link"
-                  href={`/blog/${post.id}/`}
+                  href={`${import.meta.env.BASE_URL}/blog/${post.id}/`}
                 >
                   {post.title}
                 </a>

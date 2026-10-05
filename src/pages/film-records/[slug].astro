@@ -131,7 +131,7 @@ const noteDate = formatNoteDate(film.created_at);
 
         {prevFilm ? (
           <a
-            href={`/film-records/${prevFilm.id}/`}
+            href={`${import.meta.env.BASE_URL}/film-records/${prevFilm.id}/`}
             class="topbar-nav-link"
           >
             <span class="link-text">
@@ -147,7 +147,7 @@ const noteDate = formatNoteDate(film.created_at);
 
         {nextFilm ? (
           <a
-            href={`/film-records/${nextFilm.id}/`}
+            href={`${import.meta.env.BASE_URL}/film-records/${nextFilm.id}/`}
             class="topbar-nav-link"
           >
             <span class="link-text">

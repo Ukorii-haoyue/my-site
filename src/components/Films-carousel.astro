@@ -37,7 +37,7 @@ const filmList = films ?? [];
           >
             <a
               class="card-frame"
-              href={`/film-records/${film.id}/`}
+              href={`${import.meta.env.BASE_URL}/film-records/${film.id}/`}
               aria-label={`查看《${film.title}》的观影随笔`}
             >
               {film.image_url ? (
