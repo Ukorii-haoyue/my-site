@@ -10,6 +10,17 @@ const { data: friends, error } = await supabase
 if (error) {
   console.error("Failed to load friends:", error);
 }
+
+// 安全：只允许 http/https 协议，防止 javascript: URL 注入
+const safeUrl = (url) => {
+  if (!url) return "#";
+  try {
+    const u = new URL(url);
+    return (u.protocol === "http:" || u.protocol === "https:") ? u.href : "#";
+  } catch {
+    return "#";
+  }
+};
 ---
 
 <section class="friends-section" id="friends">
@@ -55,7 +66,7 @@ if (error) {
 
               <a
                 class="friend-card"
-                href={friend.url}
+                href={safeUrl(friend.url)}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -227,6 +238,7 @@ if (error) {
             type="text"
             name="name"
             placeholder="你的网站名称"
+            maxlength="50"
             required
           />
         </label>
@@ -239,6 +251,7 @@ if (error) {
             type="url"
             name="url"
             placeholder="https://example.com"
+            maxlength="500"
             required
           />
         </label>
@@ -251,6 +264,7 @@ if (error) {
             name="description"
             placeholder="简单介绍一下你的小站..."
             rows="3"
+            maxlength="200"
             required
           ></textarea>
         </label>
@@ -263,6 +277,7 @@ if (error) {
             type="url"
             name="avatar_url"
             placeholder="https://example.com/avatar.jpg"
+            maxlength="500"
           />
         </label>
 
@@ -423,23 +438,23 @@ if (error) {
       }
 
 
-      // URL 格式兜底校验
+      // URL 格式校验（仅允许 http/https）
 
+      let parsedUrl;
       try {
-
-        new URL(url);
-
+        parsedUrl = new URL(url);
       } catch {
-
         message.textContent =
           "请填写完整的网站链接（含 https://）♡";
-
-        message.classList.add(
-          "is-visible"
-        );
-
+        message.classList.add("is-visible");
         return;
+      }
 
+      if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+        message.textContent =
+          "仅支持 http/https 链接 ♡";
+        message.classList.add("is-visible");
+        return;
       }
 
 

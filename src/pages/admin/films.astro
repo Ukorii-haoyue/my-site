@@ -347,8 +347,7 @@ import "../../styles/admin.css";
 
       if (!user) {
 
-        window.location.href =
-          "/admin";
+        window.location.href = import.meta.env.BASE_URL + "admin/";
 
         return false;
 
@@ -374,8 +373,7 @@ import "../../styles/admin.css";
 
         await supabase.auth.signOut();
 
-        window.location.href =
-          "/admin";
+        window.location.href = import.meta.env.BASE_URL + "admin/";
 
         return false;
 
@@ -892,8 +890,7 @@ import "../../styles/admin.css";
 
         await supabase.auth.signOut();
 
-        window.location.href =
-          "/admin";
+        window.location.href = import.meta.env.BASE_URL + "admin/";
 
       }
     );

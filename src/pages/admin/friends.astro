@@ -176,7 +176,7 @@ import "../../styles/admin.css";
       } = await supabase.auth.getUser();
 
       if (!user) {
-        window.location.href = "/admin";
+        window.location.href = import.meta.env.BASE_URL + "admin/";
         return false;
       }
 
@@ -190,7 +190,7 @@ import "../../styles/admin.css";
 
       if (error || !data?.is_admin) {
         alert("You do not have administrator permission.");
-        window.location.href = "/admin";
+        window.location.href = import.meta.env.BASE_URL + "admin/";
         return false;
       }
 
@@ -997,7 +997,7 @@ import "../../styles/admin.css";
 
         await supabase.auth.signOut();
 
-        window.location.href = "/admin";
+        window.location.href = import.meta.env.BASE_URL + "admin/";
 
       }
     );
