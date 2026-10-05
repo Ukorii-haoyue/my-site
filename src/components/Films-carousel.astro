@@ -8,10 +8,8 @@ import "../styles/films-carousel.css";
     <div class="header-center" id="carouselActiveTitle">Films</div>
   </div>
 
-  <div class="carousel-container">
-    <div class="carousel-track" id="carouselTrack">
-      <div style="padding:2rem;color:#999;">Loading films...</div>
-    </div>
+  <div class="carousel-container" id="carouselContainer">
+    <div class="carousel-track" id="carouselTrack"></div>
   </div>
 
   <div class="carousel-pagination" id="carouselPagination"></div>
@@ -20,24 +18,34 @@ import "../styles/films-carousel.css";
 <script>
   import { supabase } from "../lib/supabase.js";
 
+  let _loaded = false;
+
   async function loadFilms() {
+    if (_loaded) return;
+    _loaded = true;
+
     const track = document.getElementById("carouselTrack");
     const pagination = document.getElementById("carouselPagination");
+    const container = document.getElementById("carouselContainer");
     if (!track) return;
 
     try {
+      // 只取最新 10 部
       const { data: films, error } = await supabase
         .from("films")
         .select("id, title, image_url")
-        .order("id", { ascending: true });
+        .order("id", { ascending: false })
+        .limit(10);
 
       if (error) throw error;
 
       if (!films || films.length === 0) {
         track.innerHTML = '<div style="padding:2rem;color:#999;">No films yet ♡</div>';
-        if (pagination) pagination.innerHTML = "";
         return;
       }
+
+      // 反转为正序显示
+      films.reverse();
 
       const base = import.meta.env.BASE_URL;
 
@@ -55,19 +63,93 @@ import "../styles/films-carousel.css";
         </div>
       `).join("");
 
-      if (pagination) {
-        pagination.innerHTML = films.map((film, index) =>
-          `<button class="page-nav-btn" data-index="${index}">${String(index + 1).padStart(2, "0")}</button>`
-        ).join("") + `<a href="${base}film-records/" class="film-all-link">all →</a>`;
-      }
+      pagination.innerHTML = films.map((_, index) =>
+        `<button class="page-nav-btn" data-index="${index}">${String(index + 1).padStart(2, "0")}</button>`
+      ).join("") + `<a href="${base}film-records/" class="film-all-link">all →</a>`;
 
-      // 重新初始化轮播
-      if (window.initFilmsCarousel) window.initFilmsCarousel();
+      initCarousel(track, container);
     } catch (e) {
       track.innerHTML = '<div style="padding:2rem;color:#999;">Failed to load films.</div>';
     }
   }
 
-  document.addEventListener("astro:page-load", loadFilms);
-  if (document.readyState !== "loading") loadFilms();
+  function initCarousel(track, container) {
+    const items = Array.from(track.getElementsByClassName("carousel-item"));
+    const buttons = Array.from(document.querySelectorAll(".page-nav-btn"));
+    const titleDisplay = document.getElementById("carouselActiveTitle");
+    const n = items.length;
+
+    // 默认停在最后一部（最新的）
+    let current = n - 1;
+    let hovering = false;
+    let locked = false;
+
+    function render() {
+      items.forEach((item, i) => {
+        const offset = i - current;
+        if (offset === 0) {
+          item.style.cssText = "transform:translate3d(0,0,0) rotate(0) scale(1.2);z-index:10;opacity:1;pointer-events:auto;";
+          item.classList.add("active");
+          if (titleDisplay) titleDisplay.textContent = item.getAttribute("data-title");
+        } else {
+          item.classList.remove("active");
+          item.style.cssText = `transform:translate3d(${offset * 75}%,35px,0) rotate(-12deg) scale(0.85);z-index:${10 - Math.abs(offset)};`;
+          if (Math.abs(offset) <= 2) {
+            item.style.opacity = Math.abs(offset) === 1 ? "0.75" : "0.25";
+            item.style.pointerEvents = "auto";
+          } else {
+            item.style.opacity = "0";
+            item.style.pointerEvents = "none";
+          }
+        }
+      });
+      buttons.forEach((btn, i) => btn.classList.toggle("active", i === current));
+    }
+
+    function goTo(idx) {
+      current = Math.max(0, Math.min(n - 1, idx));
+      render();
+    }
+
+    items.forEach((item, i) => {
+      item.onclick = (e) => {
+        if (i === current) {
+          const link = item.querySelector(".card-frame");
+          if (link) window.location.href = link.href;
+        } else {
+          e.preventDefault();
+          goTo(i);
+        }
+      };
+    });
+
+    buttons.forEach((btn, i) => {
+      btn.onclick = () => goTo(i);
+    });
+
+    container.onmouseenter = () => { hovering = true; };
+    container.onmouseleave = () => { hovering = false; };
+
+    // 滚轮：只在鼠标悬停且还有可翻的片时才接管
+    window.addEventListener("wheel", (e) => {
+      if (!hovering || locked) return;
+
+      if (e.deltaY > 0 && current < n - 1) {
+        e.preventDefault();
+        locked = true;
+        goTo(current + 1);
+        setTimeout(() => { locked = false; }, 500);
+      } else if (e.deltaY < 0 && current > 0) {
+        e.preventDefault();
+        locked = true;
+        goTo(current - 1);
+        setTimeout(() => { locked = false; }, 500);
+      }
+      // 到边缘时不 preventDefault，页面正常滚动
+    }, { passive: false });
+
+    render();
+  }
+
+  loadFilms();
 </script>
