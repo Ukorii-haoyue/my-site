@@ -1,4 +1,4 @@
-﻿---
+---
 import "../styles/about.css";
 import Footer from "../components/Footer.astro";
 import { supabase } from "../lib/supabase.js";
@@ -110,7 +110,7 @@ const monthLabel = now.toLocaleDateString("en-US", {
       <span class="en">friends</span>
     </a>
 
-    <a href={`${import.meta.env.BASE_URL}guestbook/`}>
+    <a href={`${import.meta.env.BASE_URL}/guestbook/`}>
       <span class="zh">留言板</span>
       <span class="en">guestbook</span>
     </a>
@@ -269,7 +269,7 @@ const monthLabel = now.toLocaleDateString("en-US", {
 
           <li>
             <span class="contact-label">Guestbook</span>
-            <a href={`${import.meta.env.BASE_URL}guestbook/`}>留言板</a>
+            <a href={`${import.meta.env.BASE_URL}/guestbook/`}>留言板</a>
           </li>
 
         </ul>
