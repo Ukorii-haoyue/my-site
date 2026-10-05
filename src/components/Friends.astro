@@ -1,26 +1,5 @@
 ---
 import "../styles/friends.css";
-import { supabase } from "../lib/supabase";
-
-const { data: friends, error } = await supabase
-  .from("friends")
-  .select("id, name, url, description, avatar_url")
-  .order("created_at", { ascending: true });
-
-if (error) {
-  console.error("Failed to load friends:", error);
-}
-
-// 安全：只允许 http/https 协议，防止 javascript: URL 注入
-const safeUrl = (url) => {
-  if (!url) return "#";
-  try {
-    const u = new URL(url);
-    return (u.protocol === "http:" || u.protocol === "https:") ? u.href : "#";
-  } catch {
-    return "#";
-  }
-};
 ---
 
 <section class="friends-section" id="friends">
@@ -30,484 +9,202 @@ const safeUrl = (url) => {
 
   <div class="friends-container">
 
-    <!-- =========================
-         左侧：友链列表
-    ========================== -->
-
     <div class="friends-main">
 
       <div class="friends-title">
-
-        <span class="friends-eyebrow">
-          little corners of the internet
-        </span>
-
+        <span class="friends-eyebrow">little corners of the internet</span>
         <h2>Friends</h2>
-
         <div class="friends-title-line">
-          <span>✦</span>
-          <i></i>
-          <span>♡</span>
-          <i></i>
-          <span>✦</span>
+          <span>✦</span><i></i><span>♡</span><i></i><span>✦</span>
         </div>
-
       </div>
 
-
-      <!-- 友链列表 -->
-
-      <div class="friends-list">
-
-        {
-          friends && friends.length > 0 ? (
-
-            friends.map((friend) => (
-
-              <a
-                class="friend-card"
-                href={safeUrl(friend.url)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-
-                <div class="friend-card-inner">
-
-                  {
-                    friend.avatar_url ? (
-
-                      <img
-                        class="friend-avatar"
-                        src={friend.avatar_url}
-                        alt={`${friend.name} avatar`}
-                        loading="lazy"
-                      />
-
-                    ) : (
-
-                      <div class="friend-avatar friend-avatar-placeholder">
-                        ♡
-                      </div>
-
-                    )
-                  }
-
-
-                  <div class="friend-info">
-
-                    <h3>{friend.name}</h3>
-
-                    {
-                      friend.description && (
-                        <p>{friend.description}</p>
-                      )
-                    }
-
-                  </div>
-
-
-                  <span class="friend-arrow">
-                    ↗
-                  </span>
-
-                </div>
-
-              </a>
-
-            ))
-
-          ) : (
-
-            <div class="friends-empty">
-
-              <span>♡</span>
-
-              <p>
-                little links are waiting to bloom...
-              </p>
-
-            </div>
-
-          )
-        }
-
+      <!-- 友链列表（客户端填充） -->
+      <div class="friends-list" id="friends-list">
+        <div class="friends-empty">
+          <span>♡</span>
+          <p>Loading friends...</p>
+        </div>
       </div>
 
     </div>
 
-
-    <!-- =========================
-         右侧：申请友链
-    ========================== -->
-
-    <button
-      class="friend-apply-tab"
-      id="friendApplyButton"
-      type="button"
-      aria-label="申请友链"
-      aria-expanded="false"
-    >
-
+    <button class="friend-apply-tab" id="friendApplyButton" type="button" aria-label="申请友链" aria-expanded="false">
       <span class="apply-tab-flower">✿</span>
-
-      <span class="apply-tab-text">
-        申请<br />
-        友链
-      </span>
-
-      <span class="apply-tab-arrow">
-        ‹
-      </span>
-
+      <span class="apply-tab-text">申请<br />友链</span>
+      <span class="apply-tab-arrow">‹</span>
     </button>
 
   </div>
 
+  <!-- 申请友链弹窗 -->
+  <div class="friend-modal" id="friendModal" aria-hidden="true">
+    <div class="friend-modal-overlay" id="friendModalOverlay"></div>
 
-  <!-- =========================
-       申请友链弹窗
-  ========================== -->
-
-  <div
-    class="friend-modal"
-    id="friendModal"
-    aria-hidden="true"
-  >
-
-    <!-- 遮罩 -->
-
-    <div
-      class="friend-modal-overlay"
-      id="friendModalOverlay"
-    ></div>
-
-
-    <!-- 卡片 -->
-
-    <div
-      class="friend-application-card"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="friendApplicationTitle"
-    >
-
-      <button
-        class="friend-modal-close"
-        id="friendModalClose"
-        type="button"
-        aria-label="关闭"
-      >
-        ×
-      </button>
-
-
-      <div class="application-decoration">
-        ♡
-      </div>
-
-
-      <span class="application-eyebrow">
-        leave a little trace
-      </span>
-
-      <h3 id="friendApplicationTitle">
-        Apply for a Link
-      </h3>
-
-      <div class="application-divider">
-        <span>✦</span>
-        <i></i>
-        <span>♡</span>
-        <i></i>
-        <span>✦</span>
-      </div>
-
-
-      <p class="application-description">
-        如果你也有一个小小的网站，
-        欢迎把它留在这里。
-      </p>
-
+    <div class="friend-application-card" role="dialog" aria-modal="true" aria-labelledby="friendApplicationTitle">
+      <button class="friend-modal-close" id="friendModalClose" type="button" aria-label="关闭">×</button>
+      <div class="application-decoration">♡</div>
+      <span class="application-eyebrow">leave a little trace</span>
+      <h3 id="friendApplicationTitle">Apply for a Link</h3>
+      <div class="application-divider"><span>✦</span><i></i><span>♡</span><i></i><span>✦</span></div>
+      <p class="application-description">如果你也有一个小小的网站，欢迎把它留在这里。</p>
 
       <form class="friend-application-form" id="friendApplicationForm" novalidate>
-
         <label>
           <span>网站名称</span>
-
-          <input
-            type="text"
-            name="name"
-            placeholder="你的网站名称"
-            maxlength="50"
-            required
-          />
+          <input type="text" name="name" placeholder="你的网站名称" maxlength="50" required />
         </label>
-
-
         <label>
           <span>网站链接</span>
-
-          <input
-            type="url"
-            name="url"
-            placeholder="https://example.com"
-            maxlength="500"
-            required
-          />
+          <input type="url" name="url" placeholder="https://example.com" maxlength="500" required />
         </label>
-
-
         <label>
           <span>简介</span>
-
-          <textarea
-            name="description"
-            placeholder="简单介绍一下你的小站..."
-            rows="3"
-            maxlength="200"
-            required
-          ></textarea>
+          <textarea name="description" placeholder="简单介绍一下你的小站..." rows="3" maxlength="200" required></textarea>
         </label>
-
-
         <label>
           <span>头像链接（选填）</span>
-
-          <input
-            type="url"
-            name="avatar_url"
-            placeholder="https://example.com/avatar.jpg"
-            maxlength="500"
-          />
+          <input type="url" name="avatar_url" placeholder="https://example.com/avatar.jpg" maxlength="500" />
         </label>
-
-
-        <button
-          type="submit"
-          class="application-submit"
-        >
-          Leave a little note ♡
-        </button>
-
-
-        <p
-          class="application-message"
-          id="friendApplicationMessage"
-        ></p>
-
+        <button type="submit" class="application-submit">Leave a little note ♡</button>
+        <p class="application-message" id="friendApplicationMessage"></p>
       </form>
-
     </div>
-
   </div>
 
 </section>
 
-
 <script>
   import { supabase } from "../lib/supabase";
 
-  const applyButton = document.querySelector(
-    "#friendApplyButton"
-  );
+  // 安全：只允许 http/https
+  const safeUrl = (url) => {
+    if (!url) return "#";
+    try {
+      const u = new URL(url);
+      return (u.protocol === "http:" || u.protocol === "https:") ? u.href : "#";
+    } catch { return "#"; }
+  };
 
-  const modal = document.querySelector(
-    "#friendModal"
-  );
+  // ---------- 客户端加载友链列表 ----------
+  async function loadFriends() {
+    const list = document.getElementById("friends-list");
+    if (!list) return;
 
-  const overlay = document.querySelector(
-    "#friendModalOverlay"
-  );
+    try {
+      const { data: friends, error } = await supabase
+        .from("friends")
+        .select("id, name, url, description, avatar_url")
+        .order("created_at", { ascending: true });
 
-  const closeButton = document.querySelector(
-    "#friendModalClose"
-  );
+      if (error) throw error;
 
-  const form = document.querySelector(
-    "#friendApplicationForm"
-  );
+      if (!friends || friends.length === 0) {
+        list.innerHTML = '<div class="friends-empty"><span>♡</span><p>little links are waiting to bloom...</p></div>';
+        return;
+      }
 
-  const message = document.querySelector(
-    "#friendApplicationMessage"
-  );
+      list.innerHTML = friends.map((friend) => `
+        <a class="friend-card" href="${safeUrl(friend.url)}" target="_blank" rel="noopener noreferrer">
+          <div class="friend-card-inner">
+            ${friend.avatar_url
+              ? `<img class="friend-avatar" src="${friend.avatar_url}" alt="${friend.name} avatar" loading="lazy" />`
+              : `<div class="friend-avatar friend-avatar-placeholder">♡</div>`}
+            <div class="friend-info">
+              <h3>${friend.name}</h3>
+              ${friend.description ? `<p>${friend.description}</p>` : ""}
+            </div>
+            <span class="friend-arrow">↗</span>
+          </div>
+        </a>
+      `).join("");
+    } catch (e) {
+      list.innerHTML = '<div class="friends-empty"><span>♡</span><p>Failed to load friends.</p></div>';
+    }
+  }
 
+  // ---------- 弹窗逻辑 ----------
+  const applyButton = document.querySelector("#friendApplyButton");
+  const modal = document.querySelector("#friendModal");
+  const overlay = document.querySelector("#friendModalOverlay");
+  const closeButton = document.querySelector("#friendModalClose");
+  const form = document.querySelector("#friendApplicationForm");
+  const message = document.querySelector("#friendApplicationMessage");
 
   function openModal() {
     modal?.classList.add("is-open");
-
-    modal?.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-    applyButton?.setAttribute(
-      "aria-expanded",
-      "true"
-    );
-
-    document.body.classList.add(
-      "friend-modal-open"
-    );
+    modal?.setAttribute("aria-hidden", "false");
+    applyButton?.setAttribute("aria-expanded", "true");
+    document.body.classList.add("friend-modal-open");
   }
-
 
   function closeModal() {
     modal?.classList.remove("is-open");
-
-    modal?.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-
-    applyButton?.setAttribute(
-      "aria-expanded",
-      "false"
-    );
-
-    document.body.classList.remove(
-      "friend-modal-open"
-    );
+    modal?.setAttribute("aria-hidden", "true");
+    applyButton?.setAttribute("aria-expanded", "false");
+    document.body.classList.remove("friend-modal-open");
   }
 
+  applyButton?.addEventListener("click", openModal);
+  closeButton?.addEventListener("click", closeModal);
+  overlay?.addEventListener("click", closeModal);
 
-  applyButton?.addEventListener(
-    "click",
-    openModal
-  );
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeModal();
+  });
 
-  closeButton?.addEventListener(
-    "click",
-    closeModal
-  );
+  // ---------- 提交友链申请 ----------
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-  overlay?.addEventListener(
-    "click",
-    closeModal
-  );
+    const name = form.elements.name.value.trim();
+    const url = form.elements.url.value.trim();
+    const description = form.elements.description.value.trim();
+    const avatarUrl = form.elements.avatar_url.value.trim();
 
-
-  document.addEventListener(
-    "keydown",
-    (event) => {
-
-      if (event.key === "Escape") {
-        closeModal();
-      }
-
+    if (!name || !url || !description) {
+      message.textContent = "请填写网站名称、链接和简介 ♡";
+      message.classList.add("is-visible");
+      return;
     }
-  );
 
-
-  /*
-   * 友链申请
-   *
-   * 写入 friend_applications 表（访客可提交、仅管理员可见），
-   * 由管理端审核通过后再写入正式 friends 表。
-   */
-
-  form?.addEventListener(
-    "submit",
-    async (event) => {
-
-      event.preventDefault();
-
-      const name =
-        form.elements.name.value.trim();
-
-      const url =
-        form.elements.url.value.trim();
-
-      const description =
-        form.elements.description.value.trim();
-
-      const avatarUrl =
-        form.elements.avatar_url.value.trim();
-
-
-      if (!name || !url || !description) {
-
-        message.textContent =
-          "请填写网站名称、链接和简介 ♡";
-
-        message.classList.add(
-          "is-visible"
-        );
-
-        return;
-
-      }
-
-
-      // URL 格式校验（仅允许 http/https）
-
-      let parsedUrl;
-      try {
-        parsedUrl = new URL(url);
-      } catch {
-        message.textContent =
-          "请填写完整的网站链接（含 https://）♡";
-        message.classList.add("is-visible");
-        return;
-      }
-
-      if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
-        message.textContent =
-          "仅支持 http/https 链接 ♡";
-        message.classList.add("is-visible");
-        return;
-      }
-
-
-      message.textContent =
-        "正在提交...";
-
-      message.classList.add(
-        "is-visible"
-      );
-
-
-      const {
-        error
-      } = await supabase
-        .from("friend_applications")
-        .insert({
-          name,
-          url,
-          description: description || null,
-          avatar_url: avatarUrl || null
-        });
-
-
-      if (error) {
-
-        console.error(error);
-
-        message.textContent =
-          "提交失败，请稍后再试 ♡";
-
-        return;
-
-      }
-
-
-      message.textContent =
-        "已收到你的申请 ♡";
-
-      form.reset();
-
-
-      setTimeout(() => {
-
-        closeModal();
-
-        message.textContent = "";
-
-        message.classList.remove(
-          "is-visible"
-        );
-
-      }, 1500);
-
+    let parsedUrl;
+    try { parsedUrl = new URL(url); } catch {
+      message.textContent = "请填写完整的网站链接（含 https://）♡";
+      message.classList.add("is-visible");
+      return;
     }
-  );
+
+    if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+      message.textContent = "仅支持 http/https 链接 ♡";
+      message.classList.add("is-visible");
+      return;
+    }
+
+    message.textContent = "正在提交...";
+    message.classList.add("is-visible");
+
+    const { error } = await supabase
+      .from("friend_applications")
+      .insert({ name, url, description: description || null, avatar_url: avatarUrl || null });
+
+    if (error) {
+      console.error(error);
+      message.textContent = "提交失败，请稍后再试 ♡";
+      return;
+    }
+
+    message.textContent = "已收到你的申请 ♡";
+    form.reset();
+
+    setTimeout(() => {
+      closeModal();
+      message.textContent = "";
+      message.classList.remove("is-visible");
+    }, 1500);
+  });
+
+  // 初始化
+  document.addEventListener("astro:page-load", loadFriends);
+  if (document.readyState !== "loading") loadFriends();
 </script>

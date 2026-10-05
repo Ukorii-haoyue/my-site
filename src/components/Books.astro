@@ -1,137 +1,89 @@
 ---
-// src/components/Books.astro
-// 首页书架：构建时从 Supabase books 表读取，手风琴交互不变
 import "../styles/books.css";
-import { supabase } from "../lib/supabase.js";
-
-const {
-  data: books,
-  error,
-} = await supabase
-  .from("books")
-  .select("id, title, author, description, image_url")
-  .order("id", { ascending: true });
-
-if (error) {
-  console.error("读取书架失败：", error);
-}
-
-const bookList = books ?? [];
-
-// 数据库没有配色字段，沿用原来的粉彩书脊色循环
-const palette = [
-  "#F9D4DC",
-  "#D4EDDF",
-  "#F7EDC4",
-  "#F9D4BC",
-  "#D6E2F5",
-  "#E3D1F0",
-  "#F6D3E3",
-  "#E8D4BC",
-];
 ---
 
-{bookList.length > 0 && (
-  <section class="books-section" id="books">
+<section class="books-section" id="books">
 
-    <!-- 左侧扉页 -->
-    <div class="books-intro">
+  <!-- 左侧扉页 -->
+  <div class="books-intro">
+    <div class="books-intro-top"></div>
+    <h2>
+      Books<br />
+      I've<br />
+      Read
+    </h2>
+    <a href={`${import.meta.env.BASE_URL}/book-records/`} class="book-all-link">all →</a>
+  </div>
 
-      <div class="books-intro-top">
-      </div>
+  <!-- 书页区域（客户端填充） -->
+  <div class="books-pages" id="books-pages">
+    <div style="padding:2rem;color:#999;">Loading books...</div>
+  </div>
 
-      <h2>
-        Books<br />
-        I've<br />
-        Read
-      </h2>
-
-      <a href={`${import.meta.env.BASE_URL}/book-records/`} class="book-all-link">all →</a>
-
-    </div>
-
-
-    <!-- 书页区域 -->
-    <div class="books-pages">
-
-      {bookList.map((book, index) => (
-        <article
-          class:list={[
-            "book-page",
-            { "is-active": index === 0 }
-          ]}
-          data-book={index}
-          style={`--book-color: ${palette[index % palette.length]};`}
-        >
-
-          <!-- 竖着显示的书名 -->
-          <div class="book-collapsed">
-
-            <span class="book-number">
-              {String(index + 1).padStart(2, "0")}
-            </span>
-
-            <span class="book-title-vertical">
-              {book.title}
-            </span>
-
-          </div>
-
-
-          <!-- 展开后的内容 -->
-          <div class="book-expanded">
-
-            <div class="book-content">
-
-              <div class="book-info">
-
-                <h3>
-                  {book.title}
-                </h3>
-
-                <p class="book-author">
-                  {book.author}
-                </p>
-
-                <a
-                  class="book-note-link"
-                  href={`${import.meta.env.BASE_URL}/book-records/${book.id}/`}
-                >
-                  read my note <span>↗</span>
-                </a>
-
-              </div>
-
-
-              <div class="book-cover">
-
-                <div class="cover-frame">
-
-                  {book.image_url ? (
-                    <img
-                      src={book.image_url}
-                      alt={`${book.title} book cover`}
-                    />
-                  ) : (
-                    <div class="cover-empty">
-                      <span>{book.title}</span>
-                    </div>
-                  )}
-
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </article>
-      ))}
-
-    </div>
-
-  </section>
-)}
+</section>
 
 <script src="../scripts/books.js"></script>
+
+<script>
+  import { supabase } from "../lib/supabase.js";
+
+  const palette = [
+    "#F9D4DC", "#D4EDDF", "#F7EDC4", "#F9D4BC",
+    "#D6E2F5", "#E3D1F0", "#F6D3E3", "#E8D4BC",
+  ];
+
+  async function loadBooks() {
+    const container = document.getElementById("books-pages");
+    if (!container) return;
+
+    try {
+      const { data: books, error } = await supabase
+        .from("books")
+        .select("id, title, author, description, image_url")
+        .order("id", { ascending: true });
+
+      if (error) throw error;
+
+      if (!books || books.length === 0) {
+        container.innerHTML = '<div style="padding:2rem;color:#999;">No books yet ♡</div>';
+        return;
+      }
+
+      container.innerHTML = books.map((book, index) => {
+        const num = String(index + 1).padStart(2, "0");
+        const color = palette[index % palette.length];
+        const base = import.meta.env.BASE_URL;
+        const cover = book.image_url
+          ? `<img src="${book.image_url}" alt="${book.title}" />`
+          : `<div class="cover-empty"><span>${book.title}</span></div>`;
+        return `
+          <article class="book-page ${index === 0 ? "is-active" : ""}" data-book="${index}" style="--book-color:${color};">
+            <div class="book-collapsed">
+              <span class="book-number">${num}</span>
+              <span class="book-title-vertical">${book.title}</span>
+            </div>
+            <div class="book-expanded">
+              <div class="book-content">
+                <div class="book-info">
+                  <h3>${book.title}</h3>
+                  <p class="book-author">${book.author || ""}</p>
+                  <a class="book-note-link" href="${base}book-records/${book.id}/">read my note <span>↗</span></a>
+                </div>
+                <div class="book-cover">
+                  <div class="cover-frame">${cover}</div>
+                </div>
+              </div>
+            </div>
+          </article>`;
+      }).join("");
+
+      // 重新绑定手风琴交互
+      if (window.initBooksAccordion) window.initBooksAccordion();
+    } catch (e) {
+      container.innerHTML = '<div style="padding:2rem;color:#999;">Failed to load books.</div>';
+    }
+  }
+
+  document.addEventListener("astro:page-load", loadBooks);
+  if (document.readyState !== "loading") loadBooks();
+</script>

@@ -1,84 +1,73 @@
 ---
 import "../styles/bake-diary.css";
-import { supabase } from "../lib/supabase.js";
-
-const {
-  data: bakingRecords,
-  error,
-} = await supabase
-  .from("baking")
-  .select("id, title, date, description, image_url, created_at")
-  .order("created_at", { ascending: false });
-
-if (error) {
-  console.error("读取烘焙日记失败：", error);
-}
-
-const books = bakingRecords ?? [];
-
-// 首页只显示年月 YYYY.MM
-const formatMonth = (value) =>
-  value ? String(value).slice(0, 7).replace("-", ".") : "";
 ---
 
-{books.length > 0 && (
-  <section class="book-diary" id="baking">
-      <!-- 左侧标题 -->
-      <div class="book-heading">
-          <div class="cute-star">✦</div>
-          <h2>
-              BAKE
-              <br/>
-              &
-              <br/>
-              DIARY
-          </h2>
-          <p>胡闹厨房~~<br/>
-              嘻嘻嘻
-          </p>
-          <a href={`${import.meta.env.BASE_URL}/baking-records/`}class="baking-all-link">all →</a>
-      </div>
+<section class="book-diary" id="baking">
+  <!-- 左侧标题 -->
+  <div class="book-heading">
+    <div class="cute-star">✦</div>
+    <h2>
+      BAKE
+      <br/>
+      &
+      <br/>
+      DIARY
+    </h2>
+    <p>胡闹厨房~~<br/>嘻嘻嘻</p>
+    <a href={`${import.meta.env.BASE_URL}/baking-records/`} class="baking-all-link">all →</a>
+  </div>
 
-      <!-- 右侧书架 -->
+  <!-- 右侧书架（客户端填充） -->
+  <div class="book-library">
+    <div class="book-track" id="baking-track">
+      <div style="padding:2rem;color:#999;">Loading baking diary...</div>
+    </div>
+  </div>
+  <div class="flower flower-one">✿</div>
+  <div class="flower flower-two">♡</div>
+</section>
 
-      <div class="book-library">
-          <div class="book-track">
-              {books.map((book, index)=>(
+<script>
+  import { supabase } from "../lib/supabase.js";
 
-                      <article
-                              class="book-item"
-                              style={`--delay:${index * 1.2}s`}
-                      >
+  async function loadBaking() {
+    const track = document.getElementById("baking-track");
+    if (!track) return;
 
+    try {
+      const { data: records, error } = await supabase
+        .from("baking")
+        .select("id, title, date, description, image_url, created_at")
+        .order("created_at", { ascending: false });
 
-                          <div class="book-cover">
-                              {book.image_url ? (
-                                  <img
-                                          src={book.image_url}
-                                          alt={book.title}
-                                  />
-                              ) : (
-                                  <div class="cover-empty">
-                                      <span>{book.title}</span>
-                                  </div>
-                              )}
+      if (error) throw error;
 
+      if (!records || records.length === 0) {
+        track.innerHTML = '<div style="padding:2rem;color:#999;">No baking records yet ♡</div>';
+        return;
+      }
 
-                          </div>
+      track.innerHTML = records.map((book, index) => {
+        const month = book.date ? String(book.date).slice(0, 7).replace("-", ".") : "";
+        const cover = book.image_url
+          ? `<img src="${book.image_url}" alt="${book.title}" />`
+          : `<div class="cover-empty"><span>${book.title}</span></div>`;
+        return `
+          <article class="book-item" style="--delay:${index * 1.2}s">
+            <div class="book-cover">${cover}</div>
+            <div class="book-note">
+              <h3>${book.title}</h3>
+              <small>烘焙日记</small>
+              <p>${book.description || ""}</p>
+              <time>${month}</time>
+            </div>
+          </article>`;
+      }).join("");
+    } catch (e) {
+      track.innerHTML = '<div style="padding:2rem;color:#999;">Failed to load baking diary.</div>';
+    }
+  }
 
-                          <div class="book-note">
-                              <h3>{book.title}</h3>
-                              <small>烘焙日记</small>
-                              <p>{book.description}</p>
-                              <time>{formatMonth(book.date)}</time>
-                          </div>
-                      </article>
-
-                  ))}
-                  </div>
-                  </div>
-                  <div class="flower flower-one">✿</div>
-                  <div class="flower flower-two">♡</div>
-
-                  </section>
-)}
+  document.addEventListener("astro:page-load", loadBaking);
+  if (document.readyState !== "loading") loadBaking();
+</script>

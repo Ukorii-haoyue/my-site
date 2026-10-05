@@ -1,74 +1,73 @@
 ---
-// src/components/Films-carousel.astro
-// 首页电影轮播：构建时从 Supabase films 表读取
 import "../styles/films-carousel.css";
-import { supabase } from "../lib/supabase.js";
-
-const {
-  data: films,
-  error,
-} = await supabase
-  .from("films")
-  .select("id, title, image_url")
-  .order("id", { ascending: true });
-
-if (error) {
-  console.error("读取电影轮播失败：", error);
-}
-
-const filmList = films ?? [];
 ---
 
-{filmList.length > 0 && (
-  <div class="carousel-section" id="films">
-    <div class="carousel-header">
-      <div class="header-left">MY FILMVIEW</div>
-      <div class="header-center" id="carouselActiveTitle">Films</div>
-    </div>
+<div class="carousel-section" id="films">
+  <div class="carousel-header">
+    <div class="header-left">MY FILMVIEW</div>
+    <div class="header-center" id="carouselActiveTitle">Films</div>
+  </div>
 
-    <div class="carousel-container">
-      <div class="carousel-track" id="carouselTrack">
-        {filmList.map((film, index) => (
-          <div
-            class="carousel-item"
-            data-index={index}
-            data-title={film.title}
-            data-id={film.id}
-          >
-            <a
-              class="card-frame"
-              href={`${import.meta.env.BASE_URL}/film-records/${film.id}/`}
-              aria-label={`查看《${film.title}》的观影随笔`}
-            >
-              {film.image_url ? (
-                <img src={film.image_url} alt={film.title} class="card-img" />
-              ) : (
-                <div class="card-empty">
-                  <span>{film.title}</span>
-                </div>
-              )}
-              <div class="card-overlay">
-                <h3>{film.title}</h3>
-                <p class="card-cta">read my diary <span>↗</span></p>
-              </div>
-            </a>
-          </div>
-        ))}
-      </div>
-    </div>
-
-    <div class="carousel-pagination">
-      {filmList.map((film, index) => (
-        <button class="page-nav-btn" data-index={index}>
-          {String(index + 1).padStart(2, "0")}
-        </button>
-      ))}
-      <a href={`${import.meta.env.BASE_URL}/film-records/`} class="film-all-link">all →</a>
+  <div class="carousel-container">
+    <div class="carousel-track" id="carouselTrack">
+      <div style="padding:2rem;color:#999;">Loading films...</div>
     </div>
   </div>
-)}
+
+  <div class="carousel-pagination" id="carouselPagination"></div>
+</div>
 
 <script>
-  // 引入对应的客户端脚本
-  import "../scripts/films-carousel.js";
+  import { supabase } from "../lib/supabase.js";
+
+  async function loadFilms() {
+    const track = document.getElementById("carouselTrack");
+    const pagination = document.getElementById("carouselPagination");
+    if (!track) return;
+
+    try {
+      const { data: films, error } = await supabase
+        .from("films")
+        .select("id, title, image_url")
+        .order("id", { ascending: true });
+
+      if (error) throw error;
+
+      if (!films || films.length === 0) {
+        track.innerHTML = '<div style="padding:2rem;color:#999;">No films yet ♡</div>';
+        if (pagination) pagination.innerHTML = "";
+        return;
+      }
+
+      const base = import.meta.env.BASE_URL;
+
+      track.innerHTML = films.map((film, index) => `
+        <div class="carousel-item" data-index="${index}" data-title="${film.title}" data-id="${film.id}">
+          <a class="card-frame" href="${base}film-records/${film.id}/">
+            ${film.image_url
+              ? `<img src="${film.image_url}" alt="${film.title}" class="card-img" />`
+              : `<div class="card-empty"><span>${film.title}</span></div>`}
+            <div class="card-overlay">
+              <h3>${film.title}</h3>
+              <p class="card-cta">read my diary <span>↗</span></p>
+            </div>
+          </a>
+        </div>
+      `).join("");
+
+      if (pagination) {
+        pagination.innerHTML = films.map((film, index) =>
+          `<button class="page-nav-btn" data-index="${index}">${String(index + 1).padStart(2, "0")}</button>`
+        ).join("") + `<a href="${base}film-records/" class="film-all-link">all →</a>`;
+      }
+
+      // 重新初始化轮播
+      if (window.initFilmsCarousel) window.initFilmsCarousel();
+    } catch (e) {
+      track.innerHTML = '<div style="padding:2rem;color:#999;">Failed to load films.</div>';
+    }
+  }
+
+  document.addEventListener("astro:page-load", loadFilms);
+  if (document.readyState !== "loading") loadFilms();
 </script>
