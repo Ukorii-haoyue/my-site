@@ -123,7 +123,7 @@ const noteDate = formatNoteDate(post.created_at);
     <!-- 顶部：返回 + 上下篇 -->
     <nav class="detail-topbar">
 
-      <a href="/blog/" class="back-link">
+      <a href={`${import.meta.env.BASE_URL}blog/`} class="back-link">
         <span class="link-text">
           <span class="text-en">← back to blog</span>
           <span class="text-cn">← 返回博客</span>

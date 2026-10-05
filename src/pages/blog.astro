@@ -1,4 +1,4 @@
----
+﻿---
 // src/pages/blog.astro
 // 博客列表：构建时从 Supabase blogs 表读取（只读已发布）
 import "../styles/blog-records.css";
@@ -45,7 +45,7 @@ const formatDate = (value) => {
   <main class="blog-records">
 
     <!-- 返回首页 -->
-    <a href="/" class="back-link">
+    <a href={`${import.meta.env.BASE_URL}`} class="back-link">
       ← back
     </a>
 

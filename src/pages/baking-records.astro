@@ -1,4 +1,4 @@
----
+﻿---
 import "../styles/baking-records.css";
 import { supabase } from "../lib/supabase.js";
 
@@ -42,7 +42,7 @@ const formatDate = (value) =>
     <!-- 返回首页 -->
 
     <a
-      href="/"
+      href={`${import.meta.env.BASE_URL}`}
       class="back-link"
     >
       ← back

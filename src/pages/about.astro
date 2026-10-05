@@ -1,4 +1,4 @@
----
+﻿---
 import "../styles/about.css";
 import Footer from "../components/Footer.astro";
 import { supabase } from "../lib/supabase.js";
@@ -75,42 +75,42 @@ const monthLabel = now.toLocaleDateString("en-US", {
   <!-- 快速导航（除 about 外的 7 项，默认中文，悬停英文） -->
   <nav class="hero-nav">
 
-    <a href="/">
+    <a href={`${import.meta.env.BASE_URL}`}>
       <span class="zh">首页</span>
       <span class="en">home</span>
     </a>
 
-    <a href="/#diary">
+    <a href={`${import.meta.env.BASE_URL}#diary`}>
       <span class="zh">时间线</span>
       <span class="en">timeline</span>
     </a>
 
-    <a href="/#blog">
+    <a href={`${import.meta.env.BASE_URL}#blog`}>
       <span class="zh">博客</span>
       <span class="en">blog</span>
     </a>
 
-    <a href="/#films">
+    <a href={`${import.meta.env.BASE_URL}#films`}>
       <span class="zh">电影</span>
       <span class="en">films</span>
     </a>
 
-    <a href="/#books">
+    <a href={`${import.meta.env.BASE_URL}#books`}>
       <span class="zh">书籍</span>
       <span class="en">books</span>
     </a>
 
-    <a href="/#baking">
+    <a href={`${import.meta.env.BASE_URL}#baking`}>
       <span class="zh">烘焙</span>
       <span class="en">baking</span>
     </a>
 
-    <a href="/#friends">
+    <a href={`${import.meta.env.BASE_URL}#friends`}>
       <span class="zh">友链</span>
       <span class="en">friends</span>
     </a>
 
-    <a href="/guestbook/">
+    <a href={`${import.meta.env.BASE_URL}guestbook/`}>
       <span class="zh">留言板</span>
       <span class="en">guestbook</span>
     </a>
@@ -269,7 +269,7 @@ const monthLabel = now.toLocaleDateString("en-US", {
 
           <li>
             <span class="contact-label">Guestbook</span>
-            <a href="/guestbook/">留言板</a>
+            <a href={`${import.meta.env.BASE_URL}guestbook/`}>留言板</a>
           </li>
 
         </ul>

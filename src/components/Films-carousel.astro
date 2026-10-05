@@ -1,4 +1,4 @@
----
+﻿---
 // src/components/Films-carousel.astro
 // 首页电影轮播：构建时从 Supabase films 表读取
 import "../styles/films-carousel.css";
@@ -63,7 +63,7 @@ const filmList = films ?? [];
           {String(index + 1).padStart(2, "0")}
         </button>
       ))}
-      <a href="/film-records/" class="film-all-link">all →</a>
+      <a href={`${import.meta.env.BASE_URL}film-records/`} class="film-all-link">all →</a>
     </div>
   </div>
 )}

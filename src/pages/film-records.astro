@@ -1,4 +1,4 @@
----
+﻿---
 // src/pages/film-records.astro
 // 电影列表：构建时从 Supabase films 表读取
 import "../styles/film-records.css";
@@ -43,7 +43,7 @@ function ratingHearts(rating) {
   <main class="film-records">
 
     <!-- 返回首页 -->
-    <a href="/" class="back-link">
+    <a href={`${import.meta.env.BASE_URL}`} class="back-link">
       ← back
     </a>
 

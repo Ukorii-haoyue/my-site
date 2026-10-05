@@ -120,7 +120,7 @@ const noteDate = formatNoteDate(film.created_at);
     <!-- 顶部：返回 + 上下篇 -->
     <nav class="detail-topbar">
 
-      <a href="/film-records/" class="back-link">
+      <a href={`${import.meta.env.BASE_URL}film-records/`} class="back-link">
         <span class="link-text">
           <span class="text-en">← back to films</span>
           <span class="text-cn">← 返回电影</span>
