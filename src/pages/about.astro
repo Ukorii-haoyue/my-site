@@ -110,7 +110,7 @@ const monthLabel = now.toLocaleDateString("en-US", {
       <span class="en">friends</span>
     </a>
 
-    <a href={`${import.meta.env.BASE_URL}/guestbook/`}>
+    <a href={`${import.meta.env.BASE_URL}guestbook/`}>
       <span class="zh">留言板</span>
       <span class="en">guestbook</span>
     </a>
@@ -269,7 +269,7 @@ const monthLabel = now.toLocaleDateString("en-US", {
 
           <li>
             <span class="contact-label">Guestbook</span>
-            <a href={`${import.meta.env.BASE_URL}/guestbook/`}>留言板</a>
+            <a href={`${import.meta.env.BASE_URL}guestbook/`}>留言板</a>
           </li>
 
         </ul>
@@ -303,7 +303,7 @@ const monthLabel = now.toLocaleDateString("en-US", {
               <p>
                 <a
                   class="notice-link"
-                  href={`${import.meta.env.BASE_URL}/blog/${post.id}/`}
+                  href={`${import.meta.env.BASE_URL}blog/${post.id}/`}
                 >
                   {post.title}
                 </a>
