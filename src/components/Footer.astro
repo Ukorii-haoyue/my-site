@@ -18,6 +18,27 @@ import "../styles/footer.css";
     <!-- 3. 版权细字 -->
     <div class="footer-bottom">
       <p>© {currentYear} Uko's Diary</p>
+      <p id="site-runtime">本站已运行 0 天 0 时 0 分 0 秒</p>
     </div>
   </div>
 </footer>
+
+<script>
+  // 本站正式上线时间（北京时间）。想改就改这一行。
+  const LAUNCH_DATE = new Date("2026-10-05T21:00:00+08:00");
+
+  function tickRuntime() {
+    const el = document.getElementById("site-runtime");
+    if (!el) return;
+    let diff = Math.max(0, Date.now() - LAUNCH_DATE.getTime());
+    const sec = Math.floor(diff / 1000);
+    const d = Math.floor(sec / 86400);
+    const h = Math.floor((sec % 86400) / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = sec % 60;
+    el.textContent = `本站已安全运行 ${d} 天 ${h} 时 ${m} 分 ${s} 秒`;
+  }
+  tickRuntime();
+  setInterval(tickRuntime, 1000);
+  document.addEventListener("astro:page-load", tickRuntime);
+</script>
