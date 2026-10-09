@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import "../styles/intro.css";
 
 
 
@@ -20,10 +21,58 @@ const {
 	<meta name="viewport" content="width=device-width" />
 	<link rel="icon" type="image/png" href="/images/cursor3.png" />
 	<title>{title}</title>
+	<script is:inline>
+		// 本次会话已看过开场动画 → 加标记，直接不渲染，避免翻页时闪一下
+		if (sessionStorage.getItem("uko-intro-seen")) {
+			document.documentElement.classList.add("intro-done");
+		}
+	</script>
 </head>
 
 <body>
-<slot />
+	<!-- 首页开场动画：小青蛙跳出来打个招呼（自动退场，点击任意位置可提前跳过） -->
+	<div class="site-intro" id="site-intro" aria-hidden="true">
+		<div class="intro-content">
+			<div class="intro-mascot-wrap">
+				<img class="intro-mascot" src="/images/cursor3.png" alt="" width="92" height="92" />
+				<span class="intro-star intro-star--l" aria-hidden="true">✦</span>
+				<span class="intro-star intro-star--r" aria-hidden="true">✧</span>
+			</div>
+			<p class="intro-title"><span class="intro-letter" style="animation-delay:.30s">U</span><span class="intro-letter" style="animation-delay:.38s">k</span><span class="intro-letter" style="animation-delay:.46s">o</span><span class="intro-letter" style="animation-delay:.54s">'</span><span class="intro-letter" style="animation-delay:.62s">s</span><span class="intro-space"></span><span class="intro-letter" style="animation-delay:.70s">D</span><span class="intro-letter" style="animation-delay:.78s">i</span><span class="intro-letter" style="animation-delay:.86s">a</span><span class="intro-letter" style="animation-delay:.94s">r</span><span class="intro-letter" style="animation-delay:1.02s">y</span></p>
+		</div>
+	</div>
+	<noscript><style>.site-intro{display:none}</style></noscript>
+	<slot />
+	<script>
+		// 首页开场动画：小青蛙蹦出来打招呼 → 整片淡出让位给页面
+		// 规则：同一浏览器会话只播放一次；点击任意位置可提前跳过
+		const intro = document.getElementById("site-intro");
+
+		if (intro) {
+			// 本次会话已经看过 → 直接移除，不打扰
+			if (sessionStorage.getItem("uko-intro-seen")) {
+				intro.remove();
+			} else {
+				sessionStorage.setItem("uko-intro-seen", "1");
+				document.body.classList.add("intro-lock");
+
+				const leave = () => {
+					if (intro.classList.contains("is-leaving")) return; // 只退一次
+					intro.classList.add("is-leaving");
+					document.body.classList.remove("intro-lock");
+					const cleanup = () => intro.remove();
+					intro.addEventListener("transitionend", cleanup, { once: true });
+					setTimeout(cleanup, 600); // 保险：transition 万一没触发也删掉
+				};
+
+				// 点一下可以提前跳过
+				intro.addEventListener("click", leave);
+
+				// 自动退场（多留一点时间让波浪跳动被看到）
+				setTimeout(leave, 1800);
+			}
+		}
+	</script>
 </body>
 
 </html>

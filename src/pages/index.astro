@@ -12,9 +12,23 @@ import Books from "../components/Books.astro";
 import Friends from "../components/Friends.astro";
 
 ---
-<script type="module">
+<script>
+	// 平滑滚动（Lenis）：直接在此初始化，确保被 Astro 正确打包
+	// （原来的 import 单独一行写法不会被打包，浏览器请求 /scripts/lenis.js 会 404）
+	import Lenis from "lenis";
 
-	import "../scripts/lenis.js";
+	const lenis = new Lenis({
+		duration: 1.2,
+		smoothWheel: true,
+		smoothTouch: false,
+	});
+
+	function raf(time) {
+		lenis.raf(time);
+		requestAnimationFrame(raf);
+	}
+
+	requestAnimationFrame(raf);
 </script>
 
 
