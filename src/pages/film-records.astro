@@ -1,4 +1,4 @@
----
+﻿---
 // src/pages/film-records.astro
 // 电影列表：构建时从 Supabase films 表读取
 import "../styles/film-records.css";
@@ -28,11 +28,13 @@ function ratingHearts(rating) {
     return "empty";
   });
 }
+import "../styles/global.css";
 ---
 
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <link rel="icon" type="image/png" href="/images/cursor3.png" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Film Records</title>

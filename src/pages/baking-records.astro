@@ -17,12 +17,14 @@ if (error) {
 // 后台日期为 YYYY-MM-DD，展示为 YYYY.MM.DD
 const formatDate = (value) =>
   value ? String(value).slice(0, 10).replaceAll("-", ".") : "";
+import "../styles/global.css";
 ---
 
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
+
+  <link rel="icon" type="image/png" href="/images/cursor3.png" />
   <meta charset="UTF-8" />
 
   <meta

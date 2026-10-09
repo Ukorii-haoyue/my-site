@@ -13,4 +13,8 @@ body{
     background:var(--cream);
     color:var(--ink);
     overflow-x:hidden;
+    cursor: url('/images/cursor1.png'), auto;
+}
+a, button, [role="button"], [class*="card"]{
+    cursor: url('/images/cursor2.png'), pointer !important;
 }

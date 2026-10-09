@@ -1,4 +1,4 @@
----
+﻿---
 // src/pages/blog/[slug].astro
 // 博客详情页：参数 [slug] 实际放的是 blogs.id
 // 构建时从 Supabase 查询这篇文章，content 即博客正文
@@ -105,12 +105,14 @@ const formatNoteDate = (value) => {
 };
 
 const noteDate = formatNoteDate(post.created_at);
+import "../../styles/global.css";
 ---
 
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
+
+  <link rel="icon" type="image/png" href="/images/cursor3.png" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{post.title} · My Blog</title>

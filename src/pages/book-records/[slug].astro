@@ -1,4 +1,4 @@
----
+﻿---
 // src/pages/book-records/[slug].astro
 // 单本书详情页：参数 [slug] 实际放的是 books.id
 // 构建时从 Supabase 查询这本书，description 即随笔 / 摘抄正文
@@ -102,12 +102,14 @@ const formatNoteDate = (value) => {
 };
 
 const noteDate = formatNoteDate(book.created_at);
+import "../../styles/global.css";
 ---
 
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
+
+  <link rel="icon" type="image/png" href="/images/cursor3.png" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{book.title} · My Book Diary</title>

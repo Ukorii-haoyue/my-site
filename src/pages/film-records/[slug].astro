@@ -1,4 +1,4 @@
----
+﻿---
 // src/pages/film-records/[slug].astro
 // 单部电影详情页：参数 [slug] 实际放的是 films.id
 // 构建时从 Supabase 查询这部电影，description 即 film note 正文
@@ -102,12 +102,14 @@ const formatNoteDate = (value) => {
 };
 
 const noteDate = formatNoteDate(film.created_at);
+import "../../styles/global.css";
 ---
 
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
+
+  <link rel="icon" type="image/png" href="/images/cursor3.png" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{film.title} · My Film Diary</title>

@@ -1,4 +1,4 @@
----
+﻿---
 // src/pages/book-records.astro
 // 书单列表：构建时从 Supabase books 表读取
 import "../styles/book-records.css";
@@ -15,12 +15,14 @@ const {
 if (error) {
   console.error("读取书籍失败：", error);
 }
+import "../styles/global.css";
 ---
 
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
+
+  <link rel="icon" type="image/png" href="/images/cursor3.png" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 

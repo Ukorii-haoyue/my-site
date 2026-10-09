@@ -1,4 +1,4 @@
----
+﻿---
 // src/pages/blog.astro
 // 博客列表：构建时从 Supabase blogs 表读取（只读已发布）
 import "../styles/blog-records.css";
@@ -30,11 +30,13 @@ const formatDate = (value) => {
     parts.find((part) => part.type === type)?.value ?? "";
   return `${get("year")}.${get("month")}.${get("day")}`;
 };
+import "../styles/global.css";
 ---
 
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <link rel="icon" type="image/png" href="/images/cursor3.png" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Blog</title>
