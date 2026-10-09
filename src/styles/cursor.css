@@ -1,0 +1,12 @@
+/* =========================================
+   全站统一自定义鼠标（小青蛙）
+   独立页面没有引入 global.css，需要单独引入本文件
+   ========================================= */
+
+body {
+  cursor: url('/images/cursor1.png'), auto;
+}
+
+a, button, [role="button"], [class*="card"] {
+  cursor: url('/images/cursor2.png'), pointer !important;
+}
