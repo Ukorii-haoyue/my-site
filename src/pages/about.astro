@@ -32,22 +32,16 @@ const formatNoticeDate = (value) => {
   return `${get("day")}.${get("month")}.${get("year")}`;
 };
 
-// 实时日期：构建时取当天，生成当前月日历
-const now = new Date();
-const year = now.getFullYear();
-const monthIndex = now.getMonth();
-const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
-const firstWeekday = new Date(year, monthIndex, 1).getDay(); // 0 = Sunday
-const today = now.getDate();
-const monthLabel = now.toLocaleDateString("en-US", {
-  month: "long",
-  year: "numeric"
-});
+// 日历改为浏览器端实时渲染（见页面底部脚本），避免静态构建冻结日期
 ---
 
 <html lang="zh-CN">
 <head>
   <link rel="icon" type="image/png" href="/images/cursor3.png" />
+  <!-- footer 品牌字（Great Vibes / Playfair Display）：与首页一致，避免内联样式里 @import 位置靠后导致字体不加载 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,300;1,300&display=swap" />
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>About · Uko's Diary</title>
@@ -140,9 +134,7 @@ const monthLabel = now.toLocaleDateString("en-US", {
         calendar
       </h2>
 
-      <p class="calendar-month">
-        {monthLabel}
-      </p>
+      <p class="calendar-month" id="calendar-month"></p>
 
       <div class="calendar-weekdays">
         <span>sun</span>
@@ -154,22 +146,7 @@ const monthLabel = now.toLocaleDateString("en-US", {
         <span>sat</span>
       </div>
 
-      <div class="calendar-days">
-
-        {Array.from({ length: firstWeekday }).map(() => (
-          <span class="blank"></span>
-        ))}
-
-        {Array.from({ length: daysInMonth }, (_, i) => {
-          const day = i + 1;
-          return (
-            <span class={day === today ? "today" : ""}>
-              {day}
-            </span>
-          );
-        })}
-
-      </div>
+      <div class="calendar-days" id="calendar-days"></div>
 
     </div>
 
@@ -349,6 +326,66 @@ const monthLabel = now.toLocaleDateString("en-US", {
 
 <Footer />
 
+<script>
+  // 实时日历：在浏览器端按北京时间（Asia/Shanghai）生成当前月份，
+  // 静态构建后日期仍保持准确，跨天后自动重绘。
+  (function () {
+    const TZ = "Asia/Shanghai";
+    const monthEl = document.getElementById("calendar-month");
+    const daysEl = document.getElementById("calendar-days");
+    if (!monthEl || !daysEl) return;
+
+    function currentParts() {
+      const parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: TZ,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).formatToParts(new Date());
+      const get = (type) => parts.find((p) => p.type === type)?.value ?? "";
+      return {
+        year: Number(get("year")),
+        month: Number(get("month")), // 1-12
+        day: Number(get("day")),
+      };
+    }
+
+    function renderCalendar() {
+      const { year, month, day: today } = currentParts();
+      const daysInMonth = new Date(year, month, 0).getDate();
+      const firstWeekday = new Date(year, month - 1, 1).getDay(); // 0 = Sunday
+
+      monthEl.textContent = new Intl.DateTimeFormat("en-US", {
+        timeZone: TZ,
+        month: "long",
+        year: "numeric",
+      }).format(new Date());
+
+      let html = "";
+      for (let i = 0; i < firstWeekday; i++) {
+        html += '<span class="blank"></span>';
+      }
+      for (let d = 1; d <= daysInMonth; d++) {
+        html += `<span${d === today ? ' class="today"' : ""}>${d}</span>`;
+      }
+      daysEl.innerHTML = html;
+    }
+
+    renderCalendar();
+
+    // 跨天后自动重绘
+    function scheduleNextRender() {
+      const { year, month, day } = currentParts();
+      const nextMidnight = new Date(year, month - 1, day + 1, 0, 0, 0, 0);
+      const delay = nextMidnight.getTime() - Date.now();
+      setTimeout(function () {
+        renderCalendar();
+        scheduleNextRender();
+      }, Math.max(0, delay) + 1000);
+    }
+    scheduleNextRender();
+  })();
+</script>
 
 </body>
 </html>
