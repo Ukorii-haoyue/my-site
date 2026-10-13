@@ -454,3 +454,22 @@ body {
   }
 
 }
+
+/* 手机端：intro 中文行使用猫啃什锦黑，英文行保持 GochiHand */
+@media (max-width: 768px) {
+  .intro .intro-cn {
+    font-family: "MaokenAssortedSans", "猫啃什锦黑", sans-serif;
+  }
+}
+
+
+/* 手机端：intro 中文行猫啃什锦黑，英文不变；整体字号缩小为说明文字 */
+@media (max-width: 768px) {
+  .intro .intro-cn {
+    font-family: "MaokenAssortedSans", "猫啃什锦黑", sans-serif;
+  }
+  .intro {
+    font-size: 14px;
+    line-height: 1.75;
+  }
+}

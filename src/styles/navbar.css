@@ -268,7 +268,9 @@
 .nav-text .text-cn {
   opacity: 0;
 
+  /* 导航字体统一使用 GochiHand，中文缺字时回退到猫啃什锦黑 */
   font-family:
+    GochiHand,
     "MaokenAssortedSans",
     "猫啃什锦黑",
     sans-serif;
@@ -474,17 +476,25 @@
 
   text-decoration: none;
 
+  /* 手机菜单字体统一为 GochiHand */
   font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+    GochiHand,
+    "MaokenAssortedSans",
+    "猫啃什锦黑",
+    sans-serif;
 
   font-size: 25px;
 
-  font-style: italic;
+  font-style: normal;
 
   border-bottom:
     1px dashed rgba(184, 38, 82, 0.15);
+
+  /* 初始隐藏，菜单打开时逐项淡入下滑 */
+  opacity: 0;
+
+  transform:
+    translateY(-14px);
 }
 
 .mobile-menu a span {
@@ -533,17 +543,104 @@
     display: block;
   }
 
+  /* 展开列表：半透明背景，宽度刚好贴合文字，靠右在汉堡按钮下方 */
+  .mobile-menu {
+    width: fit-content;
+
+    left: auto;
+
+    right: 0;
+
+    margin:
+      8px
+      15px
+      0
+      auto;
+
+    padding:
+      12px
+      16px;
+
+    background:
+      rgba(255, 247, 251, 0.6);
+
+    backdrop-filter:
+      blur(10px);
+
+    -webkit-backdrop-filter:
+      blur(10px);
+  }
+
   .uko-navbar.menu-open .mobile-menu {
     display: block;
 
     animation:
       menuAppear
-      0.4s
+      0.5s
       cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .uko-navbar.scrolled .navbar-inner {
+  /* 菜单项一个一个缓慢丝滑展开 */
+  .uko-navbar.menu-open .mobile-menu a {
+    animation:
+      menuItemIn
+      0.6s
+      cubic-bezier(0.22, 1, 0.36, 1)
+      forwards;
+  }
+
+  .uko-navbar.menu-open .mobile-menu a:nth-child(1) {
+    animation-delay: 0.05s;
+  }
+
+  .uko-navbar.menu-open .mobile-menu a:nth-child(2) {
+    animation-delay: 0.14s;
+  }
+
+  .uko-navbar.menu-open .mobile-menu a:nth-child(3) {
+    animation-delay: 0.23s;
+  }
+
+  .uko-navbar.menu-open .mobile-menu a:nth-child(4) {
+    animation-delay: 0.32s;
+  }
+
+  .uko-navbar.menu-open .mobile-menu a:nth-child(5) {
+    animation-delay: 0.41s;
+  }
+
+  .uko-navbar.menu-open .mobile-menu a:nth-child(6) {
+    animation-delay: 0.50s;
+  }
+
+  .uko-navbar.menu-open .mobile-menu a:nth-child(7) {
+    animation-delay: 0.59s;
+  }
+
+  .uko-navbar.menu-open .mobile-menu a:nth-child(8) {
+    animation-delay: 0.68s;
+  }
+
+    .uko-navbar.scrolled .navbar-inner {
     min-height: 52px;
+  }
+
+}
+
+@keyframes menuItemIn {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-14px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
   }
 
 }
@@ -599,4 +696,45 @@
   transform:
     translateX(-50%)
     scale(1);
+}
+
+/* 手机端展开菜单：悬停 / 按住时英文淡出、中文淡入，两层叠放避免宽度跳动 */
+@media (max-width: 800px) {
+  .mobile-menu a .m-text {
+    display: inline-grid;
+  }
+  .mobile-menu a .m-text {
+    display: inline-grid;
+    font-size: inherit;
+    font-family: inherit;
+    line-height: inherit;
+    opacity: 1;
+  }
+  .mobile-menu a .m-en,
+  .mobile-menu a .m-cn {
+    grid-area: 1 / 1;
+    white-space: nowrap;
+    font-size: inherit;
+    font-family: inherit;
+    line-height: inherit;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+  .mobile-menu a .m-en {
+    font-family: inherit;
+    opacity: 1;
+  }
+  .mobile-menu a .m-cn {
+    opacity: 0;
+    font-family: "MaokenAssortedSans", "猫啃什锦黑", sans-serif;
+    font-weight: 400;
+  }
+  .mobile-menu a:hover .m-en,
+  .mobile-menu a:active .m-en {
+    opacity: 0;
+  }
+  .mobile-menu a:hover .m-cn,
+  .mobile-menu a:active .m-cn {
+    opacity: 1;
+  }
 }

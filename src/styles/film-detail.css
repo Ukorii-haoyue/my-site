@@ -366,3 +366,61 @@
   }
 
 }
+
+/* 手机端短文案（← back / ← / →），桌面端不显示 */
+.text-short {
+  display: none;
+}
+
+/* 手机端：返回简化为 ← back（参考列表页样式），翻页只留箭头，隐藏 NO.序号 */
+@media (max-width: 768px) {
+  .detail-topbar {
+    flex-wrap: nowrap;
+    gap: 10px;
+  }
+
+  .back-link {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    font-size: 19px;
+    white-space: nowrap;
+  }
+
+  .back-link .text-en,
+  .back-link .text-cn {
+    display: none;
+  }
+
+  .back-link .text-short {
+    display: inline;
+  }
+
+  .topbar-nav {
+    gap: 14px;
+  }
+
+  .topbar-nav-link:not(.is-empty) {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    font-size: 22px;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .topbar-nav-link .text-en,
+  .topbar-nav-link .text-cn {
+    display: none;
+  }
+
+  .topbar-nav-link .text-short {
+    display: inline;
+  }
+
+  .topbar-no {
+    display: none;
+  }
+}

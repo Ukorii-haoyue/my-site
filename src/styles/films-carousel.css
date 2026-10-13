@@ -450,3 +450,138 @@
         translateX(-50%)
         translateY(0);
 }
+
+
+/* =========================================================
+   手机端：3D 封面流改为普通横向滑动小卡片
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .carousel-section {
+        height: auto;
+        min-height: auto;
+        padding: 40px 0 50px;
+        justify-content: flex-start;
+    }
+
+    /* 大标题与首页其他区块手机端字号一致 */
+    .carousel-header {
+        padding: 0 25px;
+    }
+
+    .header-left {
+        font-size: 30px;
+        letter-spacing: 2px;
+    }
+
+    /* 去掉右上角动态电影名 */
+    .header-center {
+        display: none;
+    }
+
+    .carousel-container {
+        flex: none;
+        display: block;
+        perspective: none;
+        margin-top: 24px;
+        overflow: hidden;
+        /* 左侧与区块标题对齐，右侧满屏裁切 */
+        padding: 6px 0 14px 25px;
+    }
+
+    .carousel-track {
+        display: flex;
+        justify-content: flex-start;
+        align-items: stretch;
+        gap: 14px;
+        height: auto;
+        /* 末尾补一个 gap，保证两份内容 -50% 处无缝衔接 */
+        padding-right: 14px;
+        width: max-content;
+        will-change: transform;
+        /* 自动横向无缝滚动，速度稍快；时长由 JS 按卡片数给定 */
+        animation: filmsMarquee var(--marquee-duration, 16s) linear infinite;
+    }
+
+    /* 鼠标悬停在卡片上时暂停自动滚动，移开后恢复 */
+    .carousel-container:hover .carousel-track,
+    .carousel-container:active .carousel-track {
+        animation-play-state: paused;
+    }
+
+    @keyframes filmsMarquee {
+        from {
+            transform: translateX(0);
+        }
+        to {
+            transform: translateX(-50%);
+        }
+    }
+
+    /* 小卡片：保持薄荷绿底+白框海报的原样式，仅缩小尺寸 */
+    .carousel-item {
+        position: relative;
+        flex: 0 0 auto;
+        width: 120px;
+        height: 180px;
+        max-width: none;
+        transform: none !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        z-index: auto !important;
+        transition: none;
+    }
+
+    .card-frame {
+        padding: 8px;
+        border-radius: 14px;
+        box-shadow: 0 10px 22px rgba(216, 92, 111, .18);
+    }
+
+    .card-img {
+        border-radius: 9px;
+    }
+
+    .card-empty {
+        border-radius: 9px;
+        font-size: .8rem;
+        padding: 8px;
+    }
+
+    /* 手机端没有 hover，overlay 常显、简化 */
+    .card-overlay {
+        opacity: 1;
+        transform: none;
+        position: absolute;
+        padding: 10px;
+        justify-content: flex-end;
+        background: linear-gradient(transparent 35%, rgba(255, 248, 243, .95));
+        pointer-events: auto;
+    }
+
+    .card-overlay h3 {
+        font-size: .85rem;
+        margin: 0 0 4px;
+        letter-spacing: 1px;
+        line-height: 1.2;
+    }
+
+    .card-overlay p {
+        font-size: .65rem;
+        line-height: 1.4;
+    }
+
+    /* 数字分页按钮在手机端无意义，隐藏；保留 all → 链接 */
+    .carousel-pagination {
+        margin-top: 10px;
+        gap: 0;
+        justify-content: flex-start;
+        padding: 0 25px;
+    }
+
+    .page-nav-btn {
+        display: none;
+    }
+
+}

@@ -542,7 +542,7 @@
 
 
 .apply-tab-text {
-  font-family: "GochiHand", cursive;
+  font-family: "MaokenAssortedSans", "猫啃什锦黑", sans-serif;
 
   font-size: 17px;
 
@@ -1068,57 +1068,63 @@ body.friend-modal-open {
 
 
   .friends-title h2 {
-    font-size: 45px;
+    font-size: 30px; /* 与首页其他区块手机端大标题字号一致 */
   }
 
 
   /* 移动端改成底部悬浮按钮 */
 
+  /* 随 friend 区块一起滚动，贴在区块最右端、与友链列表右侧齐平 */
   .friend-apply-tab {
-    position: fixed;
+    position: absolute;
 
-    z-index: 999;
+    z-index: 2;
 
-    right: 18px;
+    right: 0;
 
-    bottom: 25px;
+    bottom: auto;
 
-    top: auto;
+    top: 250px;
 
-    width: 62px;
+    width: 52px;
 
-    min-height: 62px;
+    min-height: 0;
 
-    height: 62px;
+    height: 140px;
 
     margin: 0;
 
-    padding: 8px;
+    padding: 16px 4px;
 
-    border-radius: 50%;
+    border-radius: 16px 0 0 16px;
+
+    background:
+      rgba(255, 238, 245, 0.92);
 
     box-shadow:
-      0 8px 25px
-      rgba(180, 120, 135, 0.2);
+      -4px 8px 25px
+      rgba(180, 120, 135, 0.22);
   }
 
 
   .friend-apply-tab::before {
-    border-radius: 50%;
+    border-radius: 12px 0 0 12px;
   }
 
 
+  /* 去掉樱花 */
   .apply-tab-flower {
-    font-size: 17px;
+    display: none;
   }
 
 
+  /* “申请友链”四字竖排，猫啃什锦黑 */
   .apply-tab-text {
-    font-size: 11px;
-
-    line-height: 1.1;
-
-    letter-spacing: 1px;
+    writing-mode: vertical-rl;
+    font-family: "MaokenAssortedSans", "猫啃什锦黑", sans-serif;
+    font-size: 15px;
+    letter-spacing: 5px;
+    line-height: 1;
   }
 
 
@@ -1163,4 +1169,12 @@ body.friend-modal-open {
     left: 17px;
   }
 
+}
+
+/* 默认 frog 头像：图片等比缩到圆形头像范围约 1/3，主体居中（手机端+网页端） */
+.friend-avatar-placeholder {
+  object-fit: contain;
+  object-position: center;
+  padding: 10px;
+  background: #f9dce2;
 }

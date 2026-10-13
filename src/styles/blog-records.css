@@ -314,21 +314,64 @@ body {
   }
 
   .blog-record {
-    grid-template-columns: 50px 1fr 45px;
-    min-height: 150px;
+    grid-template-columns: 36px 1fr 38px;
+    min-height: auto;
+    gap: 12px;
+    padding: 18px 0;
   }
 
+  /* 博客标题：字号缩小，最多两行 */
   .blog-info h2 {
-    font-size: 38px;
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .blog-meta {
+    font-size: 13px;
+    margin-bottom: 0;
+  }
+
+  .blog-number {
+    font-size: 16px;
   }
 
   .blog-arrow {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
+    width: 38px;
+    height: 38px;
+    font-size: 17px;
+  }
+
+  .blog-record:hover {
+    padding-left: 0;
+    padding-right: 0;
   }
 
   .records-footer {
     font-size: 14px;
+  }
+}
+
+
+/* 手机端：intro 中文行使用猫啃什锦黑，英文行保持 GochiHand */
+@media (max-width: 768px) {
+  .intro .intro-cn {
+    font-family: "MaokenAssortedSans", "猫啃什锦黑", sans-serif;
+  }
+}
+
+
+/* 手机端：intro 中文行猫啃什锦黑，英文不变；整体字号缩小为说明文字 */
+@media (max-width: 768px) {
+  .intro .intro-cn {
+    font-family: "MaokenAssortedSans", "猫啃什锦黑", sans-serif;
+  }
+  .intro {
+    font-size: 14px;
+    line-height: 1.75;
   }
 }

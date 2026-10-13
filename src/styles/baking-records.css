@@ -607,9 +607,51 @@ body {
   }
 
 
+  /* 评价文字右侧留出点赞按钮空间，避免重叠 */
+  .baking-info p {
+    padding-right: 52px;
+    margin-bottom: 10px;
+  }
+
+
+  /* 点赞按钮缩小，不再与评价文字冲突 */
+  .baking-like {
+    right: 4px;
+    bottom: 2px;
+    gap: 5px;
+  }
+
+  .baking-heart {
+    width: 34px;
+    height: 34px;
+    font-size: 16px;
+  }
+
+  .baking-like-count {
+    min-width: 14px;
+    font-size: 14px;
+  }
+
+
   .records-footer {
 
     font-size: 14px;
   }
 
+}
+
+/* 手机端：intro 中文行使用猫啃什锦黑，英文行保持 GochiHand */
+@media (max-width: 768px) {
+  .intro .intro-cn {
+    font-family: "MaokenAssortedSans", "猫啃什锦黑", sans-serif;
+  }
+}
+
+
+/* 手机端：解释文字缩小到与电影/书籍列表页一致 */
+@media (max-width: 768px) {
+  .intro {
+    font-size: 14px;
+    line-height: 1.75;
+  }
 }

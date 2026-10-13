@@ -349,6 +349,10 @@
 
         flex-direction:column;
 
+        padding:40px 0 50px;
+
+        min-height:auto;
+
     }
 
 
@@ -356,22 +360,199 @@
 
         width:100%;
 
+        padding:0 25px;
+
+    }
+
+    .cute-star{
+        font-size:22px;
+    }
+
+    .book-heading h2{
+
+        /* 与首页其他区块手机端大标题字号一致 */
+        font-size:30px;
+        line-height:1.1;
+        margin-top:10px;
+
+    }
+
+    .book-heading p{
+        margin-top:14px;
+        font-size:13px;
+        line-height:1.6;
+    }
+
+    .baking-all-link{
+        display:inline-block;
+        margin-top:14px;
+        font-size:1rem;
     }
 
 
+    /* 书架：与电影卡片一致的自动横向无缝轮播 */
     .book-library{
 
         width:100%;
 
+        height:auto;
+
+        margin-top:24px;
+
+        overflow:hidden;
+
+        padding-left:25px;
+
+    }
+
+    .book-track{
+
+        display:flex;
+
+        flex-direction:row;
+
+        gap:14px;
+
+        overflow:visible;
+
+        /* 末尾补一个 gap，保证两份内容 -50% 处无缝衔接 */
+        padding:6px 14px 14px 0;
+
+        width:max-content;
+
+        will-change:transform;
+
+        animation:bakingMarquee var(--marquee-duration, 12s) linear infinite;
+
+        scrollbar-width:none;
+
+    }
+
+    .book-track::-webkit-scrollbar{
+        display:none;
+    }
+
+    /* 鼠标悬停 / 手指按住时暂停，移开后恢复，与电影卡片一致 */
+    .book-library:hover .book-track,
+    .book-library:active .book-track{
+        animation-play-state:paused;
+    }
+
+    @keyframes bakingMarquee{
+        from{ transform:translateX(0); }
+        to{ transform:translateX(-50%); }
+    }
+
+    .book-item{
+
+        position:relative;
+
+        flex:0 0 auto;
+
+        width:120px;
+
+        display:block;
+
+        animation:none;
+
     }
 
 
-    .book-heading h2{
+    /* 卡片：与电影小卡片同尺寸同风格（薄荷绿底 + 圆角海报）
+       选择器加 .book-diary 前缀并显式 display:block，
+       避免与 books.css 手机端 .book-cover{display:none} 同名冲突 */
+    .book-diary .book-cover{
 
-        font-size:60px;
+        display:block;
+
+        width:120px;
+
+        height:180px;
+
+        max-height:180px;
+
+        padding:8px;
+
+        background:#b7ffe9;
+
+        border-radius:14px;
+
+        box-sizing:border-box;
+
+        box-shadow:0 10px 22px rgba(216,92,111,.18);
+
+        perspective:none;
 
     }
 
+    .book-diary .book-cover img{
+
+        width:100%;
+
+        height:100%;
+
+        max-height:100%;
+
+        object-fit:cover;
+
+        border-radius:9px;
+
+        box-shadow:none;
+
+        transition:none;
+
+    }
+
+    .book-diary .book-cover:hover img{
+        transform:none;
+    }
+
+    /* 手机端隐藏悬浮文字备注 */
+    .book-note{
+        position:static;
+        left:auto;
+        top:auto;
+        width:100%;
+        opacity:1;
+        transform:none;
+        margin-top:10px;
+        pointer-events:auto;
+    }
+
+    .book-note h3{
+        font-family:"MaokenAssortedSans","GochiHand",sans-serif;
+        font-size:13px;
+        font-weight:400;
+        line-height:1.3;
+        margin:0;
+        color:#9d3157;
+    }
+
+    .book-note p{
+        display:none;
+    }
+
+    .book-note time{
+        display:block;
+        font-family:"GochiHand",cursive;
+        font-size:11px;
+        margin-top:4px;
+        color:#ff7f9c;
+    }
+
+    /* 装饰小花在手机端可能遮挡卡片，藏起来 */
+    .flower{
+        display:none;
+    }
+
+    /* 无图占位卡片适配小尺寸 */
+    .book-diary .book-cover .cover-empty{
+        width:100%;
+        height:100%;
+        box-shadow:none;
+        border-radius:9px;
+        font-size:12px;
+    }
 
 }
 

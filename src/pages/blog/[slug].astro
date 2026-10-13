@@ -129,6 +129,7 @@ import "../../styles/global.css";
       <a href={`${import.meta.env.BASE_URL}blog/`} class="back-link">
         <span class="link-text">
           <span class="text-en">← back to blog</span>
+          <span class="text-short">← back</span>
           <span class="text-cn">← 返回博客</span>
         </span>
       </a>
@@ -143,6 +144,7 @@ import "../../styles/global.css";
             <span class="link-text">
               <span class="text-en">← prev</span>
               <span class="text-cn">← 上一篇</span>
+              <span class="text-short">←</span>
             </span>
           </a>
         ) : (
@@ -159,6 +161,7 @@ import "../../styles/global.css";
             <span class="link-text">
               <span class="text-en">next →</span>
               <span class="text-cn">下一篇 →</span>
+              <span class="text-short">→</span>
             </span>
           </a>
         ) : (

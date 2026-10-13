@@ -67,6 +67,14 @@ import "../styles/films-carousel.css";
         `<button class="page-nav-btn" data-index="${index}">${String(index + 1).padStart(2, "0")}</button>`
       ).join("") + `<a href="${base}film-records/" class="film-all-link">all →</a>`;
 
+      // 手机端：跳过 3D 封面流，卡片复制一份做无缝自动横向滚动
+      if (window.matchMedia("(max-width: 768px)").matches) {
+        track.classList.add("is-mobile-marquee");
+        track.innerHTML += track.innerHTML;
+        // 每张 1.6s，保证与烘焙轮播视觉速度一致
+        track.style.setProperty("--marquee-duration", `${films.length * 1.6}s`);
+        return;
+      }
       initCarousel(track, container);
     } catch (e) {
       track.innerHTML = '<div style="padding:2rem;color:#999;">Failed to load films.</div>';

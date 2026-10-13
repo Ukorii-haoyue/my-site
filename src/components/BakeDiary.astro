@@ -57,12 +57,18 @@ import "../styles/bake-diary.css";
             <div class="book-cover">${cover}</div>
             <div class="book-note">
               <h3>${book.title}</h3>
-              <small>烘焙日记</small>
               <p>${book.description || ""}</p>
               <time>${month}</time>
             </div>
           </article>`;
       }).join("");
+
+      // 手机端：卡片复制一份，做与电影卡片一致的无缝自动横向轮播
+      if (window.matchMedia("(max-width: 768px)").matches) {
+        track.innerHTML += track.innerHTML;
+        // 每张 1.6s，与电影轮播视觉速度一致
+        track.style.setProperty("--marquee-duration", `${records.length * 1.6}s`);
+      }
     } catch (e) {
       track.innerHTML = '<div style="padding:2rem;color:#999;">Failed to load baking diary.</div>';
     }

@@ -208,24 +208,50 @@
     padding: 40px 25px 60px;
   }
 
-  .blog-row {
-    grid-template-columns: 45px 1fr 40px;
-    min-height: 100px;
+  /* 隐藏右上角小字 "Blog" */
+  .blog-header-center {
+    display: none;
   }
 
+  /* 大标题与首页其他区块手机端字号保持一致 */
+  .blog-header-left {
+    font-size: 30px;
+    letter-spacing: 2px;
+  }
+
+  .blog-row {
+    grid-template-columns: 32px 1fr 38px;
+    min-height: auto;
+    gap: 12px;
+    padding: 18px 0;
+    align-items: center;
+  }
+
+  /* 博客标题：字号缩小，最多两行 */
   .blog-row-info h3 {
-    font-size: 28px;
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.35;
+    margin: 0 0 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .blog-date {
+    font-size: 13px;
   }
 
   .blog-arrow {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
+    width: 38px;
+    height: 38px;
+    font-size: 17px;
   }
 
   .blog-row:hover {
-    padding-left: 15px;
-    padding-right: 15px;
+    padding-left: 0;
+    padding-right: 0;
   }
 
 }

@@ -174,9 +174,9 @@
 
 
 @media (max-width:768px){
+    /* 手机端隐藏整个 timeline 区块，避免 8 列网格与悬停照片在小屏上无法排版 */
     .timeline-section{
-        grid-template-columns:repeat(4, 1fr);
-        grid-template-rows:repeat(9, 1fr);
+        display:none;
     }
     .tl-grid{
         background-size:

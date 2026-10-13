@@ -462,29 +462,36 @@
         width: 100%;
         min-width: 0;
 
-        min-height: 45vh;
+        /* 手机端压缩标题板块，使整区块一屏可容纳 */
+        min-height: 0;
+
+        padding: 24px 25px 16px;
 
         border-right: none;
 
-        border-bottom: 1px solid #171717;
+        /* 去掉卡片上方的黑色分隔线 */
+        border-bottom: none;
     }
 
     .books-intro-top {
-        margin-bottom: 50px;
+        margin-bottom: 16px;
     }
 
     .books-intro h2 {
-        font-size: 64px;
+        /* 与首页其他区块手机端大标题字号一致 */
+        font-size: 30px;
+        line-height: 1;
     }
 
     .books-intro p {
-        margin-top: 50px;
+        margin-top: 14px;
+        margin-bottom: 12px;
     }
 
     .books-pages {
         width: 100%;
 
-        height: 70vh;
+        height: 58vh;
     }
 
     .book-page {
@@ -497,11 +504,11 @@
     }
 
     .book-content {
-        padding: 20px;
+        padding: 16px;
 
         grid-template-columns: 1fr 0.75fr;
 
-        gap: 15px;
+        gap: 12px;
     }
 
     .book-info h3 {
@@ -521,29 +528,32 @@
 @media (max-width: 600px) {
 
     .books-pages {
-        height: 80vh;
+        height: 52vh;
 
         overflow-x: auto;
     }
 
     .book-page {
-        min-width: 50px;
+        min-width: 44px;
     }
 
     .book-page:hover,
     .book-page.is-active {
         flex: 8;
 
-        min-width: 280px;
+        min-width: 230px;
     }
 
     .book-content {
         grid-template-columns: 1fr;
 
         overflow-y: auto;
+
+        padding: 14px;
     }
 
-    .book-cover {
+    /* 仅隐藏书籍区展开卡片里的封面，避免同名类误伤烘焙卡片 */
+    .books-pages .book-cover {
         display: none;
     }
 }

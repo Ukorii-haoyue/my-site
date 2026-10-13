@@ -31,7 +31,7 @@ import "../styles/friends.css";
 
     <button class="friend-apply-tab" id="friendApplyButton" type="button" aria-label="申请友链" aria-expanded="false">
       <span class="apply-tab-flower">✿</span>
-      <span class="apply-tab-text">申请<br />友链</span>
+      <span class="apply-tab-text">申请友链</span>
       <span class="apply-tab-arrow">‹</span>
     </button>
 
@@ -109,7 +109,7 @@ import "../styles/friends.css";
           <div class="friend-card-inner">
             ${friend.avatar_url
               ? `<img class="friend-avatar" src="${friend.avatar_url}" alt="${friend.name} avatar" loading="lazy" />`
-              : `<div class="friend-avatar friend-avatar-placeholder">♡</div>`}
+              : `<img class="friend-avatar friend-avatar-placeholder" src="/images/frog.png" alt="default avatar" />`}
             <div class="friend-info">
               <h3>${friend.name}</h3>
               ${friend.description ? `<p>${friend.description}</p>` : ""}
