@@ -1,0 +1,276 @@
+---
+// src/pages/404.astro
+// GitHub Pages 是纯静态托管：后台新增内容后，正文页 URL
+// （如 /film-records/新id/）在构建产物里没有对应文件，会落到 404.html。
+// 此页按 URL 路径在浏览器端拉取 Supabase 数据并渲染对应正文；
+// 已存在的旧正文页仍走构建时静态 HTML，不受影响。
+import "../styles/film-records.css";
+import "../styles/film-detail.css";
+import "../styles/book-records.css";
+import "../styles/book-detail.css";
+import "../styles/blog-records.css";
+import "../styles/blog-detail.css";
+import "../styles/cursor.css";
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <link rel="icon" type="image/png" href="/images/cursor3.png" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Not Found · Uko's Diary</title>
+</head>
+<body>
+  <main id="detail-root">
+    <div style="padding: 90px 20px; text-align: center; color: #c896a6;">
+      Loading... ♡
+    </div>
+  </main>
+
+  <script>
+    import { supabase } from "../lib/supabase.js";
+
+    const base = import.meta.env.BASE_URL;
+    const root = document.getElementById("detail-root");
+
+    function splitParagraphs(text) {
+      if (!text) return [];
+      return text
+        .split(/\n+/)
+        .map((line) => line.trim())
+        .filter(Boolean);
+    }
+
+    function formatNoteDate(value) {
+      if (!value) return "";
+      const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Shanghai",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      }).formatToParts(new Date(value));
+      const get = (t) => parts.find((p) => p.type === t)?.value ?? "";
+      return `${get("year")}.${get("month")}.${get("day")} ${get("hour")}:${get("minute")}`;
+    }
+
+    function esc(s) {
+      return String(s ?? "").replace(/[&<>"']/g, (c) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+      }[c]));
+    }
+
+    function renderNotFound() {
+      document.title = "Not Found · Uko's Diary";
+      root.className = "film-records";
+      root.innerHTML = `
+        <a href="${base}" class="back-link">← back</a>
+        <div style="padding: 100px 20px; text-align: center;">
+          <p class="small-title">404</p>
+          <h1 style="font-family: 'GochiHand', cursive; color:#ff7896;">Not found ♡</h1>
+          <p style="color:#b86b82;">This little page has wandered off.</p>
+        </div>
+      `;
+    }
+
+    /* =========================
+       电影正文
+    ========================= */
+    async function renderFilm(id) {
+      const { data: film, error } = await supabase
+        .from("films")
+        .select("id, title, year, director, image_url, description, created_at")
+        .eq("id", id)
+        .single();
+
+      if (error || !film) { renderNotFound(); return; }
+
+      const { data: all } = await supabase
+        .from("films").select("id, title").order("id", { ascending: true });
+      const list = all ?? [];
+      const idx = list.findIndex((x) => x.id === film.id);
+      const prev = idx > 0 ? list[idx - 1] : null;
+      const next = idx < list.length - 1 ? list[idx + 1] : null;
+      const no = String(idx + 1).padStart(2, "0");
+      const paras = splitParagraphs(film.description);
+      const noteDate = formatNoteDate(film.created_at);
+
+      document.title = `${film.title} · My Film Diary`;
+
+      root.className = "film-records film-detail-page";
+      root.innerHTML = `
+        <nav class="detail-topbar">
+          <a href="${base}film-records/" class="back-link">
+            <span class="link-text">
+              <span class="text-en">← back to films</span>
+              <span class="text-short">← back</span>
+              <span class="text-cn">← 返回电影</span>
+            </span>
+          </a>
+          <div class="topbar-nav">
+            ${prev ? `<a href="${base}film-records/${prev.id}/" class="topbar-nav-link"><span class="link-text"><span class="text-en">← prev</span><span class="text-cn">← 上一篇</span><span class="text-short">←</span></span></a>` : `<span class="topbar-nav-link is-empty"></span>`}
+            <span class="topbar-no">NO.${no}</span>
+            ${next ? `<a href="${base}film-records/${next.id}/" class="topbar-nav-link"><span class="link-text"><span class="text-en">next →</span><span class="text-cn">下一篇 →</span><span class="text-short">→</span></span></a>` : `<span class="topbar-nav-link is-empty"></span>`}
+          </div>
+        </nav>
+        <section class="detail-grid">
+          <aside class="film-side">
+            <figure class="poster-frame">
+              ${film.image_url ? `<img src="${esc(film.image_url)}" alt="${esc(film.title)} 海报" />` : `<div class="poster-empty">No poster ♡</div>`}
+            </figure>
+            <div class="film-side-info">
+              <h1 class="detail-title">${esc(film.title)}</h1>
+              <p class="detail-meta"><span>${esc(film.year)}</span><span class="dot">·</span><span>${esc(film.director)}</span></p>
+            </div>
+          </aside>
+          <article class="note-card">
+            <h2 class="note-heading">film note</h2>
+            <div class="note-body">
+              ${paras.length > 0
+                ? paras.map((p) => `<p class="note-paragraph">${esc(p)}</p>`).join("")
+                : `<p class="note-paragraph empty-note">A little note is waiting to be written...</p>`}
+            </div>
+            <p class="note-date">${noteDate ? `${noteDate} ♡` : "Uko's little film note ♡"}</p>
+          </article>
+        </section>
+      `;
+    }
+
+    /* =========================
+       书籍正文
+    ========================= */
+    async function renderBook(id) {
+      const { data: book, error } = await supabase
+        .from("books")
+        .select("id, title, author, description, image_url, created_at")
+        .eq("id", id)
+        .single();
+
+      if (error || !book) { renderNotFound(); return; }
+
+      const { data: all } = await supabase
+        .from("books").select("id, title").order("id", { ascending: true });
+      const list = all ?? [];
+      const idx = list.findIndex((x) => x.id === book.id);
+      const prev = idx > 0 ? list[idx - 1] : null;
+      const next = idx < list.length - 1 ? list[idx + 1] : null;
+      const no = String(idx + 1).padStart(2, "0");
+      const paras = splitParagraphs(book.description);
+      const noteDate = formatNoteDate(book.created_at);
+
+      document.title = `${book.title} · My Book Diary`;
+
+      root.className = "book-records book-detail-page";
+      root.innerHTML = `
+        <nav class="detail-topbar">
+          <a href="${base}book-records/" class="back-link">
+            <span class="link-text">
+              <span class="text-en">← back to books</span>
+              <span class="text-short">← back</span>
+              <span class="text-cn">← 返回书籍</span>
+            </span>
+          </a>
+          <div class="topbar-nav">
+            ${prev ? `<a href="${base}book-records/${prev.id}/" class="topbar-nav-link"><span class="link-text"><span class="text-en">← prev</span><span class="text-cn">← 上一篇</span><span class="text-short">←</span></span></a>` : `<span class="topbar-nav-link is-empty"></span>`}
+            <span class="topbar-no">NO.${no}</span>
+            ${next ? `<a href="${base}book-records/${next.id}/" class="topbar-nav-link"><span class="link-text"><span class="text-en">next →</span><span class="text-cn">下一篇 →</span><span class="text-short">→</span></span></a>` : `<span class="topbar-nav-link is-empty"></span>`}
+          </div>
+        </nav>
+        <section class="detail-grid">
+          <aside class="book-side">
+            <figure class="detail-cover-frame">
+              ${book.image_url ? `<img src="${esc(book.image_url)}" alt="${esc(book.title)} 封面" />` : `<div class="cover-empty">No cover ♡</div>`}
+            </figure>
+            <div class="book-side-info">
+              <h1 class="detail-title">${esc(book.title)}</h1>
+              <p class="detail-meta"><span>${esc(book.author)}</span></p>
+            </div>
+          </aside>
+          <article class="note-card">
+            <h2 class="note-heading">book note</h2>
+            <div class="note-body">
+              ${paras.length > 0
+                ? paras.map((p) => `<p class="note-paragraph">${esc(p)}</p>`).join("")
+                : `<p class="note-paragraph empty-note">A little note is waiting to be written...</p>`}
+            </div>
+            <p class="note-date">${noteDate ? `${noteDate} ♡` : "Uko's little book note ♡"}</p>
+          </article>
+        </section>
+      `;
+    }
+
+    /* =========================
+       博客正文
+    ========================= */
+    async function renderBlog(id) {
+      const { data: post, error } = await supabase
+        .from("blogs")
+        .select("id, title, content, created_at")
+        .eq("id", id)
+        .eq("is_visible", true)
+        .single();
+
+      if (error || !post) { renderNotFound(); return; }
+
+      const { data: all } = await supabase
+        .from("blogs").select("id, title").eq("is_visible", true).order("created_at", { ascending: false });
+      const list = all ?? [];
+      const idx = list.findIndex((x) => x.id === post.id);
+      const prev = idx > 0 ? list[idx - 1] : null;
+      const next = idx < list.length - 1 ? list[idx + 1] : null;
+      const no = String(idx + 1).padStart(2, "0");
+      const paras = splitParagraphs(post.content);
+      const noteDate = formatNoteDate(post.created_at);
+
+      document.title = `${post.title} · My Blog`;
+
+      root.className = "blog-records blog-detail-page";
+      root.innerHTML = `
+        <nav class="detail-topbar">
+          <a href="${base}blog/" class="back-link">
+            <span class="link-text">
+              <span class="text-en">← back to blog</span>
+              <span class="text-short">← back</span>
+              <span class="text-cn">← 返回博客</span>
+            </span>
+          </a>
+          <div class="topbar-nav">
+            ${prev ? `<a href="${base}blog/${prev.id}/" class="topbar-nav-link"><span class="link-text"><span class="text-en">← prev</span><span class="text-cn">← 上一篇</span><span class="text-short">←</span></span></a>` : `<span class="topbar-nav-link is-empty"></span>`}
+            <span class="topbar-no">NO.${no}</span>
+            ${next ? `<a href="${base}blog/${next.id}/" class="topbar-nav-link"><span class="link-text"><span class="text-en">next →</span><span class="text-cn">下一篇 →</span><span class="text-short">→</span></span></a>` : `<span class="topbar-nav-link is-empty"></span>`}
+          </div>
+        </nav>
+        <article class="blog-note-card">
+          <h1 class="blog-note-title">${esc(post.title)}</h1>
+          <p class="blog-note-meta">${noteDate ? noteDate : "Uko's little blog ♡"}</p>
+          <div class="blog-note-body">
+            ${paras.length > 0
+              ? paras.map((p) => `<p class="note-paragraph">${esc(p)}</p>`).join("")
+              : `<p class="note-paragraph empty-note">A little post is waiting to be written...</p>`}
+          </div>
+        </article>
+      `;
+    }
+
+    /* =========================
+       根据 URL 分发
+    ========================= */
+    (async function route() {
+      const path = location.pathname;
+      let m;
+      if ((m = path.match(/\/film-records\/(\d+)\/?$/))) {
+        await renderFilm(Number(m[1]));
+      } else if ((m = path.match(/\/book-records\/(\d+)\/?$/))) {
+        await renderBook(Number(m[1]));
+      } else if ((m = path.match(/\/blog\/(\d+)\/?$/))) {
+        await renderBlog(Number(m[1]));
+      } else {
+        renderNotFound();
+      }
+    })();
+  </script>
+</body>
+</html>

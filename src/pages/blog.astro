@@ -1,35 +1,8 @@
 ﻿---
 // src/pages/blog.astro
-// 博客列表：构建时从 Supabase blogs 表读取（只读已发布）
+// 博客列表：改为浏览器端实时从 Supabase 读取，
+// 后台新增/更新文章后无需重新部署即可在列表看到。
 import "../styles/blog-records.css";
-import { supabase } from "../lib/supabase.js";
-
-const {
-  data: posts,
-  error,
-} = await supabase
-  .from("blogs")
-  .select("id, title, created_at")
-  .eq("is_visible", true)
-  .order("created_at", { ascending: false });
-
-if (error) {
-  console.error("读取博客失败：", error);
-}
-
-// created_at 按北京时间格式化为 YYYY.MM.DD
-const formatDate = (value) => {
-  if (!value) return "";
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Shanghai",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(new Date(value));
-  const get = (type) =>
-    parts.find((part) => part.type === type)?.value ?? "";
-  return `${get("year")}.${get("month")}.${get("day")}`;
-};
 import "../styles/global.css";
 ---
 
@@ -70,42 +43,9 @@ import "../styles/global.css";
     </header>
 
 
-    <!-- 博客列表（点击进入文章详情页） -->
-    <section class="blog-list">
-
-      {posts && posts.length > 0 ? (
-        posts.map((post, index) => (
-          <a
-            href={`${import.meta.env.BASE_URL}blog/${post.id}/`}
-            class="blog-record"
-          >
-
-            <div class="blog-number">
-              {String(index + 1).padStart(2, "0")}
-            </div>
-
-            <div class="blog-info">
-
-              <h2>{post.title}</h2>
-
-              <div class="blog-meta">
-                <span>{formatDate(post.created_at)}</span>
-              </div>
-
-            </div>
-
-            <div class="blog-arrow">
-              ↗
-            </div>
-
-          </a>
-        ))
-      ) : (
-        <div class="empty-blogs">
-          No posts yet ♡
-        </div>
-      )}
-
+    <!-- 博客列表（浏览器端填充） -->
+    <section class="blog-list" id="blog-list">
+      <div class="empty-blogs">Loading posts...♡</div>
     </section>
 
 
@@ -117,6 +57,61 @@ import "../styles/global.css";
     </footer>
 
   </main>
+
+  <script>
+    import { supabase } from "../lib/supabase.js";
+
+    const base = import.meta.env.BASE_URL;
+
+    // created_at 按北京时间格式化为 YYYY.MM.DD
+    function formatDate(value) {
+      if (!value) return "";
+      const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Shanghai",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).formatToParts(new Date(value));
+      const get = (t) => parts.find((p) => p.type === t)?.value ?? "";
+      return `${get("year")}.${get("month")}.${get("day")}`;
+    }
+
+    async function loadPosts() {
+      const list = document.getElementById("blog-list");
+
+      const { data, error } = await supabase
+        .from("blogs")
+        .select("id, title, created_at")
+        .eq("is_visible", true)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("读取博客失败：", error);
+        list.innerHTML = '<div class="empty-blogs">Failed to load posts.</div>';
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        list.innerHTML = '<div class="empty-blogs">No posts yet ♡</div>';
+        return;
+      }
+
+      list.innerHTML = data.map((post, index) => `
+        <a href="${base}blog/${post.id}/" class="blog-record">
+          <div class="blog-number">${String(index + 1).padStart(2, "0")}</div>
+          <div class="blog-info">
+            <h2>${post.title ?? ""}</h2>
+            <div class="blog-meta">
+              <span>${formatDate(post.created_at)}</span>
+            </div>
+          </div>
+          <div class="blog-arrow">↗</div>
+        </a>
+      `).join("");
+    }
+
+    loadPosts();
+  </script>
 
 </body>
 </html>

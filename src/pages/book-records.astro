@@ -1,20 +1,8 @@
 ---
 // src/pages/book-records.astro
-// 书单列表：构建时从 Supabase books 表读取
+// 书单列表：改为浏览器端实时从 Supabase 读取，
+// 后台新增/更新书籍后无需重新部署即可在列表看到。
 import "../styles/book-records.css";
-import { supabase } from "../lib/supabase.js";
-
-const {
-  data: books,
-  error,
-} = await supabase
-  .from("books")
-  .select("id, title, author, description, image_url")
-  .order("id", { ascending: true });
-
-if (error) {
-  console.error("读取书籍失败：", error);
-}
 import "../styles/global.css";
 ---
 
@@ -59,58 +47,14 @@ import "../styles/global.css";
     </header>
 
 
-    <!-- 书籍列表（点击进入这本书的随笔 / 摘抄详情页） -->
+    <!-- 书籍列表（浏览器端填充） -->
     <section class="book-list" id="book-list">
-
-      {books && books.length > 0 ? (
-        books.map((book, index) => (
-
-          <a
-            class="book-record"
-            href={`${import.meta.env.BASE_URL}book-records/${book.id}/`}
-          >
-
-            <!-- 编号 -->
-            <div class="book-number">
-              {String(index + 1).padStart(2, "0")}
-            </div>
-
-
-            <!-- 书籍信息 -->
-            <div class="book-info">
-
-              <h2>
-                {book.title}
-              </h2>
-
-              <div class="book-meta">
-                <span>
-                  {book.author}
-                </span>
-              </div>
-
-            </div>
-
-
-            <!-- 右侧装饰 -->
-            <div class="book-mark">
-              ♡
-            </div>
-
-          </a>
-
-        ))
-      ) : (
-        <div class="empty-books">
-          No books yet ♡
-        </div>
-      )}
-
+      <div class="empty-books">Loading books...♡</div>
     </section>
 
 
     <!-- 翻页工具 -->
-    <nav class="records-pager" id="book-pager" aria-label="翻页">
+    <nav class="records-pager" id="book-pager" aria-label="翻页" style="display: none;">
       <button type="button" class="pager-btn" data-pager="prev">← prev</button>
       <span class="pager-info">NO.1 / 1</span>
       <button type="button" class="pager-btn" data-pager="next">next →</button>
@@ -119,30 +63,24 @@ import "../styles/global.css";
 
     <!-- 底部 -->
     <footer class="records-footer">
-
-      <span>
-        Uko's Diary
-      </span>
-
-      <span>
-        ♡
-      </span>
-
-      <span>
-        My little library
-      </span>
-
+      <span>Uko's Diary</span>
+      <span>♡</span>
+      <span>My little library</span>
     </footer>
 
   </main>
 
   <script>
-    // 书籍列表翻页：每页 6 条，上一页 / 下一页切换
-    const PER_PAGE = 6;
-    const list = document.getElementById("book-list");
-    const pager = document.getElementById("book-pager");
+    import { supabase } from "../lib/supabase.js";
 
-    if (list && pager) {
+    const base = import.meta.env.BASE_URL;
+    const PER_PAGE = 6;
+
+    function setupPagination() {
+      const list = document.getElementById("book-list");
+      const pager = document.getElementById("book-pager");
+      if (!list || !pager) return;
+
       const items = list.querySelectorAll(".book-record");
       const totalPages = Math.max(1, Math.ceil(items.length / PER_PAGE));
       let current = 1;
@@ -163,24 +101,59 @@ import "../styles/global.css";
 
       if (items.length <= PER_PAGE) {
         pager.style.display = "none";
-      } else {
-        prevBtn.addEventListener("click", () => {
-          if (current <= 1) return;
-          current -= 1;
-          render();
-          list.scrollIntoView({ behavior: "smooth", block: "start" });
-        });
-        nextBtn.addEventListener("click", () => {
-          if (current >= totalPages) return;
-          current += 1;
-          render();
-          list.scrollIntoView({ behavior: "smooth", block: "start" });
-        });
-        render();
+        return;
       }
+      pager.style.display = "";
+      prevBtn.onclick = () => {
+        if (current <= 1) return;
+        current -= 1;
+        render();
+      };
+      nextBtn.onclick = () => {
+        if (current >= totalPages) return;
+        current += 1;
+        render();
+      };
+      render();
     }
+
+    async function loadBooks() {
+      const list = document.getElementById("book-list");
+
+      const { data, error } = await supabase
+        .from("books")
+        .select("id, title, author")
+        .order("id", { ascending: true });
+
+      if (error) {
+        console.error("读取书籍失败：", error);
+        list.innerHTML = '<div class="empty-books">Failed to load books.</div>';
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        list.innerHTML = '<div class="empty-books">No books yet ♡</div>';
+        return;
+      }
+
+      list.innerHTML = data.map((book, index) => `
+        <a class="book-record" href="${base}book-records/${book.id}/">
+          <div class="book-number">${String(index + 1).padStart(2, "0")}</div>
+          <div class="book-info">
+            <h2>${book.title ?? ""}</h2>
+            <div class="book-meta">
+              <span>${book.author ?? ""}</span>
+            </div>
+          </div>
+          <div class="book-mark">♡</div>
+        </a>
+      `).join("");
+
+      setupPagination();
+    }
+
+    loadBooks();
   </script>
 
 </body>
-
 </html>
