@@ -12,6 +12,20 @@
 }
 
 
+@font-face {
+  font-family: "MaokenAssortedSans";
+
+  src: url("/fonts/猫啃什锦黑1.70/MaokenAssortedSans.ttf")
+    format("truetype");
+
+  font-weight: normal;
+
+  font-style: normal;
+
+  font-display: swap;
+}
+
+
 /* =========================
    基础
 ========================= */
@@ -164,7 +178,17 @@ body {
 
   line-height: 1.5;
 
-  color: #b86b82;
+  color: #ff7f9c;
+}
+
+
+/* 中文说明文字使用猫啃什锦黑，英文保持 GochiHand */
+.intro .intro-cn {
+
+  font-family:
+    "MaokenAssortedSans",
+    "猫啃什锦黑",
+    sans-serif;
 }
 
 
@@ -529,6 +553,10 @@ body {
 
 .message-date {
 
+  font-family:
+    "GochiHand",
+    cursive;
+
   font-size: 12px;
 
   color: #c896a6;
@@ -669,6 +697,15 @@ body {
   .guestbook-header h1 {
 
     font-size: 75px;
+  }
+
+
+  /* 说明文字缩小到与电影/书籍/烘焙列表页一致 */
+  .intro {
+
+    font-size: 14px;
+
+    line-height: 1.75;
   }
 
 

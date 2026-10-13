@@ -135,6 +135,11 @@ body {
   color: #ff7896;
 }
 
+/* 中文说明文字使用猫啃什锦黑，英文保持 GochiHand */
+.intro .intro-cn {
+  font-family: "MaokenAssortedSans", "猫啃什锦黑", sans-serif;
+}
+
 
 /* =========================
    博客列表
