@@ -146,7 +146,7 @@ import "../styles/global.css";
       }
 
       list.innerHTML = data.map((film, index) => `
-        <a href="${base}/film-records/${film.id}/" class="film-record">
+        <a href="${base}film-records/${film.id}/" class="film-record">
           <div class="film-number">${String(index + 1).padStart(2, "0")}</div>
           <div class="film-info">
             <h2>${film.title ?? ""}</h2>

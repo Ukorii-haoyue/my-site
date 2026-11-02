@@ -126,7 +126,7 @@ import "../../styles/global.css";
     <!-- 顶部：返回 + 上下篇 -->
     <nav class="detail-topbar">
 
-      <a href={`${import.meta.env.BASE_URL}/blog/`} class="back-link">
+      <a href={`${import.meta.env.BASE_URL}blog/`} class="back-link">
         <span class="link-text">
           <span class="text-en">← back to blog</span>
           <span class="text-short">← back</span>
@@ -138,7 +138,7 @@ import "../../styles/global.css";
 
         {prevPost ? (
           <a
-            href={`${import.meta.env.BASE_URL}/blog/${prevPost.id}/`}
+            href={`${import.meta.env.BASE_URL}blog/${prevPost.id}/`}
             class="topbar-nav-link"
           >
             <span class="link-text">
@@ -155,7 +155,7 @@ import "../../styles/global.css";
 
         {nextPost ? (
           <a
-            href={`${import.meta.env.BASE_URL}/blog/${nextPost.id}/`}
+            href={`${import.meta.env.BASE_URL}blog/${nextPost.id}/`}
             class="topbar-nav-link"
           >
             <span class="link-text">

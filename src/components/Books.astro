@@ -12,7 +12,7 @@ import "../styles/books.css";
       I've<br />
       Read
     </h2>
-    <a href={`${import.meta.env.BASE_URL}/book-records/`} class="book-all-link">all →</a>
+    <a href={`${import.meta.env.BASE_URL}book-records/`} class="book-all-link">all →</a>
   </div>
 
   <!-- 书页区域（客户端填充） -->
@@ -68,7 +68,7 @@ import "../styles/books.css";
                 <div class="book-info">
                   <h3>${book.title}</h3>
                   <p class="book-author">${book.author || ""}</p>
-                  <a class="book-note-link" href="${base}/book-records/${book.id}/">read my note <span>↗</span></a>
+                  <a class="book-note-link" href="${base}book-records/${book.id}/">read my note <span>↗</span></a>
                 </div>
                 <div class="book-cover">
                   <div class="cover-frame">${cover}</div>

@@ -103,7 +103,7 @@ import "../styles/cursor.css";
       root.className = "film-records film-detail-page";
       root.innerHTML = `
         <nav class="detail-topbar">
-          <a href="${base}/film-records/" class="back-link">
+          <a href="${base}film-records/" class="back-link">
             <span class="link-text">
               <span class="text-en">← back to films</span>
               <span class="text-short">← back</span>
@@ -111,9 +111,9 @@ import "../styles/cursor.css";
             </span>
           </a>
           <div class="topbar-nav">
-            ${prev ? `<a href="${base}/film-records/${prev.id}/" class="topbar-nav-link"><span class="link-text"><span class="text-en">← prev</span><span class="text-cn">← 上一篇</span><span class="text-short">←</span></span></a>` : `<span class="topbar-nav-link is-empty"></span>`}
+            ${prev ? `<a href="${base}film-records/${prev.id}/" class="topbar-nav-link"><span class="link-text"><span class="text-en">← prev</span><span class="text-cn">← 上一篇</span><span class="text-short">←</span></span></a>` : `<span class="topbar-nav-link is-empty"></span>`}
             <span class="topbar-no">NO.${no}</span>
-            ${next ? `<a href="${base}/film-records/${next.id}/" class="topbar-nav-link"><span class="link-text"><span class="text-en">next →</span><span class="text-cn">下一篇 →</span><span class="text-short">→</span></span></a>` : `<span class="topbar-nav-link is-empty"></span>`}
+            ${next ? `<a href="${base}film-records/${next.id}/" class="topbar-nav-link"><span class="link-text"><span class="text-en">next →</span><span class="text-cn">下一篇 →</span><span class="text-short">→</span></span></a>` : `<span class="topbar-nav-link is-empty"></span>`}
           </div>
         </nav>
         <section class="detail-grid">
@@ -166,7 +166,7 @@ import "../styles/cursor.css";
       root.className = "book-records book-detail-page";
       root.innerHTML = `
         <nav class="detail-topbar">
-          <a href="${base}/book-records/" class="back-link">
+          <a href="${base}book-records/" class="back-link">
             <span class="link-text">
               <span class="text-en">← back to books</span>
               <span class="text-short">← back</span>
@@ -174,9 +174,9 @@ import "../styles/cursor.css";
             </span>
           </a>
           <div class="topbar-nav">
-            ${prev ? `<a href="${base}/book-records/${prev.id}/" class="topbar-nav-link"><span class="link-text"><span class="text-en">← prev</span><span class="text-cn">← 上一篇</span><span class="text-short">←</span></span></a>` : `<span class="topbar-nav-link is-empty"></span>`}
+            ${prev ? `<a href="${base}book-records/${prev.id}/" class="topbar-nav-link"><span class="link-text"><span class="text-en">← prev</span><span class="text-cn">← 上一篇</span><span class="text-short">←</span></span></a>` : `<span class="topbar-nav-link is-empty"></span>`}
             <span class="topbar-no">NO.${no}</span>
-            ${next ? `<a href="${base}/book-records/${next.id}/" class="topbar-nav-link"><span class="link-text"><span class="text-en">next →</span><span class="text-cn">下一篇 →</span><span class="text-short">→</span></span></a>` : `<span class="topbar-nav-link is-empty"></span>`}
+            ${next ? `<a href="${base}book-records/${next.id}/" class="topbar-nav-link"><span class="link-text"><span class="text-en">next →</span><span class="text-cn">下一篇 →</span><span class="text-short">→</span></span></a>` : `<span class="topbar-nav-link is-empty"></span>`}
           </div>
         </nav>
         <section class="detail-grid">
@@ -230,7 +230,7 @@ import "../styles/cursor.css";
       root.className = "blog-records blog-detail-page";
       root.innerHTML = `
         <nav class="detail-topbar">
-          <a href="${base}/blog/" class="back-link">
+          <a href="${base}blog/" class="back-link">
             <span class="link-text">
               <span class="text-en">← back to blog</span>
               <span class="text-short">← back</span>
@@ -238,9 +238,9 @@ import "../styles/cursor.css";
             </span>
           </a>
           <div class="topbar-nav">
-            ${prev ? `<a href="${base}/blog/${prev.id}/" class="topbar-nav-link"><span class="link-text"><span class="text-en">← prev</span><span class="text-cn">← 上一篇</span><span class="text-short">←</span></span></a>` : `<span class="topbar-nav-link is-empty"></span>`}
+            ${prev ? `<a href="${base}blog/${prev.id}/" class="topbar-nav-link"><span class="link-text"><span class="text-en">← prev</span><span class="text-cn">← 上一篇</span><span class="text-short">←</span></span></a>` : `<span class="topbar-nav-link is-empty"></span>`}
             <span class="topbar-no">NO.${no}</span>
-            ${next ? `<a href="${base}/blog/${next.id}/" class="topbar-nav-link"><span class="link-text"><span class="text-en">next →</span><span class="text-cn">下一篇 →</span><span class="text-short">→</span></span></a>` : `<span class="topbar-nav-link is-empty"></span>`}
+            ${next ? `<a href="${base}blog/${next.id}/" class="topbar-nav-link"><span class="link-text"><span class="text-en">next →</span><span class="text-cn">下一篇 →</span><span class="text-short">→</span></span></a>` : `<span class="topbar-nav-link is-empty"></span>`}
           </div>
         </nav>
         <article class="blog-note-card">
