@@ -1,4 +1,4 @@
-﻿---
+---
 // src/pages/book-records/[slug].astro
 // 单本书详情页：参数 [slug] 实际放的是 books.id
 // 构建时从 Supabase 查询这本书，description 即随笔 / 摘抄正文
@@ -123,7 +123,7 @@ import "../../styles/global.css";
     <!-- 顶部：返回 + 上下本 -->
     <nav class="detail-topbar">
 
-      <a href={`${import.meta.env.BASE_URL}book-records/`} class="back-link">
+      <a href={`${import.meta.env.BASE_URL}/book-records/`} class="back-link">
         <span class="link-text">
           <span class="text-en">← back to books</span>
           <span class="text-short">← back</span>
@@ -135,7 +135,7 @@ import "../../styles/global.css";
 
         {prevBook ? (
           <a
-            href={`${import.meta.env.BASE_URL}book-records/${prevBook.id}/`}
+            href={`${import.meta.env.BASE_URL}/book-records/${prevBook.id}/`}
             class="topbar-nav-link"
           >
             <span class="link-text">
@@ -152,7 +152,7 @@ import "../../styles/global.css";
 
         {nextBook ? (
           <a
-            href={`${import.meta.env.BASE_URL}book-records/${nextBook.id}/`}
+            href={`${import.meta.env.BASE_URL}/book-records/${nextBook.id}/`}
             class="topbar-nav-link"
           >
             <span class="link-text">

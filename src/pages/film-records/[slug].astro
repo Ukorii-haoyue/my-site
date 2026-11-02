@@ -1,4 +1,4 @@
-﻿---
+---
 // src/pages/film-records/[slug].astro
 // 单部电影详情页：参数 [slug] 实际放的是 films.id
 // 构建时从 Supabase 查询这部电影，description 即 film note 正文
@@ -123,7 +123,7 @@ import "../../styles/global.css";
     <!-- 顶部：返回 + 上下篇 -->
     <nav class="detail-topbar">
 
-      <a href={`${import.meta.env.BASE_URL}film-records/`} class="back-link">
+      <a href={`${import.meta.env.BASE_URL}/film-records/`} class="back-link">
         <span class="link-text">
           <span class="text-en">← back to films</span>
           <span class="text-short">← back</span>
@@ -135,7 +135,7 @@ import "../../styles/global.css";
 
         {prevFilm ? (
           <a
-            href={`${import.meta.env.BASE_URL}film-records/${prevFilm.id}/`}
+            href={`${import.meta.env.BASE_URL}/film-records/${prevFilm.id}/`}
             class="topbar-nav-link"
           >
             <span class="link-text">
@@ -152,7 +152,7 @@ import "../../styles/global.css";
 
         {nextFilm ? (
           <a
-            href={`${import.meta.env.BASE_URL}film-records/${nextFilm.id}/`}
+            href={`${import.meta.env.BASE_URL}/film-records/${nextFilm.id}/`}
             class="topbar-nav-link"
           >
             <span class="link-text">

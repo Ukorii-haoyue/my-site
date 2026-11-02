@@ -1,4 +1,4 @@
-﻿---
+---
 import "../styles/about.css";
 import "../styles/cursor.css";
 import Footer from "../components/Footer.astro";
@@ -76,37 +76,37 @@ const formatNoticeDate = (value) => {
       <span class="en">home</span>
     </a>
 
-    <a href={`${import.meta.env.BASE_URL}#diary`}>
+    <a href={`${import.meta.env.BASE_URL}/#diary`}>
       <span class="zh">时间线</span>
       <span class="en">timeline</span>
     </a>
 
-    <a href={`${import.meta.env.BASE_URL}#blog`}>
+    <a href={`${import.meta.env.BASE_URL}/#blog`}>
       <span class="zh">博客</span>
       <span class="en">blog</span>
     </a>
 
-    <a href={`${import.meta.env.BASE_URL}#films`}>
+    <a href={`${import.meta.env.BASE_URL}/#films`}>
       <span class="zh">电影</span>
       <span class="en">films</span>
     </a>
 
-    <a href={`${import.meta.env.BASE_URL}#books`}>
+    <a href={`${import.meta.env.BASE_URL}/#books`}>
       <span class="zh">书籍</span>
       <span class="en">books</span>
     </a>
 
-    <a href={`${import.meta.env.BASE_URL}#baking`}>
+    <a href={`${import.meta.env.BASE_URL}/#baking`}>
       <span class="zh">烘焙</span>
       <span class="en">baking</span>
     </a>
 
-    <a href={`${import.meta.env.BASE_URL}#friends`}>
+    <a href={`${import.meta.env.BASE_URL}/#friends`}>
       <span class="zh">友链</span>
       <span class="en">friends</span>
     </a>
 
-    <a href={`${import.meta.env.BASE_URL}guestbook/`}>
+    <a href={`${import.meta.env.BASE_URL}/guestbook/`}>
       <span class="zh">留言板</span>
       <span class="en">guestbook</span>
     </a>
@@ -248,7 +248,12 @@ const formatNoticeDate = (value) => {
 
           <li>
             <span class="contact-label">Guestbook</span>
-            <a href={`${import.meta.env.BASE_URL}guestbook/`}>留言板</a>
+            <a href={`${import.meta.env.BASE_URL}/guestbook/`}>留言板</a>
+          </li>
+
+          <li>
+            <span class="contact-label">Friends</span>
+            <a href={`${import.meta.env.BASE_URL}/#friends`}>友链</a>
           </li>
 
         </ul>
@@ -282,7 +287,7 @@ const formatNoticeDate = (value) => {
               <p>
                 <a
                   class="notice-link"
-                  href={`${import.meta.env.BASE_URL}blog/${post.id}/`}
+                  href={`${import.meta.env.BASE_URL}/blog/${post.id}/`}
                 >
                   {post.title}
                 </a>

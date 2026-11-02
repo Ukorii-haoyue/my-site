@@ -123,7 +123,7 @@ import "../styles/global.css";
       const { data, error } = await supabase
         .from("books")
         .select("id, title, author")
-        .order("id", { ascending: true });
+        .order("id", { ascending: false });
 
       if (error) {
         console.error("读取书籍失败：", error);
@@ -137,7 +137,7 @@ import "../styles/global.css";
       }
 
       list.innerHTML = data.map((book, index) => `
-        <a class="book-record" href="${base}book-records/${book.id}/">
+        <a class="book-record" href="${base}/book-records/${book.id}/">
           <div class="book-number">${String(index + 1).padStart(2, "0")}</div>
           <div class="book-info">
             <h2>${book.title ?? ""}</h2>

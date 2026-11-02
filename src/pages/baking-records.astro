@@ -62,6 +62,14 @@ import "../styles/global.css";
     </section>
 
 
+    <!-- 翻页工具 -->
+    <nav class="records-pager" id="baking-pager" aria-label="翻页" style="display: none;">
+      <button type="button" class="pager-btn" data-pager="prev">← prev</button>
+      <span class="pager-info">NO.1 / 1</span>
+      <button type="button" class="pager-btn" data-pager="next">next →</button>
+    </nav>
+
+
     <!-- Footer -->
     <footer class="records-footer">
       <span>Uko's Diary</span>
@@ -76,9 +84,55 @@ import "../styles/global.css";
   <script>
     import { supabase } from "../lib/supabase.js";
 
+    const PER_PAGE = 6;
+
     // 后台日期为 YYYY-MM-DD，展示为 YYYY.MM.DD
     const formatDate = (value) =>
       value ? String(value).slice(0, 10).replaceAll("-", ".") : "";
+
+    /* =========================
+       翻页（与电影/书籍列表一致）
+    ========================= */
+    function setupPagination() {
+      const grid = document.getElementById("baking-grid");
+      const pager = document.getElementById("baking-pager");
+      if (!grid || !pager) return;
+
+      const items = grid.querySelectorAll(".baking-card");
+      const totalPages = Math.max(1, Math.ceil(items.length / PER_PAGE));
+      let current = 1;
+
+      const prevBtn = pager.querySelector('[data-pager="prev"]');
+      const nextBtn = pager.querySelector('[data-pager="next"]');
+      const info = pager.querySelector(".pager-info");
+
+      function render() {
+        items.forEach((item, i) => {
+          const page = Math.floor(i / PER_PAGE) + 1;
+          item.style.display = page === current ? "" : "none";
+        });
+        info.textContent = `NO.${current} / ${totalPages}`;
+        prevBtn.disabled = current <= 1;
+        nextBtn.disabled = current >= totalPages;
+      }
+
+      if (items.length <= PER_PAGE) {
+        pager.style.display = "none";
+        return;
+      }
+      pager.style.display = "";
+      prevBtn.onclick = () => {
+        if (current <= 1) return;
+        current -= 1;
+        render();
+      };
+      nextBtn.onclick = () => {
+        if (current >= totalPages) return;
+        current += 1;
+        render();
+      };
+      render();
+    }
 
     /* =========================
        渲染烘焙卡片
@@ -125,6 +179,7 @@ import "../styles/global.css";
       `).join("");
 
       initLikes();
+      setupPagination();
     }
 
     /* =========================

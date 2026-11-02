@@ -30,7 +30,7 @@ import "../styles/films-carousel.css";
     if (!track) return;
 
     try {
-      // 只取最新 10 部
+      // 只取最新 10 部：id 倒序 → 数组第 0 项就是最新上传的那部（序号 1）
       const { data: films, error } = await supabase
         .from("films")
         .select("id, title, image_url")
@@ -44,14 +44,12 @@ import "../styles/films-carousel.css";
         return;
       }
 
-      // 反转为正序显示
-      films.reverse();
-
+      // 不再 reverse：films[0] = 最新（序号 1），films[9] = 最老（序号 10）
       const base = import.meta.env.BASE_URL;
 
       track.innerHTML = films.map((film, index) => `
         <div class="carousel-item" data-index="${index}" data-title="${film.title}" data-id="${film.id}">
-          <a class="card-frame" href="${base}film-records/${film.id}/">
+          <a class="card-frame" href="${base}/film-records/${film.id}/">
             ${film.image_url
               ? `<img src="${film.image_url}" alt="${film.title}" class="card-img" />`
               : `<div class="card-empty"><span>${film.title}</span></div>`}
@@ -65,7 +63,7 @@ import "../styles/films-carousel.css";
 
       pagination.innerHTML = films.map((_, index) =>
         `<button class="page-nav-btn" data-index="${index}">${String(index + 1).padStart(2, "0")}</button>`
-      ).join("") + `<a href="${base}film-records/" class="film-all-link">all →</a>`;
+      ).join("") + `<a href="${base}/film-records/" class="film-all-link">all →</a>`;
 
       // 手机端：跳过 3D 封面流，卡片复制一份做无缝自动横向滚动
       if (window.matchMedia("(max-width: 768px)").matches) {
@@ -87,14 +85,23 @@ import "../styles/films-carousel.css";
     const titleDisplay = document.getElementById("carouselActiveTitle");
     const n = items.length;
 
-    // 默认停在最后一部（最新的）
-    let current = n - 1;
+    // 默认停在序号 1（最新上传的那部）
+    let current = 0;
     let hovering = false;
     let locked = false;
 
+    // 环形偏移：把 i - current 归一化到 [-n/2, n/2]，
+    // 这样序号 1 居中时，右侧依次是 #2 #3，左侧绕回最老的 #10。
+    function circularOffset(i) {
+      let off = i - current;
+      if (off > n / 2) off -= n;
+      if (off < -n / 2) off += n;
+      return off;
+    }
+
     function render() {
       items.forEach((item, i) => {
-        const offset = i - current;
+        const offset = circularOffset(i);
         if (offset === 0) {
           item.style.cssText = "transform:translate3d(0,0,0) rotate(0) scale(1.2);z-index:10;opacity:1;pointer-events:auto;";
           item.classList.add("active");
@@ -115,7 +122,8 @@ import "../styles/films-carousel.css";
     }
 
     function goTo(idx) {
-      current = Math.max(0, Math.min(n - 1, idx));
+      // 环形跳转：首尾相接形成循环
+      current = ((idx % n) + n) % n;
       render();
     }
 
@@ -138,22 +146,21 @@ import "../styles/films-carousel.css";
     container.onmouseenter = () => { hovering = true; };
     container.onmouseleave = () => { hovering = false; };
 
-    // 滚轮：只在鼠标悬停且还有可翻的片时才接管
+    // 滚轮：环形翻页，到首尾后绕回，不再阻断页面滚动
     window.addEventListener("wheel", (e) => {
       if (!hovering || locked) return;
 
-      if (e.deltaY > 0 && current < n - 1) {
+      if (e.deltaY > 0) {
         e.preventDefault();
         locked = true;
         goTo(current + 1);
         setTimeout(() => { locked = false; }, 500);
-      } else if (e.deltaY < 0 && current > 0) {
+      } else if (e.deltaY < 0) {
         e.preventDefault();
         locked = true;
         goTo(current - 1);
         setTimeout(() => { locked = false; }, 500);
       }
-      // 到边缘时不 preventDefault，页面正常滚动
     }, { passive: false });
 
     render();
